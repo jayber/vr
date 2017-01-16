@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <script src="https://aframe.io/releases/0.3.0/aframe.js"></script>
+    <script src="https://cdn.rawgit.com/AltspaceVR/aframe-altspace-component/master/dist/aframe-altspace-component.js"></script>
+    <script src="https://sdk.altvr.com/libs/altspace.js/0.24.4/altspace.js"></script>
+    <title>Throb!</title>
+</head>
+<body>
+
+<script src="script/main.js"></script>
+
+<a-scene debug altspace=''>
+
+    <a-assets>
+        <audio id="kick" src="audio/kick.WAV"></audio>
+        <img id="texture" src="img/noisetexture.png">
+        <canvas id="acanvas"></canvas>
+    </a-assets>
+
+    <a-entity id="beater" beat></a-entity>
+
+    <a-circle rotation="0 0 90" position="0 -0.5 0" radius="0.5" color="#fff" side="double"></a-circle>
+
+    <a-ring rotation="0 0 90" position="0 -0.5 0.01" geometry="radiusInner: 0.4; radiusOuter: 0.5" color="#000" side="double" animate-theta beat-listener="src:#beater">
+
+    </a-ring>
+
+
+    <a-sphere flash="on:beat; from:#6688ff; to:#fff; delay:150; dur:50"
+              n-sound="src:audio/kick.WAV; on:beat"
+              material="src:#texture; repeat:5 5; color: #6688ff" position="1 1 1" radius="0.5" beat-listener="src:#beater">
+        <a-animation attribute="scale" from="1 1 1" to="1.2 1.2 1.2" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
+    </a-sphere>
+
+</a-scene>
+
+
+</body>
+</html>

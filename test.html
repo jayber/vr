@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <script src="https://aframe.io/releases/0.3.0/aframe.js"></script>
+    <script src="https://cdn.rawgit.com/AltspaceVR/aframe-altspace-component/v1.3.1/dist/aframe-altspace-component.min.js"></script>
+    <title>beat</title>
+</head>
+<body>
+<script>
+    var bpm = 150;
+    var duration = 60000 / bpm;
+
+    AFRAME.registerComponent('animate-theta', {
+        init: function() {
+            var self = this;
+            self.beatTime = (new Date()).getTime();
+            this.el.addEventListener("beat", function(event) {
+                self.beatTime = (new Date()).getTime();
+            });
+        },
+        tick: function (time, timeDelta) {
+            var el = this.el;
+            var interval = (new Date()).getTime() - this.beatTime;
+            var beatFraction = interval / duration;
+            if (beatFraction < 1) {
+                el.setAttribute("geometry", "thetaLength", 360-(360 * beatFraction));
+            }
+        }
+    });
+
+    AFRAME.registerComponent('beater', {
+        init: function () {
+            var el = this.el;
+            var count = 0;
+            var player = setInterval(function () {
+                var sound = el.emit('beat');
+                console.log("beating");
+                count++;
+                if (count === 5) {
+                    clearInterval(player);
+                }
+            }, duration);
+        }
+    });
+
+</script>
+
+<a-scene debug altspace=''>
+
+    <a-circle rotation="0 0 90" position="0 -0.5 0" radius="0.5" color="#fff" side="double"></a-circle>
+
+    <a-ring rotation="0 0 90" position="0 -0.5 0.01" geometry="radiusInner: 0.4; radiusOuter: 0.5" color="#000" side="double" animate-theta beater>
+    </a-ring>
+
+</a-scene>
+
+</body>
+</html>
