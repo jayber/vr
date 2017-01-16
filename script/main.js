@@ -40,7 +40,7 @@ AFRAME.registerComponent('animate-theta', {
         var interval = (new Date()).getTime() - this.beatTime;
         var beatFraction = interval / duration;
         if (beatFraction < 1) {
-            el.setAttribute("geometry", "thetaLength", 360-(360 * beatFraction));
+            el.setAttribute("geometry", "thetaLength", (360 * beatFraction));
         }
     }
 });
