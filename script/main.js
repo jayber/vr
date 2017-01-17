@@ -1,28 +1,41 @@
-
-var bpm = 200;
+var bpm = 110;
 var duration = 60000 / bpm;
+var noOfSegments = 32;
 
 AFRAME.registerComponent('beat', {
     init: function () {
         var el = this.el;
+        var curSeg = 0;
         var count = 0;
         var player = setInterval(function () {
-            var sound = el.emit('beat');
+            el.emit('beat-fraction', {seg: curSeg++}, false);
             count++;
-            if (count === 5) {
-                clearInterval(player);
+            if ((count % noOfSegments) == 0) {
+                el.emit('beat');
+                curSeg = 0;
             }
-        }, duration);
+            if (count / noOfSegments === 20) {
+                clearInterval(player);
+                console.log("clear");
+            }
+        }, duration / noOfSegments);
     }
 });
 
 AFRAME.registerComponent('beat-listener', {
-    schema: { src: {type: 'string', default: ''}},
+    schema: {
+        src: {type: 'string', default: ''},
+        seg: {type: 'number', default: 0}
+    },
     init: function () {
         var el = this.el;
+        var self = this;
         var beater = document.querySelector(this.data.src);
-        beater.addEventListener("beat", function() {
-            el.emit('beat');
+        beater.addEventListener("beat-fraction", function (event) {
+            console.log("listener, seg=" + event.detail.seg);
+            if (event.detail.seg === self.data.seg) {
+                el.emit('beat');
+            }
         });
     }
 });
@@ -40,7 +53,8 @@ AFRAME.registerComponent('animate-theta', {
         var interval = (new Date()).getTime() - this.beatTime;
         var beatFraction = interval / duration;
         if (beatFraction < 1) {
-            el.setAttribute("geometry", "thetaLength", (360 * beatFraction));
+            var thetaLength = (360 * beatFraction);
+            el.setAttribute("geometry", "thetaLength", thetaLength);
         }
     }
 });

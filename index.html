@@ -18,6 +18,7 @@
         <img id="noise-texture" src="img/noisetexture.png">
         <img id="stripe-texture" src="img/Noise_Stripes_03.jpg">
         <img id="galv-texture" src="img/galvanised.jpg">
+        <img id="copper-texture" src="img/copper.jpg">
     </a-assets>
 
     <a-entity id="beater" beat></a-entity>
@@ -31,9 +32,15 @@
 
     <a-sphere flash="on:beat; from:#6688ff; to:#fff; delay:150; dur:50"
               n-sound="src:audio/kick.WAV; on:beat"
-              material="src:#noise-texture; repeat:5 5; color: #6688ff" position="1 1 1" radius="0.5" beat-listener="src:#beater">
-        <a-animation attribute="scale" from="1 1 1" to="1.2 1.2 1.2" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
+              material="src:#noise-texture; repeat:5 5; color: #6688ff" position="1.5 1 1.5" radius="0.3" beat-listener="src:#beater">
+        <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
     </a-sphere>
+
+    <a-box depth="0.5" height="0.5" width="0.5" flash="on:beat; from:#ff6688; to:#fff; delay:150; dur:50"
+           n-sound="src:audio/hat.WAV; on:beat"
+           material="src:#copper-texture;color: #ff6688" position="-1.5 1 1.5" beat-listener="src:#beater;seg:16;">
+        <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
+    </a-box>
 
 </a-scene>
 
