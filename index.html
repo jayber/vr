@@ -29,30 +29,30 @@
 
     <a-cylinder material="src:#stripe-texture;" height="0.05" rotation="-135 0 0" position="0 1.5 0" radius="0.6" side="double"></a-cylinder>
 
-    <a-cylinder material="src:#noise-texture; repeat:5 5" height="0.1" rotation="-135 0 0" position="0 1.5 0" geometry="radius: 0.4" color="#222" side="double" animate-theta beat-listener="src:#beater"></a-cylinder>
+    <a-cylinder material="src:#noise-texture; repeat:5 5" height="0.1" rotation="-135 0 0" position="0 1.5 0" geometry="radius: 0.4" color="#222" side="double" animate-theta="beats:4" beat-listener="src:#beater"></a-cylinder>
 
 
     <a-sphere flash="on:beat; from:#6688ff; to:#fff; delay:150; dur:50"
               n-sound="src:audio/kick.WAV; on:beat"
-              material="src:#noise-texture; repeat:5 5; color: #6688ff" position="1.5 1 1.5" radius="0.3" beat-listener="src:#beater;seg:0">
+              material="src:#noise-texture; repeat:5 5; color: #6688ff" position="1.5 1 1.5" radius="0.3" time-listener="src:#beater;beat: 0, 1, 2, 3;seg: 0, 0, 0, 0">
         <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
     </a-sphere>
 
     <a-box depth="0.5" height="0.5" width="0.5" flash="on:beat; from:#ff6688; to:#fff; delay:150; dur:50"
            n-sound="src:audio/hat.WAV; on:beat"
-           material="src:#copper-texture;color: #ff6688" position="-1.5 1 1.5" beat-listener="src:#beater;seg:15;">
+           material="src:#copper-texture;color: #ff6688" position="-1.5 1 1.5" time-listener="src:#beater;beat: 0, 1, 2, 3;seg: 2, 2, 2, 2">
         <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
     </a-box>
 
-    <a-tetrahedron rotation="215 45 45" radius="0.6" flash="on:beat; from:#beb; to:#fff; delay:150; dur:50"
+    <a-tetrahedron rotation="215 45 45" radius="0.6" flash="on:beat; from:#b0d8b0; to:#fff; delay:150; dur:50"
                    n-sound="src:audio/snare.WAV; on:beat"
-                   material="src:#green-texture;color:#beb" position="-1.5 1 -1.5" beat-listener="src:#beater;seg:7;">
+                   material="src:#green-texture;color:#b0d8b0" position="-1.5 1 -1.5" time-listener="src:#beater;beat: 2, 3;seg: 1, 1">
         <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
     </a-tetrahedron>
 
-    <a-torus radius-tubular="0.1" radius="0.3" flash="on:beat; from:#fffe6b; to:#fff; delay:150; dur:50"
+    <a-torus radius-tubular="0.1" radius="0.3" flash="on:beat; from:#f6f467; to:#fff; delay:150; dur:50"
              n-sound="src:audio/blip.wav; on:beat"
-             material="src:#crackles-texture;color:#fffe6b" position="1.5 1 -1.5" beat-listener="src:#beater;seg:23;">
+             material="src:#crackles-texture;color:#f6f467" position="1.5 1 -1.5" time-listener="src:#beater;beat: 2, 3;seg:3, 3;">
         <a-animation attribute="rotation" from="0 0 0" to="1440 0 0" fill="none" begin="beat" dur="500" easing="ease-in"></a-animation>
     </a-torus>
 

@@ -1,41 +1,68 @@
-var bpm = 110;
+var bpm = 60;
 var duration = 60000 / bpm;
-var noOfSegments = 32;
+var noOfSegments = 4;
+var beatsPerClock = 4;
+var repeats = 4;
+var repeatCount = 0;
 
 AFRAME.registerComponent('beat', {
     init: function () {
         var el = this.el;
         var curSeg = 0;
         var count = 0;
-        var player = setInterval(function () {
-            el.emit('beat-fraction', {seg: curSeg++}, false);
-            count++;
-            if ((count % noOfSegments) == 0) {
+        setTimeout(function () {
+            var player = setInterval(function () {
+                var beatCount = Math.floor(count / noOfSegments);
+                if (count % noOfSegments == 0) {
+                    el.emit('beat');
+                    curSeg = 0;
+                }
+                el.emit('beat-fraction', {beatCount: beatCount, seg: curSeg++}, false);
+                if (beatCount == beatsPerClock) {
+                    count = 0;
+                    curSeg = 0;
+                    repeatCount++;
+                }
+                if (repeatCount === repeats) {
+                    clearInterval(player);
+                    console.log("clear");
+                }
+                count++;
+            }, duration / noOfSegments);
+        }, 2000);
+    }
+});
+
+AFRAME.registerComponent('time-listener', {
+    schema: {
+        src: {type: 'string', default: ''},
+        beat: {type: 'array'},
+        seg: {type: 'array'}
+    },
+    init: function () {
+        console.log("beat=" + this.data.beat + ";seg=" + this.data.seg);
+        var el = this.el;
+        var self = this;
+        var beater = document.querySelector(this.data.src);
+        beater.addEventListener("beat-fraction", function (event) {
+            var beatLoc = self.data.beat.indexOf(event.detail.beatCount + "");
+            if (beatLoc > -1 && event.detail.seg + "" == self.data.seg[beatLoc]) {
                 el.emit('beat');
-                curSeg = 0;
             }
-            if (count / noOfSegments === 20) {
-                clearInterval(player);
-                console.log("clear");
-            }
-        }, duration / noOfSegments);
+        });
     }
 });
 
 AFRAME.registerComponent('beat-listener', {
     schema: {
-        src: {type: 'string', default: ''},
-        seg: {type: 'number', default: 0}
+        src: {type: 'string', default: ''}
     },
     init: function () {
         var el = this.el;
         var self = this;
         var beater = document.querySelector(this.data.src);
-        beater.addEventListener("beat-fraction", function (event) {
-            console.log("listener, seg=" + event.detail.seg);
-            if (event.detail.seg === self.data.seg) {
-                el.emit('beat');
-            }
+        beater.addEventListener("beat", function (event) {
+            el.emit('beat');
         });
     }
 });
@@ -43,18 +70,29 @@ AFRAME.registerComponent('beat-listener', {
 AFRAME.registerComponent('animate-theta', {
     init: function() {
         var self = this;
-        self.beatTime = (new Date()).getTime();
         this.el.addEventListener("beat", function(event) {
             self.beatTime = (new Date()).getTime();
+            if (self.curBeat !== undefined) {
+                if (self.curBeat < beatsPerClock - 1) {
+                    self.curBeat++;
+                } else {
+                    self.curBeat = 0;
+                }
+            } else {
+                self.curBeat = 0;
+            }
         });
     },
     tick: function (time, timeDelta) {
         var el = this.el;
-        var interval = (new Date()).getTime() - this.beatTime;
-        var beatFraction = interval / duration;
-        if (beatFraction < 1) {
-            var thetaLength = (360 * beatFraction);
-            el.setAttribute("geometry", "thetaLength", thetaLength);
+        if (this.beatTime && repeatCount < repeats) {
+            var interval = (new Date()).getTime() - this.beatTime;
+            var beatFraction = interval / duration;
+            var scaledBeatFraction = beatFraction / beatsPerClock;
+            if (beatFraction < 1) {
+                var thetaLength = (360 * scaledBeatFraction) + ((360 / beatsPerClock) * this.curBeat);
+                el.setAttribute("geometry", "thetaLength", thetaLength);
+            }
         }
     }
 });
