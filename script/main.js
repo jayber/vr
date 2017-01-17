@@ -43,10 +43,14 @@ AFRAME.registerComponent('time-listener', {
         console.log("beat=" + this.data.beat + ";seg=" + this.data.seg);
         var el = this.el;
         var self = this;
+        var zip = this.data.beat.map(function (element, index) {
+            return [element, self.data.seg[index]];
+        });
         var beater = document.querySelector(this.data.src);
         beater.addEventListener("beat-fraction", function (event) {
-            var beatLoc = self.data.beat.indexOf(event.detail.beatCount + "");
-            if (beatLoc > -1 && event.detail.seg + "" == self.data.seg[beatLoc]) {
+            if (zip.find(function (element) {
+                    return element[0] == event.detail.beatCount && element[1] == event.detail.seg;
+                })) {
                 el.emit('beat');
             }
         });
