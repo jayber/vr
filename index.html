@@ -19,6 +19,7 @@
         <img id="stripe-texture" src="img/Noise_Stripes_03.jpg">
         <img id="galv-texture" src="img/galvanised.jpg">
         <img id="copper-texture" src="img/copper.jpg">
+        <img id="green-texture" src="img/green.jpg">
     </a-assets>
 
     <a-entity id="beater" beat></a-entity>
@@ -32,15 +33,21 @@
 
     <a-sphere flash="on:beat; from:#6688ff; to:#fff; delay:150; dur:50"
               n-sound="src:audio/kick.WAV; on:beat"
-              material="src:#noise-texture; repeat:5 5; color: #6688ff" position="1.5 1 1.5" radius="0.3" beat-listener="src:#beater">
+              material="src:#noise-texture; repeat:5 5; color: #6688ff" position="1.5 1 1.5" radius="0.3" beat-listener="src:#beater;seg:0">
         <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
     </a-sphere>
 
     <a-box depth="0.5" height="0.5" width="0.5" flash="on:beat; from:#ff6688; to:#fff; delay:150; dur:50"
            n-sound="src:audio/hat.WAV; on:beat"
-           material="src:#copper-texture;color: #ff6688" position="-1.5 1 1.5" beat-listener="src:#beater;seg:16;">
+           material="src:#copper-texture;color: #ff6688" position="-1.5 1 1.5" beat-listener="src:#beater;seg:15;">
         <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
     </a-box>
+
+    <a-tetrahedron rotation="0 45 45" radius="1"
+                   n-sound="src:audio/snare.WAV; on:beat"
+                   material="src:#green-texture;color:#888" position="-1.5 1 -1.5" beat-listener="src:#beater;seg:7;">
+        <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
+    </a-tetrahedron>
 
 </a-scene>
 
