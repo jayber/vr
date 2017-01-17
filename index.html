@@ -20,6 +20,7 @@
         <img id="galv-texture" src="img/galvanised.jpg">
         <img id="copper-texture" src="img/copper.jpg">
         <img id="green-texture" src="img/green.jpg">
+        <img id="crackles-texture" src="img/crackles.jpg">
     </a-assets>
 
     <a-entity id="beater" beat></a-entity>
@@ -48,6 +49,12 @@
                    material="src:#green-texture;color:#beb" position="-1.5 1 -1.5" beat-listener="src:#beater;seg:7;">
         <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
     </a-tetrahedron>
+
+    <a-torus radius-tubular="0.1" radius="0.4" flash="on:beat; from:#fffd00; to:#fff; delay:150; dur:50"
+             n-sound="src:audio/blip.wav; on:beat"
+             material="src:#crackles-texture;color:#fffd00" position="1.5 1 -1.5" beat-listener="src:#beater;seg:23;">
+        <a-animation attribute="rotation" from="0 0 0" to="360 360 360" fill="none" begin="beat" dur="500" easing="ease-in"></a-animation>
+    </a-torus>
 
 </a-scene>
 
