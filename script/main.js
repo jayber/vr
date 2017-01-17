@@ -75,7 +75,8 @@ AFRAME.registerComponent('animate-theta', {
     init: function () {
         var self = this;
         /*this.el.addEventListener("beat", function (event) {
-            self.beatTime = (new Date()).getTime();
+
+         self.beatTime = (new Date()).getTime();
             if (self.curBeat !== undefined && self.curBeat < beatsPerClock - 1) {
                 self.curBeat++;
             } else {
