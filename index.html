@@ -32,30 +32,30 @@
     <a-cylinder material="src:#noise-texture; repeat:5 5" height="0.1" rotation="-135 0 0" position="0 1.5 0" geometry="radius: 0.4" color="#222" side="double" animate-theta="beats:4" beat-listener="src:#beater"></a-cylinder>
 
 
-    <a-sphere flash="on:beat; from:#6688ff; to:#fff; delay:150; dur:50"
-              n-sound="src:audio/kick.WAV; on:beat"
-              material="src:#noise-texture; repeat:5 5; color: #6688ff" position="1.5 1 1.5" radius="0.3" time-listener="src:#beater;beat: 0, 1, 2, 3;seg: 0, 0, 0, 0">
-        <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
+    <a-sphere flash="on:play; from:#6688ff; to:#fff; delay:150; dur:50"
+              n-sound="src:audio/kick.WAV; on:play"
+              material="src:#noise-texture; repeat:5 5; color: #6688ff" position="1.5 1 1.5" radius="0.3" time-listener="src:#beater;beat: 0, 0, 1, 1, 2, 2, 3, 3;seg: 0, 2, 0, 2, 0, 2, 0, 2">
+        <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="play" dur="200" easing="ease-in"></a-animation>
     </a-sphere>
 
-    <a-box depth="0.5" height="0.5" width="0.5" flash="on:beat; from:#ff6688; to:#fff; delay:150; dur:50"
-           n-sound="src:audio/hat.WAV; on:beat"
+    <a-box depth="0.5" height="0.5" width="0.5" flash="on:play; from:#ff6688; to:#fff; delay:150; dur:50"
+           n-sound="src:audio/hat.WAV; on:play"
            material="src:#copper-texture;color: #ff6688" position="-1.5 1 1.5" time-listener="src:#beater;beat: 0, 1, 2, 3;seg: 2, 2, 2, 2">
-        <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
+        <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="play" dur="200" easing="ease-in"></a-animation>
     </a-box>
 
-    <a-tetrahedron rotation="215 45 45" radius="0.6" flash="on:beat; from:#b0d8b0; to:#fff; delay:150; dur:50"
-                   n-sound="src:audio/snare.WAV; on:beat"
-                   material="src:#green-texture;color:#b0d8b0" position="-1.5 1 -1.5" time-listener="src:#beater;beat: 2, 3, 3;seg: 1, 2, 3">
-        <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
+    <a-tetrahedron rotation="215 45 45" radius="0.6" flash="on:play; from:#b0d8b0; to:#fff; delay:150; dur:50"
+                   n-sound="src:audio/snare.WAV; on:play"
+                   material="src:#green-texture;color:#b0d8b0" position="-1.5 1 -1.5" time-listener="src:#beater;beat: 3, 3;seg: 2, 3">
+        <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="play" dur="200" easing="ease-in"></a-animation>
     </a-tetrahedron>
 
-    <a-cone height="0.7" radius-top="0.01" radius-bottom="0.4" flash="on:beat; from:#efd057; to:#fff; delay:150; dur:50"
-             n-sound="src:audio/blip.wav; on:beat"
-             material="src:#crackles-texture;color:#efd057" position="1.5 1 -1.5" time-listener="src:#beater;beat: 2, 3;seg:3, 3;">
-        <a-animation attribute="height" from="0.7" to="0.9" begin="beat" dur="200" easing="ease-in"></a-animation>
-        <a-animation attribute="radius-top" from="0.01" to="0.08" begin="beat" dur="200" easing="ease-in"></a-animation>
-        <a-animation attribute="position" from="1.5 1 -1.5" to="1.5 1.1 -1.5" begin="beat" dur="200" easing="ease-in"></a-animation>
+    <a-cone height="0.7" radius-top="0.01" radius-bottom="0.4" flash="on:play; from:#efd057; to:#fff; delay:150; dur:50"
+            n-sound="src:audio/blip.wav; on:play"
+            material="src:#crackles-texture;color:#efd057" position="1.5 1 -1.5" time-listener="src:#beater;beat: 2, 3;seg:0, 0;">
+        <a-animation attribute="height" from="0.7" to="0.9" begin="play" dur="200" easing="ease-in"></a-animation>
+        <a-animation attribute="radius-top" from="0.01" to="0.08" begin="play" dur="200" easing="ease-in"></a-animation>
+        <a-animation attribute="position" from="1.5 1 -1.5" to="1.5 1.1 -1.5" begin="play" dur="200" easing="ease-in"></a-animation>
     </a-cone>
 
 </a-scene>

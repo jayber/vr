@@ -17,7 +17,7 @@ AFRAME.registerComponent('beat', {
                     el.emit('beat');
                     curSeg = 0;
                 }
-                el.emit('beat-fraction', {beatCount: beatCount, seg: curSeg++}, false);
+                el.emit('time', {beatCount: beatCount, seg: curSeg++}, false);
                 if (beatCount == beatsPerClock) {
                     count = 0;
                     curSeg = 0;
@@ -47,11 +47,11 @@ AFRAME.registerComponent('time-listener', {
             return [element, self.data.seg[index]];
         });
         var beater = document.querySelector(this.data.src);
-        beater.addEventListener("beat-fraction", function (event) {
+        beater.addEventListener("time", function (event) {
             if (zip.find(function (element) {
                     return element[0] == event.detail.beatCount && element[1] == event.detail.seg;
                 })) {
-                el.emit('beat');
+                el.emit('play');
             }
         });
     }
