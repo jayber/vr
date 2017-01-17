@@ -74,7 +74,7 @@ AFRAME.registerComponent('beat-listener', {
 AFRAME.registerComponent('animate-theta', {
     init: function () {
         var self = this;
-        this.el.addEventListener("beat", function (event) {
+        /*this.el.addEventListener("beat", function (event) {
             self.beatTime = (new Date()).getTime();
             if (self.curBeat !== undefined && self.curBeat < beatsPerClock - 1) {
                 self.curBeat++;
@@ -82,11 +82,11 @@ AFRAME.registerComponent('animate-theta', {
                 self.curBeat = 0;
             }
 
-        });
+         });*/
     },
     tick: function (time, timeDelta) {
         var el = this.el;
-        if (this.beatTime && repeatCount < repeats) {
+        /*if (this.beatTime && repeatCount < repeats) {
             var interval = (new Date()).getTime() - this.beatTime;
             var beatFraction = interval / duration;
             var scaledBeatFraction = beatFraction / beatsPerClock;
@@ -94,7 +94,7 @@ AFRAME.registerComponent('animate-theta', {
                 var thetaLength = (360 * scaledBeatFraction) + ((360 / beatsPerClock) * this.curBeat);
                 el.setAttribute("geometry", "thetaLength", thetaLength);
             }
-        }
+         }*/
     }
 });
 
@@ -109,13 +109,13 @@ AFRAME.registerComponent('flash', {
     init: function () {
         var el = this.el;
         var self = this;
-        el.addEventListener(this.data.on, function () {
+        /*el.addEventListener(this.data.on, function () {
             setTimeout(function () {
                 el.setAttribute('material', 'color', self.data.to);
             }, self.data.delay);
             setTimeout(function () {
                 el.setAttribute('material', 'color', self.data.from);
             }, self.data.delay + self.data.dur);
-        });
+         });*/
     }
 });
