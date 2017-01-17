@@ -68,19 +68,16 @@ AFRAME.registerComponent('beat-listener', {
 });
 
 AFRAME.registerComponent('animate-theta', {
-    init: function() {
+    init: function () {
         var self = this;
-        this.el.addEventListener("beat", function(event) {
+        this.el.addEventListener("beat", function (event) {
             self.beatTime = (new Date()).getTime();
-            if (self.curBeat !== undefined) {
-                if (self.curBeat < beatsPerClock - 1) {
-                    self.curBeat++;
-                } else {
-                    self.curBeat = 0;
-                }
+            if (self.curBeat !== undefined && self.curBeat < beatsPerClock - 1) {
+                self.curBeat++;
             } else {
                 self.curBeat = 0;
             }
+
         });
     },
     tick: function (time, timeDelta) {
@@ -109,12 +106,12 @@ AFRAME.registerComponent('flash', {
         var el = this.el;
         var self = this;
         el.addEventListener(this.data.on, function () {
-            setTimeout(function() {
+            setTimeout(function () {
                 el.setAttribute('material', 'color', self.data.to);
             }, self.data.delay);
-            setTimeout(function() {
+            setTimeout(function () {
                 el.setAttribute('material', 'color', self.data.from);
-             }, self.data.delay+self.data.dur);
+            }, self.data.delay + self.data.dur);
         });
     }
 });

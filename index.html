@@ -50,11 +50,13 @@
         <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="beat" dur="200" easing="ease-in"></a-animation>
     </a-tetrahedron>
 
-    <a-torus radius-tubular="0.1" radius="0.3" flash="on:beat; from:#f6f467; to:#fff; delay:150; dur:50"
+    <a-cone height="0.7" radius-top="0.01" radius-bottom="0.4" flash="on:beat; from:#efd057; to:#fff; delay:150; dur:50"
              n-sound="src:audio/blip.wav; on:beat"
-             material="src:#crackles-texture;color:#f6f467" position="1.5 1 -1.5" time-listener="src:#beater;beat: 2, 3;seg:3, 3;">
-        <a-animation attribute="rotation" from="0 0 0" to="1440 0 0" fill="none" begin="beat" dur="500" easing="ease-in"></a-animation>
-    </a-torus>
+             material="src:#crackles-texture;color:#efd057" position="1.5 1 -1.5" time-listener="src:#beater;beat: 2, 3;seg:3, 3;">
+        <a-animation attribute="height" from="0.7" to="0.9" begin="beat" dur="200" easing="ease-in"></a-animation>
+        <a-animation attribute="radius-top" from="0.01" to="0.08" begin="beat" dur="200" easing="ease-in"></a-animation>
+        <a-animation attribute="position" from="1.5 1 -1.5" to="1.5 1.1 -1.5" begin="beat" dur="200" easing="ease-in"></a-animation>
+    </a-cone>
 
 </a-scene>
 
