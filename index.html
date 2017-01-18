@@ -21,6 +21,7 @@
         <img id="copper-texture" src="img/copper.jpg">
         <img id="green-texture" src="img/green.jpg">
         <img id="crackles-texture" src="img/crackles.jpg">
+        <img id="rock-texture" src="img/rock2.png">
     </a-assets>
 
     <a-entity id="beater" beat></a-entity>
@@ -50,13 +51,14 @@
         <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="play" dur="200" easing="ease-in"></a-animation>
     </a-tetrahedron>
 
-    <a-cone height="0.7" radius-top="0.01" radius-bottom="0.4" flash="on:play; from:#efd057; to:#fff; delay:150; dur:50"
+    <a-cone height="0.7" radius-top="0.2" radius-bottom="0.38" open-ended="true"
             n-sound="src:audio/blip.wav; on:play"
-            material="src:#crackles-texture;color:#efd057" position="1.5 1 -1.5" time-listener="src:#beater;beat: 2, 3;seg:0, 0;">
-        <a-animation attribute="height" from="0.7" to="0.9" begin="play" dur="200" easing="ease-in"></a-animation>
-        <a-animation attribute="radius-top" from="0.01" to="0.08" begin="play" dur="200" easing="ease-in"></a-animation>
-        <a-animation attribute="position" from="1.5 1 -1.5" to="1.5 1.1 -1.5" begin="play" dur="200" easing="ease-in"></a-animation>
+            material="src:#rock-texture;color:#99c;side:double" position="1.5 1.1 -1.5" time-listener="src:#beater;beat: 2, 3;seg:0, 0;">
     </a-cone>
+
+    <a-torus radius="0.12" rotation="90 0 0" radius-tubular="0.05" position="1.5 1.3 -1.5" material="src:#crackles-texture;color:#f4f693;" time-listener="src:#beater;beat: 2, 3;seg:0, 0;">
+        <a-animation attribute="position" from="1.5 1.3 -1.5" to="1.5 2.2 -1.5" begin="play" dur="700" fill="none" easing="ease-in"></a-animation>
+    </a-torus>
 
 </a-scene>
 

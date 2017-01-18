@@ -1,9 +1,12 @@
 var bpm = 60;
-var duration = 60000 / bpm;
-var noOfSegments = 4;
+var beatDuration = 60000 / bpm;
+var beatDivider = 4;
 var beatsPerClock = 4;
 var repeats = 4;
 var repeatCount = 0;
+var beatInterval = beatDuration / beatDivider;
+
+var logTime;
 
 AFRAME.registerComponent('beat', {
     init: function () {
@@ -11,9 +14,11 @@ AFRAME.registerComponent('beat', {
         var curSeg = 0;
         var count = 0;
         setTimeout(function () {
+            logTime = (new Date()).getTime();
+
             var player = setInterval(function () {
-                var beatCount = Math.floor(count / noOfSegments);
-                if (count % noOfSegments == 0) {
+                var beatCount = Math.floor(count / beatDivider);
+                if (count % beatDivider == 0) {
                     el.emit('beat');
                     curSeg = 0;
                 }
@@ -28,7 +33,10 @@ AFRAME.registerComponent('beat', {
                     console.log("clear");
                 }
                 count++;
-            }, duration / noOfSegments);
+                var time = (new Date()).getTime();
+                console.log("interval - expected:" + beatInterval + "; actual:" + (time - logTime));
+                logTime = time;
+            }, beatInterval);
         }, 2000);
     }
 });
