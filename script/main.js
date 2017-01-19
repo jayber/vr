@@ -26,24 +26,24 @@ AFRAME.registerComponent('beat', {
     init: function () {
         var el = this.el;
         var self = this;
+        self.count = 0;
+        self.repeatCount = 0;
         setTimeout(function () {
-            var count = 0;
-            var repeatCount = 0;
             var player = setInterval(function () {
-                var beatCount = Math.floor(count / beatDivider);
-                if (repeatCount == noOfRepeats) {
+                var beatCount = Math.floor(self.count / beatDivider);
+                if (self.repeatCount == noOfRepeats) {
                     clearInterval(player);
                     console.log("end");
                 } else {
                     if (beatCount == lengthInBeats) {
-                        count = 0;
-                        beatCount = Math.floor(count / beatDivider);
-                        repeatCount++;
+                        self.count = 0;
+                        beatCount = Math.floor(self.count / beatDivider);
+                        self.repeatCount++;
                     }
-                    if (repeatCount != noOfRepeats) {
-                        self.emitEvents(el, beatCount, count);
-                        self.logInterval(count);
-                        count++;
+                    if (self.repeatCount != noOfRepeats) {
+                        self.emitEvents(el, beatCount, self.count);
+                        self.logInterval(self.count);
+                        self.count++;
                     }
                 }
             }, beatInterval);
