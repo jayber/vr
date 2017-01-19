@@ -1,43 +1,53 @@
 var bpm = 60;
 var beatDuration = 60000 / bpm;
-var beatDivider = 4;
-var beatsPerClock = 4;
-var repeats = 4;
-var repeatCount = 0;
+var beatDivider = 8;
 var beatInterval = beatDuration / beatDivider;
 
-var logTime;
+var lengthInBeats = 4;
+var noOfRepeats = 4;
 
 AFRAME.registerComponent('beat', {
+    logTime: (new Date()).getTime(),
+
+    logInterval: function (count) {
+        var time = (new Date()).getTime();
+        console.log("seg:" + count + " interval - expected:" + beatInterval + "; actual:" + (time - this.logTime));
+        this.logTime = time;
+    },
+
+    emitEvents: function (el, beatCount, count) {
+        var currentSegment = count - (beatCount * beatDivider);
+        el.emit('time', {beatCount: beatCount, seg: currentSegment}, false);
+        if (count % beatDivider == 0) {
+            el.emit('beat');
+        }
+    },
+
     init: function () {
         var el = this.el;
-        var curSeg = 0;
-        var count = 0;
+        var self = this;
         setTimeout(function () {
-            logTime = (new Date()).getTime();
-
+            var count = 0;
+            var repeatCount = 0;
             var player = setInterval(function () {
                 var beatCount = Math.floor(count / beatDivider);
-                if (count % beatDivider == 0) {
-                    el.emit('beat');
-                    curSeg = 0;
-                }
-                el.emit('time', {beatCount: beatCount, seg: curSeg++}, false);
-                if (beatCount == beatsPerClock) {
-                    count = 0;
-                    curSeg = 0;
-                    repeatCount++;
-                }
-                if (repeatCount === repeats) {
+                if (repeatCount == noOfRepeats) {
                     clearInterval(player);
-                    console.log("clear");
+                    console.log("end");
+                } else {
+                    if (beatCount == lengthInBeats) {
+                        count = 0;
+                        beatCount = Math.floor(count / beatDivider);
+                        repeatCount++;
+                    }
+                    if (repeatCount != noOfRepeats) {
+                        self.emitEvents(el, beatCount, count);
+                        self.logInterval(count);
+                        count++;
+                    }
                 }
-                count++;
-                var time = (new Date()).getTime();
-                console.log("interval - expected:" + beatInterval + "; actual:" + (time - logTime));
-                logTime = time;
             }, beatInterval);
-        }, 2000);
+        }, 4000);
     }
 });
 
@@ -55,10 +65,15 @@ AFRAME.registerComponent('time-listener', {
             return [element, self.data.seg[index]];
         });
         var beater = document.querySelector(this.data.src);
+        self.logTime = (new Date()).getTime();
         beater.addEventListener("time", function (event) {
             if (zip.find(function (element) {
                     return element[0] == event.detail.beatCount && element[1] == event.detail.seg;
                 })) {
+
+                var time = (new Date()).getTime();
+                console.log(event.detail.beatCount + ":" + event.detail.seg + ";" + self.data.name + ";" + (time - self.logTime));
+                self.logTime = time;
                 el.emit('play');
             }
         });
