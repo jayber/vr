@@ -1,7 +1,7 @@
 var bpm = 60;
 var beatDuration = 60000 / bpm;
 var beatDivider = 8;
-var beatInterval = beatDuration / beatDivider;
+var segmentInterval = beatDuration / beatDivider;
 
 var lengthInBeats = 4;
 var noOfRepeats = 4;
@@ -11,7 +11,7 @@ AFRAME.registerComponent('beat', {
 
     logInterval: function (count) {
         var time = (new Date()).getTime();
-        console.log("seg:" + count + " interval - expected:" + beatInterval + "; actual:" + (time - this.logTime));
+        console.log("seg:" + count + " interval - expected:" + segmentInterval + "; actual:" + (time - this.logTime));
         this.logTime = time;
     },
 
@@ -46,7 +46,7 @@ AFRAME.registerComponent('beat', {
                         self.count++;
                     }
                 }
-            }, beatInterval);
+            }, segmentInterval);
         }, 4000);
     }
 });
