@@ -122,15 +122,14 @@ AFRAME.registerComponent('animate-theta', {
     },
 
     tick: function (time, timeDelta) {
-        /* var el = this.el;
-         //aargh
+        var el = this.el;
         if (this.currentDegrees != undefined) {
             var currentDegs = this.currentDegrees + (timeDelta * this.degreesPerMilli);
             if (this.currentDegrees <= 360) {
                 el.setAttribute("geometry", "thetaLength", currentDegs);
                 this.currentDegrees = currentDegs;
             }
-         }*/
+        }
     }
 });
 
@@ -145,13 +144,13 @@ AFRAME.registerComponent('flash', {
     init: function () {
         var el = this.el;
         var self = this;
-        /*el.addEventListener(this.data.on, function () {
-         setTimeout(function () {
-         el.setAttribute('material', 'color', self.data.to);
-         }, self.data.delay);
-         setTimeout(function () {
-         el.setAttribute('material', 'color', self.data.from);
-         }, self.data.delay + self.data.dur);
-         });*/
+        el.addEventListener(this.data.on, function () {
+            setTimeout(function () {
+                el.setAttribute('material', 'color', self.data.to);
+            }, self.data.delay);
+            setTimeout(function () {
+                el.setAttribute('material', 'color', self.data.from);
+            }, self.data.delay + self.data.dur);
+        });
     }
 });
