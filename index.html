@@ -34,7 +34,7 @@
 
     <a-sphere flash="on:play; from:#6688ff; to:#fff; delay:150; dur:50"
               n-sound="src:audio/kick.WAV; on:play"
-              material="src:#noise-texture; repeat:5 5; color: #6688ff" position="1.5 1 1.5" radius="0.3" time-listener="name:kick;src:#beater;beat: 0, 0, 1, 1, 2, 2, 3, 3;seg: 0, 4, 0, 4, 0, 4, 0, 4">
+              material="src:#noise-texture; repeat:5 5; color: #6688ff" position="1.5 1 1.5" radius="0.3" time-listener="name:kick;src:#beater;beat: 0, 0, 0, 0, 0, 1, 1, 2, 2, 3, 3;seg: 0, 2, 2, 3, 4, 0, 4, 0, 4, 0, 4">
         <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="play" dur="200" easing="ease-in"></a-animation>
     </a-sphere>
 
@@ -46,7 +46,7 @@
 
     <a-tetrahedron rotation="215 45 45" radius="0.6" flash="on:play; from:#b0d8b0; to:#fff; delay:150; dur:50"
                    n-sound="src:audio/snare.WAV; on:play"
-                   material="src:#green-texture;color:#b0d8b0" position="-1.5 1 -1.5" time-listener="name:snare;src:#beater;beat: 3, 3;seg: 4, 6">
+                   material="src:#green-texture;color:#b0d8b0" position="-1.5 1 -1.5" time-listener="name:snare;src:#beater;beat: 0, 3, 3;seg: 2, 3, 6">
         <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="play" dur="200" easing="ease-in"></a-animation>
     </a-tetrahedron>
 
