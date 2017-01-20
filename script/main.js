@@ -122,14 +122,14 @@ AFRAME.registerComponent('animate-theta', {
     },
 
     tick: function (time, timeDelta) {
-        var el = this.el;
+        /* var el = this.el;
         if (this.currentDegrees != undefined) {
             var currentDegs = this.currentDegrees + (timeDelta * this.degreesPerMilli);
             if (this.currentDegrees <= 360) {
                 el.setAttribute("geometry", "thetaLength", currentDegs);
                 this.currentDegrees = currentDegs;
             }
-        }
+         }*/
     }
 });
 
