@@ -123,6 +123,7 @@ AFRAME.registerComponent('animate-theta', {
 
     tick: function (time, timeDelta) {
         /* var el = this.el;
+         //aargh
         if (this.currentDegrees != undefined) {
             var currentDegs = this.currentDegrees + (timeDelta * this.degreesPerMilli);
             if (this.currentDegrees <= 360) {
