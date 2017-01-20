@@ -1,4 +1,4 @@
-const bpm = 100;
+const bpm = 110;
 const beatDuration = 60000 / bpm;
 const noOfSegments = 8;
 const segmentDuration = beatDuration / noOfSegments;
@@ -89,6 +89,13 @@ AFRAME.registerComponent('time-listener', {
                 el.emit('play');
             }
         });
+    }
+});
+
+AFRAME.registerComponent('bpm-label', {
+    init: function () {
+        var el = this.el;
+        el.setAttribute("n-text", {text: bpm + " BPM", fontSize: "1pt"});
     }
 });
 
