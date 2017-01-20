@@ -1,4 +1,4 @@
-const bpm = 60;
+const bpm = 100;
 const beatDuration = 60000 / bpm;
 const noOfSegments = 8;
 const segmentDuration = beatDuration / noOfSegments;
@@ -28,9 +28,10 @@ AFRAME.registerComponent('beat', {
     adjustInterval: function (self) {
         var time = Date.now();
         var lastInterval = time - self.lastSegmentTime;
-        var adjustedInterval = segmentDuration + segmentDuration - lastInterval;
+        var adjustedInterval = lastInterval > segmentDuration ? segmentDuration + segmentDuration - lastInterval : segmentDuration;
         self.lastSegmentTime = time;
         self.lastExpectedInterval = adjustedInterval;
+        console.log("adjusted interval: " + adjustedInterval);
         return adjustedInterval;
     },
 
@@ -50,7 +51,6 @@ AFRAME.registerComponent('beat', {
                 self.logInterval(self.count);
                 self.count++;
                 var adjustedInterval = self.adjustInterval(self);
-                console.log("adjusted interval: " + adjustedInterval);
                 setTimeout(self.timedAction(self), adjustedInterval);
             }
         }
@@ -98,7 +98,6 @@ AFRAME.registerComponent('beat-listener', {
     },
     init: function () {
         var el = this.el;
-        var self = this;
         var beater = document.querySelector(this.data.src);
         beater.addEventListener("beat", function (event) {
             el.emit('beat');
@@ -109,14 +108,14 @@ AFRAME.registerComponent('beat-listener', {
 AFRAME.registerComponent('animate-theta', {
     init: function () {
         var self = this;
-        self.degreesPerBeat = (360 / noOfBeats);
-        self.degreesPerMilli = self.degreesPerBeat / beatDuration;
+        var degreesPerBeat = (360 / noOfBeats);
+        self.degreesPerMilli = degreesPerBeat / beatDuration;
         this.el.addEventListener("beat", function (event) {
-            self.beatTime = Date.now();
             if (self.curBeat !== undefined && self.curBeat < noOfBeats - 1) {
                 self.curBeat++;
             } else {
                 self.curBeat = 0;
+                self.currentDegrees = 0;
             }
 
         });
@@ -124,12 +123,11 @@ AFRAME.registerComponent('animate-theta', {
 
     tick: function (time, timeDelta) {
         var el = this.el;
-        if (this.beatTime) {
-            var interval = Date.now() - this.beatTime;
-            var beatFraction = interval / beatDuration;
-            if (beatFraction < 1) {
-                var thetaLength = (this.degreesPerBeat * beatFraction) + (this.degreesPerBeat * this.curBeat);
-                el.setAttribute("geometry", "thetaLength", thetaLength);
+        if (this.currentDegrees != undefined) {
+            var currentDegs = this.currentDegrees + (timeDelta * this.degreesPerMilli);
+            if (this.currentDegrees <= 360) {
+                el.setAttribute("geometry", "thetaLength", currentDegs);
+                this.currentDegrees = currentDegs;
             }
         }
     }
