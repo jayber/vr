@@ -18,7 +18,7 @@ AFRAME.registerComponent('beat', {
     },
 
     emitEvents: function (el, beatCount, count) {
-        var currentSegment = count - (beatCount * noOfSegments);
+        var currentSegment = count % noOfSegments;
         el.emit('time', {beatCount: beatCount, seg: currentSegment}, false);
         if (count % noOfSegments == 0) {
             el.emit('beat');
@@ -80,12 +80,12 @@ AFRAME.registerComponent('time-listener', {
             return [element, self.data.seg[index]];
         });
         var beater = document.querySelector(this.data.src);
-
         beater.addEventListener("time", function (event) {
-            if (zip.find(function (element) {
+            if (zip.length == 0) {
+                el.emit('play');
+            } else if (zip.find(function (element) {
                     return element[0] == event.detail.beatCount && element[1] == event.detail.seg;
                 })) {
-
                 el.emit('play');
             }
         });
@@ -115,28 +115,25 @@ AFRAME.registerComponent('beat-listener', {
 AFRAME.registerComponent('animate-theta', {
     init: function () {
         var self = this;
-        var degreesPerBeat = (360 / noOfBeats);
-        self.degreesPerMilli = degreesPerBeat / beatDuration;
-        this.el.addEventListener("beat", function (event) {
-            if (self.curBeat !== undefined && self.curBeat < noOfBeats - 1) {
-                self.curBeat++;
+        var el = this.el;
+        self.degreesPerBeat = (360 / noOfBeats);
+        self.degreesPerMilli = self.degreesPerBeat / beatDuration;
+        el.addEventListener("beat", function (event) {
+            self.lastBeatTime = Date.now();
+            if (self.currentBeat !== undefined && self.currentBeat < noOfBeats - 1) {
+                self.currentBeat++;
             } else {
-                self.curBeat = 0;
-                self.currentDegrees = 0;
+                self.currentBeat = 0;
             }
 
         });
-    },
-
-    tick: function (time, timeDelta) {
-        var el = this.el;
-        if (this.currentDegrees != undefined) {
-            var currentDegs = this.currentDegrees + (timeDelta * this.degreesPerMilli);
-            if (this.currentDegrees <= 360) {
-                el.setAttribute("geometry", "thetaLength", currentDegs);
-                this.currentDegrees = currentDegs;
+        el.addEventListener("play", function (event) {
+            var now = Date.now();
+            var currentDegrees = (self.degreesPerBeat * self.currentBeat) + ((now - self.lastBeatTime) * self.degreesPerMilli);
+            if (currentDegrees <= 360) {
+                el.setAttribute("geometry", "thetaLength", currentDegrees);
             }
-        }
+        });
     }
 });
 
