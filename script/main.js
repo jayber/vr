@@ -10,7 +10,7 @@ AFRAME.registerComponent('beat', {
     init: function () {
         var self = this;
         setTimeout(function () {
-            var worker = new Worker('/script/worker.js');
+            var worker = new Worker('script/worker.js');
             worker.onmessage = function (event) {
                 var eventName = event.data.name;
                 self.el.emit(eventName, event.data.data);
