@@ -1,67 +1,22 @@
 const bpm = 110;
 const beatDuration = 60000 / bpm;
-const noOfSegments = 8;
+const noOfSegments = 32;
 const segmentDuration = beatDuration / noOfSegments;
 
 const noOfBeats = 4;
 const noOfRepeats = 4;
 
 AFRAME.registerComponent('beat', {
-    logTime: Date.now(),
-    count: 0,
-    repeatCount: 0,
-
-    logInterval: function (count) {
-        var time = Date.now();
-        console.log("seg:" + count + " interval - expected:" + this.lastExpectedInterval + "; actual:" + (time - this.logTime));
-        this.logTime = time;
-    },
-
-    emitEvents: function (el, beatCount, count) {
-        var currentSegment = count % noOfSegments;
-        el.emit('time', {beatCount: beatCount, seg: currentSegment}, false);
-        if (count % noOfSegments == 0) {
-            el.emit('beat');
-        }
-    },
-
-    adjustInterval: function (self) {
-        var time = Date.now();
-        var lastInterval = time - self.lastSegmentTime;
-        var adjustedInterval = lastInterval > segmentDuration ? segmentDuration + segmentDuration - lastInterval : segmentDuration;
-        self.lastSegmentTime = time;
-        self.lastExpectedInterval = adjustedInterval;
-        console.log("adjusted interval: " + adjustedInterval);
-        return adjustedInterval;
-    },
-
-    timedAction: function (self) {
-        return function () {
-            var el = self.el;
-            var beatCount = Math.floor(self.count / noOfSegments);
-            if (beatCount == noOfBeats) {
-                self.count = 0;
-                beatCount = 0;
-                self.repeatCount++;
-            }
-            if (self.repeatCount == noOfRepeats) {
-                console.log("end");
-            } else {
-                self.emitEvents(el, beatCount, self.count);
-                self.logInterval(self.count);
-                self.count++;
-                var adjustedInterval = self.adjustInterval(self);
-                setTimeout(self.timedAction(self), adjustedInterval);
-            }
-        }
-    },
-
     init: function () {
         var self = this;
         setTimeout(function () {
-            self.lastSegmentTime = Date.now();
-            self.lastExpectedInterval = segmentDuration;
-            var player = setTimeout(self.timedAction(self), segmentDuration);
+            var worker = new Worker('/script/worker.js');
+            worker.onmessage = function (event) {
+                var eventName = event.data.name;
+                self.el.emit(eventName, event.data.data);
+            };
+            worker.postMessage([segmentDuration, noOfSegments, noOfBeats, noOfRepeats]);
+
         }, 4000);
     }
 });
