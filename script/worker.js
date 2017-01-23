@@ -3,9 +3,14 @@ var count = 0;
 var repeatCount = 0;
 var lastSegmentTime;
 
+var player;
+
 function logInterval(count) {
     var time = Date.now();
-    console.log("seg:" + count + " interval - expected:" + lastExpectedInterval + "; actual:" + (time - logTime));
+    postMessage({
+        name: 'log',
+        message: "seg:" + count + " interval - expected:" + lastExpectedInterval + "; actual:" + (time - logTime)
+    });
     logTime = time;
 }
 
@@ -20,7 +25,7 @@ function emitEvents(beatCount, count, noOfSegments) {
 function adjustInterval(segmentDuration) {
     var time = Date.now();
     var lastInterval = time - lastSegmentTime;
-    var adjustedInterval = segmentDuration + segmentDuration - lastInterval;
+    var adjustedInterval = lastInterval > segmentDuration ? segmentDuration + segmentDuration - lastInterval : segmentDuration;
     lastSegmentTime = time;
     lastExpectedInterval = adjustedInterval;
     console.log("adjusted interval: " + adjustedInterval);
@@ -36,6 +41,7 @@ function getTimedFunction(segmentDuration, noOfSegments, noOfBeats, noOfRepeats)
             repeatCount++;
         }
         if (repeatCount == noOfRepeats) {
+            //clearInterval(player);
             close();
         } else {
             emitEvents(beatCount, count, noOfSegments);
@@ -55,5 +61,6 @@ onmessage = function (event) {
     var noOfBeats = event.data[2];
     var noOfRepeats = event.data[3];
     lastExpectedInterval = segmentDuration;
+    //player = setInterval(getTimedFunction(segmentDuration, noOfSegments, noOfBeats, noOfRepeats), segmentDuration);
     setTimeout(getTimedFunction(segmentDuration, noOfSegments, noOfBeats, noOfRepeats), segmentDuration);
 };

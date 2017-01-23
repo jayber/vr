@@ -1,7 +1,7 @@
-const bpm = 110;
+const bpm = 100;
 const beatDuration = 60000 / bpm;
-const noOfSegments = 32;
-const segmentDuration = beatDuration / noOfSegments;
+const noOfSegments = 16;
+const segmentDuration = Math.floor(beatDuration / noOfSegments);
 
 const noOfBeats = 4;
 const noOfRepeats = 4;
@@ -13,7 +13,11 @@ AFRAME.registerComponent('beat', {
             var worker = new Worker('script/worker.js');
             worker.onmessage = function (event) {
                 var eventName = event.data.name;
-                self.el.emit(eventName, event.data.data);
+                if (eventName == 'log') {
+                    console.log(event.data.message);
+                } else {
+                    self.el.emit(eventName, event.data.data);
+                }
             };
             worker.postMessage([segmentDuration, noOfSegments, noOfBeats, noOfRepeats]);
 
