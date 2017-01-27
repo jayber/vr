@@ -42,7 +42,7 @@
         <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="play" dur="200" easing="ease-in"></a-animation>
     </a-sphere>
 
-    <a-box depth="0.5" height="0.5" width="0.5" flash="on:play; from:#ff6688; to:#fff; delay:150; dur:50"
+    <a-box id="hat" depth="0.5" height="0.5" width="0.5" flash="on:play; from:#ff6688; to:#fff; delay:150; dur:50"
            n-sound="src:audio/hat.WAV; on:play; oneshot:true;"
            material="src:#copper-texture;color: #ff6688" position="-1 1 1.5" time-listener="src:#beater;beat: 0, 1, 2, 3;seg: 7, 7, 7, 7">
         <a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="play" dur="200" easing="ease-in"></a-animation>
@@ -68,6 +68,8 @@
     <a-torus radius="0.15" rotation="90 0 0" radius-tubular="0.029" position="1.7 1.3 -0.8" material="src:#cloud-texture;color:#ffe8c0;" time-listener="src:#beater;beat: 2, 3;seg:0, 0;">
         <a-animation attribute="position" from="1.7 1.3 -0.8" to="1.7 3 -0.8" begin="play" dur="500" fill="none" easing="linear"></a-animation>
     </a-torus>
+
+    <a-entity cable="src:#hat"></a-entity>
 
 </a-scene>
 

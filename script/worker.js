@@ -28,7 +28,7 @@ function adjustInterval(segmentDuration) {
     var adjustedInterval = lastInterval > segmentDuration ? segmentDuration + segmentDuration - lastInterval : segmentDuration;
     lastSegmentTime = time;
     lastExpectedInterval = adjustedInterval;
-    console.log("adjusted interval: " + adjustedInterval);
+    //console.log("adjusted interval: " + adjustedInterval);
     return adjustedInterval;
 }
 
