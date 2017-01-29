@@ -5,49 +5,61 @@ const segmentDuration = Math.floor(beatDuration / noOfSegments);
 
 const noOfBeats = 4;
 const noOfRepeats = 4;
-/*
 
- AFRAME.registerComponent('cable', {
- schema: {
- src: {type: 'string', default: ''}
- },
-    init: function () {
-        var self = this;
- var src = document.querySelector(this.data.src);
- this.el.sceneEl.object3D.updateMatrixWorld(true);
- var srcPosition = src.object3D.getWorldPosition();
- var v2 = new THREE.Vector3( srcPosition.x, 0, srcPosition.z );
- var path = new THREE.LineCurve3(srcPosition, v2);
- var geometry = new THREE.TubeGeometry( path, 20, 0.01, 8, false );
- var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
- var tube = new THREE.Mesh( geometry, material );
- tube.position.set(0,0,1);
- this.el.sceneEl.object3D.add( tube );
- */
-/*
- this.el.setAttribute("geometry", {primitive: "box"});
- this.el.setAttribute("color","#77f");
- this.el.setAttribute("depth","0.5");
- this.el.setAttribute("height","0.5");
- this.el.setAttribute("width","0.5");*//*
-
- console.log("cabled");
-    }
-});
- */
+var scene = document.querySelector('a-scene');
+if (scene.hasLoaded) {
+    run();
+} else {
+    scene.addEventListener('loaded', run);
+}
+function run() {
+    var entity = scene.querySelector('#hat');
+    console.log("position: " + JSON.stringify(entity.object3D.getWorldPosition()));
+    /*
+     try {
+     var v1 = new THREE.Vector3(0, 0, 0);
+     var v2 = new THREE.Vector3(0, -1, 0);
+     var path = new THREE.CurvePath();
+     path.add(new THREE.LineCurve3(v1, v2));
+     path.add(new THREE.LineCurve3(v2, new THREE.Vector3(1, -1, -1.5)));
+     var geometry = new THREE.TubeGeometry(path, 20, 0.01, 8, false);
+     var material = new THREE.MeshBasicMaterial();
+     var tube = new THREE.Mesh(geometry, material);
+     this.el.setObject3D("mesh",tube);
+     this.el.setAttribute("material", "color", this.el.parentNode.getAttribute("material").color);
+     this.el.setAttribute("material", "src", this.el.parentNode.getAttribute("material").src);
+     } catch (error) {
+     console.log(error);
+     }*/
+    //console.log("cabled");
+}
 
 
 AFRAME.registerComponent('cable', {
-    schema: {
-        src: {type: 'string', default: ''}
-    },
+    schema: {type: 'string'},
     init: function () {
-        var src = document.querySelector(this.data.src);
-//            this.el.sceneEl.object3D.updateMatrixWorld(true);
-        var srcPosition = src.object3D.getWorldPosition();
-        console.log("position: " + JSON.stringify(srcPosition));
+        var self = this;
+        var entity = scene.querySelector(self.data);
+        entity.addEventListener('loaded', function () {
+            try {
+                var v1 = entity.object3D.getWorldPosition();
+                var v2 = new THREE.Vector3(v1.x, 0, v1.z);
+                var path = new THREE.CurvePath();
+                path.add(new THREE.LineCurve3(v1, v2));
+                path.add(new THREE.LineCurve3(v2, new THREE.Vector3(0, 0, 0)));
+                var geometry = new THREE.TubeGeometry(path, 20, 0.01, 8, false);
+                var material = new THREE.MeshBasicMaterial();
+                var tube = new THREE.Mesh(geometry, material);
+                self.el.setObject3D("mesh", tube);
+                self.el.setAttribute("material", "color", entity.getAttribute("material").color);
+                self.el.setAttribute("material", "src", entity.getAttribute("material").src);
+            } catch (error) {
+                console.log(error);
+            }
+        });
     }
 });
+
 
 AFRAME.registerComponent('beat', {
     init: function () {
