@@ -6,47 +6,19 @@ const segmentDuration = Math.floor(beatDuration / noOfSegments);
 const noOfBeats = 4;
 const noOfRepeats = 4;
 
-var scene = document.querySelector('a-scene');
-if (scene.hasLoaded) {
-    run();
-} else {
-    scene.addEventListener('loaded', run);
-}
-function run() {
-    var entity = scene.querySelector('#hat');
-    console.log("position: " + JSON.stringify(entity.object3D.getWorldPosition()));
-    /*
-     try {
-     var v1 = new THREE.Vector3(0, 0, 0);
-     var v2 = new THREE.Vector3(0, -1, 0);
-     var path = new THREE.CurvePath();
-     path.add(new THREE.LineCurve3(v1, v2));
-     path.add(new THREE.LineCurve3(v2, new THREE.Vector3(1, -1, -1.5)));
-     var geometry = new THREE.TubeGeometry(path, 20, 0.01, 8, false);
-     var material = new THREE.MeshBasicMaterial();
-     var tube = new THREE.Mesh(geometry, material);
-     this.el.setObject3D("mesh",tube);
-     this.el.setAttribute("material", "color", this.el.parentNode.getAttribute("material").color);
-     this.el.setAttribute("material", "src", this.el.parentNode.getAttribute("material").src);
-     } catch (error) {
-     console.log(error);
-     }*/
-    //console.log("cabled");
-}
-
 
 AFRAME.registerComponent('cable', {
     schema: {type: 'string'},
     init: function () {
         var self = this;
-        var entity = scene.querySelector(self.data);
-        entity.addEventListener('loaded', function () {
+        var entity = document.querySelector(self.data);
+        document.querySelector("a-scene").addEventListener('loaded', function () {
             try {
-                var v1 = entity.object3D.getWorldPosition();
-                var v2 = new THREE.Vector3(v1.x, 0, v1.z);
+                var start = entity.object3D.getWorldPosition();
+                var instrumentFloor = new THREE.Vector3(start.x, 0, start.z);
                 var path = new THREE.CurvePath();
-                path.add(new THREE.LineCurve3(v1, v2));
-                path.add(new THREE.LineCurve3(v2, new THREE.Vector3(0, 0, 0)));
+                path.add(new THREE.LineCurve3(start, instrumentFloor));
+                path.add(new THREE.LineCurve3(instrumentFloor, new THREE.Vector3(0, 0, 0)));
                 var geometry = new THREE.TubeGeometry(path, 20, 0.01, 8, false);
                 var material = new THREE.MeshBasicMaterial();
                 var tube = new THREE.Mesh(geometry, material);
