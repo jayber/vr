@@ -6,37 +6,83 @@ const segmentDuration = Math.floor(beatDuration / noOfSegments);
 const noOfBeats = 4;
 const noOfRepeats = 4;
 
-
-AFRAME.registerComponent('cable', {
+AFRAME.registerComponent('playoff', {
     schema: {type: 'string'},
+
     init: function () {
-        var self = this;
-        var entity = document.querySelector(self.data);
-        document.querySelector("a-scene").addEventListener('loaded', function () {
-            try {
-                var start = entity.object3D.getWorldPosition();
-                var instrumentFloor = new THREE.Vector3(start.x, 0, start.z);
-                var path = new THREE.CurvePath();
-                path.add(new THREE.LineCurve3(start, instrumentFloor));
-                path.add(new THREE.LineCurve3(instrumentFloor, new THREE.Vector3(0, 0, 0)));
-                var geometry = new THREE.TubeGeometry(path, 20, 0.01, 8, false);
-                var material = new THREE.MeshBasicMaterial();
-                var tube = new THREE.Mesh(geometry, material);
-                self.el.setObject3D("mesh", tube);
-                self.el.setAttribute("material", "color", entity.getAttribute("material").color);
-                self.el.setAttribute("material", "src", entity.getAttribute("material").src);
-            } catch (error) {
-                console.log(error);
+        var el = this.el;
+        var played = false;
+
+        el.addEventListener("play", function () {
+            played = true;
+        });
+
+        var beater = document.querySelector(this.data);
+        beater.addEventListener("time", function (event) {
+            if (played) {
+                played = false;
+                el.emit('playoff');
             }
         });
     }
 });
 
+AFRAME.registerComponent('cable', {
+    schema: {type: 'string'},
+    init: function () {
+        var self = this;
+        var srcEntity = document.querySelector(self.data);
+        var doThis = function () {
+            try {
+                var start = srcEntity.object3D.getWorldPosition();
+                var instrumentFloor = new THREE.Vector3(start.x, 0, start.z);
+                var path = new THREE.CurvePath();
+                path.add(new THREE.LineCurve3(start, instrumentFloor));
+                path.add(new THREE.LineCurve3(instrumentFloor, new THREE.Vector3(0, 0, 0)));
+                var geometry = new THREE.TubeGeometry(path, 64, 0.015, 8, false);
+
+                var texture = new THREE.TextureLoader().load("img/stripe2.png");
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(100, 1);
+
+                var material = new THREE.MeshBasicMaterial({
+                    map: texture,
+                    color: srcEntity.getAttribute("material").color
+                });
+                var tube = new THREE.Mesh(geometry, material);
+                self.el.setObject3D("mesh", tube);
+
+                if (srcEntity.hasAttribute("flash")) {
+                    var flash = srcEntity.getAttribute("flash");
+                    srcEntity.addEventListener("play", function () {
+                        self.el.object3DMap["mesh"].material.color.set(flash.to);
+                    });
+                    srcEntity.addEventListener("playoff", function () {
+                        self.el.object3DMap["mesh"].material.color.set(flash.from);
+                    });
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        if (srcEntity.hasLoaded) {
+            doThis();
+        } else {
+            srcEntity.addEventListener('loaded', doThis);
+        }
+        srcEntity.addEventListener('play', function () {
+            self.el.emit("play");
+        });
+
+    }
+});
 
 AFRAME.registerComponent('beat', {
     init: function () {
         var self = this;
-        setTimeout(function () {
+        document.querySelector("a-scene").addEventListener("loaded", function () {
+            setTimeout(function () {
             var worker = new Worker('script/worker.js');
             worker.onmessage = function (event) {
                 var eventName = event.data.name;
@@ -47,8 +93,8 @@ AFRAME.registerComponent('beat', {
                 }
             };
             worker.postMessage([segmentDuration, noOfSegments, noOfBeats, noOfRepeats]);
-
-        }, 4000);
+            }, 4000);
+        });
     }
 });
 
@@ -125,7 +171,6 @@ AFRAME.registerComponent('animate-theta', {
 
 AFRAME.registerComponent('flash', {
     schema: {
-        on: {type: 'string', default: ''},
         from: {type: 'string', default: ''},
         delay: {type: 'number', default: ''},
         dur: {type: 'number', default: ''},
@@ -134,13 +179,11 @@ AFRAME.registerComponent('flash', {
     init: function () {
         var el = this.el;
         var self = this;
-        el.addEventListener(this.data.on, function () {
-            setTimeout(function () {
+        el.addEventListener("play", function () {
                 el.setAttribute('material', 'color', self.data.to);
-            }, self.data.delay);
-            setTimeout(function () {
+        });
+        el.addEventListener("playoff", function () {
                 el.setAttribute('material', 'color', self.data.from);
-            }, self.data.delay + self.data.dur);
         });
     }
 });
