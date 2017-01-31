@@ -1,6 +1,6 @@
 const bpm = 100;
 const beatDuration = 60000 / bpm;
-const noOfSegments = 16;
+const noOfSegments = 4;
 const segmentDuration = Math.floor(beatDuration / noOfSegments);
 
 const noOfBeats = 4;
