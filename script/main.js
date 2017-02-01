@@ -6,6 +6,37 @@ const segmentDuration = Math.floor(beatDuration / noOfSegments);
 const noOfBeats = 4;
 const noOfRepeats = 4;
 
+function start(self) {
+    return function () {
+        var worker = new Worker('script/worker.js');
+        worker.onmessage = function (event) {
+            var eventName = event.data.name;
+            if (eventName == 'log') {
+                //console.log(event.data.message);
+            } else {
+                self.emit(eventName, event.data.data);
+            }
+        };
+        worker.postMessage([segmentDuration, noOfSegments, noOfBeats, noOfRepeats]);
+    };
+}
+
+AFRAME.registerComponent('playable', {
+    schema: {type: 'string'},
+
+    init: function () {
+        var el = this.el;
+        var self = this;
+
+        document.querySelector("a-scene").addEventListener("loaded", function () {
+            el.addEventListener("click", function () {
+                var beater = document.querySelector(self.data);
+                start(beater)();
+            });
+        });
+    }
+});
+
 AFRAME.registerComponent('playoff', {
     schema: {type: 'string'},
 
@@ -13,7 +44,7 @@ AFRAME.registerComponent('playoff', {
         var el = this.el;
         var played = false;
 
-        el.addEventListener("play", function () {
+        el.addEventListener("playtime", function () {
             played = true;
         });
 
@@ -55,7 +86,7 @@ AFRAME.registerComponent('cable', {
 
                 if (srcEntity.hasAttribute("flash")) {
                     var flash = srcEntity.getAttribute("flash");
-                    srcEntity.addEventListener("play", function () {
+                    srcEntity.addEventListener("playtime", function () {
                         self.el.object3DMap["mesh"].material.color.set(flash.to);
                     });
                     srcEntity.addEventListener("playoff", function () {
@@ -71,30 +102,10 @@ AFRAME.registerComponent('cable', {
         } else {
             srcEntity.addEventListener('loaded', doThis);
         }
-        srcEntity.addEventListener('play', function () {
-            self.el.emit("play");
+        srcEntity.addEventListener('playtime', function () {
+            self.el.emit("playtime");
         });
 
-    }
-});
-
-AFRAME.registerComponent('beat', {
-    init: function () {
-        var self = this;
-        document.querySelector("a-scene").addEventListener("loaded", function () {
-            setTimeout(function () {
-            var worker = new Worker('script/worker.js');
-            worker.onmessage = function (event) {
-                var eventName = event.data.name;
-                if (eventName == 'log') {
-                    //console.log(event.data.message);
-                } else {
-                    self.el.emit(eventName, event.data.data);
-                }
-            };
-            worker.postMessage([segmentDuration, noOfSegments, noOfBeats, noOfRepeats]);
-            }, 4000);
-        });
     }
 });
 
@@ -114,11 +125,11 @@ AFRAME.registerComponent('time-listener', {
         var beater = document.querySelector(this.data.src);
         beater.addEventListener("time", function (event) {
             if (zip.length == 0) {
-                el.emit('play');
+                el.emit('playtime');
             } else if (zip.find(function (element) {
                     return element[0] == event.detail.beatCount && element[1] == event.detail.seg;
                 })) {
-                el.emit('play');
+                el.emit('playtime');
             }
         });
     }
@@ -159,7 +170,7 @@ AFRAME.registerComponent('animate-theta', {
             }
 
         });
-        el.addEventListener("play", function (event) {
+        el.addEventListener("playtime", function (event) {
             var now = Date.now();
             var currentDegrees = (self.degreesPerBeat * self.currentBeat) + ((now - self.lastBeatTime) * self.degreesPerMilli);
             if (currentDegrees <= 360) {
@@ -179,11 +190,12 @@ AFRAME.registerComponent('flash', {
     init: function () {
         var el = this.el;
         var self = this;
-        el.addEventListener("play", function () {
-                el.setAttribute('material', 'color', self.data.to);
+        el.addEventListener("playtime", function () {
+            console.log("flash");
+            el.setAttribute('material', 'color', self.data.to);
         });
         el.addEventListener("playoff", function () {
-                el.setAttribute('material', 'color', self.data.from);
+            el.setAttribute('material', 'color', self.data.from);
         });
     }
 });
