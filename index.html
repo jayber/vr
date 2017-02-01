@@ -37,7 +37,7 @@
     <a-sphere id="kick" flash="from:#6688ff; to:#fff"
               playoff="#beater"
               n-sound="src:audio/kick.WAV; on:play; oneshot:true;"
-              material="src:#noise-texture; repeat:5 5; color: #6688ff" position="1 1 1.5" radius="0.3" time-listener="src:#beater;beat: 0, 0, 2, 2, 3, 3;seg: 0, 2, 0, 2, 0, 2">
+              material="src:#noise-texture; repeat:5 5; color: #6688ff" position="1 1 1.5" radius="0.3" time-listener="src:#beater;beat: 0, 0, 2, 2, 3;seg: 0, 2, 0, 2, 2">
         <!--<a-animation attribute="scale" from="1 1 1" to="1.1 1.1 1.1" fill="none" begin="play" dur="200" easing="ease-in"></a-animation>-->
     </a-sphere>
 
@@ -62,27 +62,27 @@
     </a-tetrahedron>
 
     <a-entity cable="#snare"></a-entity>
-    <!--
-        <a-cylinder height="1" radius="0.08" position="0 1.2 -1.5" material="src:#stain-texture"></a-cylinder>
-        <a-sphere id="bork" n-sound="src:audio/bork.WAV; on:play;" material="src:#tongue-texture;color:#aaf" flash="from:#ca9; to:#fff"
-                  playoff="#beater"
-                  position="0 1 -1.5" radius="0.15" time-listener="src:#beater;beat: 0, 0, 3;seg: 0, 7, 7">
-            &lt;!&ndash;<a-animation attribute="position" from="0 0.9 -1.5" to="0 1.6 -1.5" begin="play" dur="200" fill="none" easing="ease-in-out"></a-animation>&ndash;&gt;
-        </a-sphere>
 
-        <a-entity cable="#bork"></a-entity>
+    <a-cylinder height="1" radius="0.08" position="0 1.2 -1.5" material="src:#stain-texture"></a-cylinder>
+    <a-sphere id="bork" n-sound="src:audio/bork.WAV; on:play;" material="src:#tongue-texture;color:#aaf" flash="from:#ca9; to:#fff"
+              playoff="#beater"
+              position="0 1 -1.5" radius="0.15" time-listener="src:#beater;beat: 3;seg: 0">
+        <!--<a-animation attribute="position" from="0 0.9 -1.5" to="0 1.6 -1.5" begin="play" dur="200" fill="none" easing="ease-in-out"></a-animation>-->
+    </a-sphere>
 
-        <a-cone id="beep" height="0.7" radius-top="0.2" radius-bottom="0.38" open-ended="true"
-                playoff="#beater" flash="from:#ffc34e; to:#fff"
-                n-sound="src:audio/beep.wav; on:play; oneshot:true;"
-                material="src:#rock-texture;side:double" position="1.7 1.1 -0.8" time-listener="src:#beater;beat: 3, 3, 3;seg: 0, 7, 11;">
-        </a-cone>
+    <a-entity cable="#bork"></a-entity>
 
-        <a-entity cable="#beep"></a-entity>
+    <a-cone id="beep" height="0.7" radius-top="0.2" radius-bottom="0.38" open-ended="true"
+            playoff="#beater" flash="from:#ffc34e; to:#fff"
+            n-sound="src:audio/beep.wav; on:play; oneshot:true;"
+            material="src:#rock-texture;side:double" position="1.7 1.1 -0.8" time-listener="src:#beater;beat: 3, 3, 3, 3;seg: 0, 1, 2, 3;">
+    </a-cone>
 
-        <a-torus radius="0.15" rotation="90 0 0" radius-tubular="0.029" position="1.7 1.3 -0.8" material="src:#cloud-texture;color:#ffe8c0;" time-listener="src:#beater;beat: 2, 3;seg:0, 0;">
-            <a-animation attribute="position" from="1.7 1.3 -0.8" to="1.7 3 -0.8" begin="play" dur="500" fill="none" easing="linear"></a-animation>
-        </a-torus>-->
+    <a-entity cable="#beep"></a-entity>
+
+    <a-torus radius="0.15" rotation="90 0 0" radius-tubular="0.029" position="1.7 1.3 -0.8" material="src:#cloud-texture;color:#ffe8c0;" time-listener="src:#beater;beat: 2, 3;seg:0, 0;">
+        <a-animation attribute="position" from="1.7 1.3 -0.8" to="1.7 3 -0.8" begin="play" dur="500" fill="none" easing="linear"></a-animation>
+    </a-torus>
 
 </a-scene>
 
