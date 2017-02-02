@@ -14,16 +14,12 @@ function logInterval(count) {
     logTime = time;
 }
 
-function emitEvents(beatCount, count, noOfSegments) {
+function emitEvents(beatCount, count, noOfSegments, now) {
     var currentSegment = count % noOfSegments;
-    postMessage({name: 'time', data: {beatCount: beatCount, seg: currentSegment}});
-    if (count % noOfSegments == 0) {
-        postMessage({name: 'beat', data: {}});
-    }
+    postMessage({name: 'time', data: {beatCount: beatCount, seg: currentSegment, now: now}});
 }
 
-function adjustInterval(segmentDuration) {
-    var time = Date.now();
+function adjustInterval(segmentDuration, time) {
     var lastInterval = time - lastSegmentTime;
     var adjustedInterval = lastInterval > segmentDuration ? segmentDuration + segmentDuration - lastInterval : segmentDuration;
     lastSegmentTime = time;
@@ -44,10 +40,11 @@ function getTimedFunction(segmentDuration, noOfSegments, noOfBeats, noOfRepeats)
             //clearInterval(player);
             close();
         } else {
-            emitEvents(beatCount, count, noOfSegments);
-            logInterval(count);
+            var now = Date.now();
+            emitEvents(beatCount, count, noOfSegments, now);
+            //logInterval(count);
             count++;
-            var adjustedInterval = adjustInterval(segmentDuration);
+            var adjustedInterval = adjustInterval(segmentDuration, now);
             setTimeout(getTimedFunction(segmentDuration, noOfSegments, noOfBeats, noOfRepeats), adjustedInterval);
         }
     }
