@@ -54,7 +54,6 @@ function getTimedFunction(segmentDuration, noOfSegments, noOfBeats, noOfRepeats)
 }
 
 onmessage = function (event) {
-    console.log("Worker.onmesage");
     lastSegmentTime = Date.now();
     var segmentDuration = event.data[0];
     var noOfSegments = event.data[1];

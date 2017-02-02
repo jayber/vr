@@ -6,32 +6,25 @@ const segmentDuration = Math.floor(beatDuration / noOfSegments);
 const noOfBeats = 4;
 const noOfRepeats = 4;
 
-function start(self) {
-    return function () {
+function start(src) {
         var worker = new Worker('script/worker.js');
         worker.onmessage = function (event) {
             var eventName = event.data.name;
             if (eventName == 'log') {
                 //console.log(event.data.message);
             } else {
-                self.emit(eventName, event.data.data);
+                src.emit(eventName, event.data.data);
             }
         };
         worker.postMessage([segmentDuration, noOfSegments, noOfBeats, noOfRepeats]);
-    };
 }
 
 AFRAME.registerComponent('playable', {
-    schema: {type: 'string'},
-
     init: function () {
         var el = this.el;
-        var self = this;
-
         document.querySelector("a-scene").addEventListener("loaded", function () {
             el.addEventListener("click", function () {
-                var beater = document.querySelector(self.data);
-                start(beater)();
+                start(el);
             });
         });
     }
@@ -39,7 +32,6 @@ AFRAME.registerComponent('playable', {
 
 AFRAME.registerComponent('playoff', {
     schema: {type: 'string'},
-
     init: function () {
         var el = this.el;
         var played = false;
@@ -183,15 +175,12 @@ AFRAME.registerComponent('animate-theta', {
 AFRAME.registerComponent('flash', {
     schema: {
         from: {type: 'string', default: ''},
-        delay: {type: 'number', default: ''},
-        dur: {type: 'number', default: ''},
-        to: {type: 'string', default: ''}
+        delay: {type: 'number', default: ''}
     },
     init: function () {
         var el = this.el;
         var self = this;
         el.addEventListener("playtime", function () {
-            console.log("flash");
             el.setAttribute('material', 'color', self.data.to);
         });
         el.addEventListener("playoff", function () {
