@@ -6,6 +6,8 @@ const segmentDuration = Math.floor(beatDuration / noOfSegments);
 const noOfBeats = 4;
 const noOfRepeats = 4;
 
+var multiplier = 0.03;
+
 function start(src) {
     var worker = new Worker('script/worker.js');
     worker.onmessage = function (event) {
@@ -109,7 +111,8 @@ AFRAME.registerComponent('time-listener', {
     schema: {
         src: {type: 'string', default: ''},
         beat: {type: 'array'},
-        seg: {type: 'array'}
+        seg: {type: 'array'},
+        display: {type: 'boolean', default: true}
     },
 
     init: function () {
@@ -119,8 +122,9 @@ AFRAME.registerComponent('time-listener', {
             return [element, self.data.seg[index]];
         });
 
-        this.generateMarkers(zip);
-
+        if (this.data.display) {
+            this.generateMarkers(zip);
+        }
         var beater = document.querySelector(this.data.src);
         beater.addEventListener("time", function (event) {
             if (zip.length == 0) {
@@ -135,17 +139,22 @@ AFRAME.registerComponent('time-listener', {
 
     generateMarkers: function (times) {
         var el = this.el;
+        var multi = multiplier++;
         times.forEach(function (time) {
             try {
                 var angle = (time[0] * (360 / noOfBeats)) + (time[1] * (360 / (noOfSegments * noOfBeats)));
 
                 var subElement = document.createElement("a-sphere");
-                subElement.setAttribute("radius", "0.035");
+                subElement.setAttribute("radius", "0.03");
                 var clockFace = document.querySelector('#clock-face');
                 var parentRadius = clockFace.getAttribute('radius');
 
-                var newX = Math.cos(angle * (Math.PI / 180)) * parentRadius;
-                var newY = Math.sin(angle * (Math.PI / 180)) * parentRadius;
+                var startRad = 0.25;
+                var step = 0.032;
+                var rad = startRad + (multi * step);
+
+                var newX = Math.cos(angle * (Math.PI / 180)) * rad;
+                var newY = Math.sin(angle * (Math.PI / 180)) * rad;
                 subElement.setAttribute("position", newY + " -0.025 " + newX);
 
                 var color = el.getAttribute("material").color;
@@ -172,15 +181,19 @@ AFRAME.registerComponent('animate-theta', {
         var self = this;
         var el = this.el;
         self.degreesPerBeat = (360 / noOfBeats);
-        self.degreesPerMilli = self.degreesPerBeat / beatDuration;
+        self.degreesPerSeg = self.degreesPerBeat / noOfSegments;
         el.addEventListener("playtime", function (event) {
             var now = event.detail.now;
             if (event.detail.seg === 0) {
                 self.lastBeatTime = now;
             }
-            var currentDegrees = (self.degreesPerBeat * event.detail.beatCount) + ((now - self.lastBeatTime) * self.degreesPerMilli);
-            el.setAttribute("geometry", "thetaLength", (currentDegrees + (Math.PI / 180)));
-            //console.log(currentDegrees + " - beat="+event.detail.beatCount + "; seg="+event.detail.seg);
+            var currentDegrees = ((event.detail.beatCount * noOfSegments) + event.detail.seg) * self.degreesPerSeg;
+            try {
+                el.setAttribute("theta-length", currentDegrees + 0.05);    //OMFG i have no idea why i have to add this little number, but if i don't, it doesn't work!!
+                //console.log(el.getAttribute("theta-length") + " - beat="+event.detail.beatCount + "; seg="+event.detail.seg);
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 });
