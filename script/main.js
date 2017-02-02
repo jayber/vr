@@ -6,7 +6,7 @@ const segmentDuration = Math.floor(beatDuration / noOfSegments);
 const noOfBeats = 4;
 const noOfRepeats = 4;
 
-var multiplier = 0.03;
+var dialRadiusMultiplier = 0.03;
 
 function start(src) {
     var worker = new Worker('script/worker.js');
@@ -139,7 +139,7 @@ AFRAME.registerComponent('time-listener', {
 
     generateMarkers: function (times) {
         var el = this.el;
-        var multi = multiplier++;
+        var multi = dialRadiusMultiplier++;
         times.forEach(function (time) {
             try {
                 var angle = (time[0] * (360 / noOfBeats)) + (time[1] * (360 / (noOfSegments * noOfBeats)));
