@@ -8,6 +8,8 @@ const noOfRepeats = 4;
 
 var dialRadiusMultiplier = 0.03;
 
+var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 function start(src) {
     var worker = new Worker('script/worker.js');
     worker.onmessage = function (event) {
@@ -42,21 +44,20 @@ AFRAME.registerComponent('j-sound', {
         var el = this.el;
         var self = this;
         try {
-            var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            /*
-             var loader = new AudioSampleLoader();
-             loader.src = this.data.src;
-             loader.ctx = audioCtx;
-             loader.onload = function () {
-             self.source = audioCtx.createBufferSource();
-             self.source.buffer = loader.response;
-             };
-             loader.send();
+            var loader = new AudioSampleLoader();
+            loader.src = this.data.src;
+            loader.ctx = audioCtx;
+            loader.onload = function () {
+                self.audio = loader.response;
+            };
+            loader.send();
 
-             el.addEventListener(this.data.on, function () {
-             self.source.connect(audioCtx.destination);
-             self.source.start();
-             });*/
+            el.addEventListener(this.data.on, function () {
+                var source = audioCtx.createBufferSource();
+                source.buffer = self.audio;
+                source.connect(audioCtx.destination);
+                source.start();
+            });
         } catch (error) {
             console.log(error);
         }
