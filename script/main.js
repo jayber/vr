@@ -33,6 +33,36 @@ function setFlashing(srcEntity, el) {
     }
 }
 
+AFRAME.registerComponent('j-sound', {
+    schema: {
+        src: {type: 'string', default: ''},
+        on: {type: 'array'}
+    },
+    init: function () {
+        var el = this.el;
+        var self = this;
+        try {
+            var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            /*
+             var loader = new AudioSampleLoader();
+             loader.src = this.data.src;
+             loader.ctx = audioCtx;
+             loader.onload = function () {
+             self.source = audioCtx.createBufferSource();
+             self.source.buffer = loader.response;
+             };
+             loader.send();
+
+             el.addEventListener(this.data.on, function () {
+             self.source.connect(audioCtx.destination);
+             self.source.start();
+             });*/
+        } catch (error) {
+            console.log(error);
+        }
+    }
+});
+
 AFRAME.registerComponent('playable', {
     init: function () {
         var el = this.el;
