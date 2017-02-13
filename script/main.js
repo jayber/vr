@@ -9,19 +9,10 @@ const noOfRepeats = 4;
 var dialRadiusMultiplier = 0.03;
 
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+var worker = new Worker('script/worker.js');
 
-function start(src) {
-    var worker = new Worker('script/worker.js');
-    worker.onmessage = function (event) {
-        var eventName = event.data.name;
-        if (eventName == 'log') {
-            //console.log(event.data.message);
-        } else {
-            src.emit(eventName, event.data.data);
-        }
-    };
-    worker.postMessage([segmentDuration, noOfSegments, noOfBeats, noOfRepeats]);
-}
+var sounds = {};
+
 
 function setFlashing(srcEntity, el) {
     if (srcEntity.hasAttribute("flash")) {
@@ -34,6 +25,39 @@ function setFlashing(srcEntity, el) {
         });
     }
 }
+
+AFRAME.registerComponent('playable', {
+    init: function () {
+        var el = this.el;
+        var self = this;
+        worker.onmessage = function (event) {
+            var eventName = event.data.name;
+            if (eventName == 'log') {
+                console.log(event.data.message);
+            } else if (eventName == 'schedule') {
+                console.log(JSON.stringify(event.data));
+                event.data.sounds.forEach(function (currentSound) {
+                    var source = audioCtx.createBufferSource();
+                    source.buffer = sounds[currentSound];
+                    source.connect(audioCtx.destination);
+                    source.start(event.data.when / 1000);
+                });
+            } else {
+                el.emit(eventName, event.data.data);
+            }
+        };
+
+        document.querySelector("a-scene").addEventListener("loaded", function () {
+            el.addEventListener("click", function () {
+                self.start(el);
+            });
+        });
+    },
+
+    start: function (src) {
+        worker.postMessage({name: "start", data: [segmentDuration, noOfSegments, noOfBeats, noOfRepeats]});
+    }
+});
 
 AFRAME.registerComponent('j-sound', {
     schema: {
@@ -48,29 +72,83 @@ AFRAME.registerComponent('j-sound', {
             loader.src = this.data.src;
             loader.ctx = audioCtx;
             loader.onload = function () {
-                self.audio = loader.response;
+                sounds[self.data.src] = loader.response;
             };
             loader.send();
 
-            el.addEventListener(this.data.on, function () {
-                var source = audioCtx.createBufferSource();
-                source.buffer = self.audio;
-                source.connect(audioCtx.destination);
-                source.start();
-            });
         } catch (error) {
             console.log(error);
         }
     }
 });
 
-AFRAME.registerComponent('playable', {
+AFRAME.registerComponent('time-listener', {
+    schema: {
+        src: {type: 'string', default: ''},
+        beat: {type: 'array'},
+        seg: {type: 'array'},
+        display: {type: 'boolean', default: true}
+    },
+
     init: function () {
         var el = this.el;
-        document.querySelector("a-scene").addEventListener("loaded", function () {
-            el.addEventListener("click", function () {
-                start(el);
-            });
+        var self = this;
+        var zip = this.data.beat.map(function (element, index) {
+            return [element, self.data.seg[index]];
+        });
+
+        if (this.data.display) {
+            this.generateMarkers(zip);
+        }
+
+        if (el.hasAttribute("j-sound")) {
+            worker.postMessage({name: "register-sound", src: el.getAttribute("j-sound").src, times: zip});
+        }
+
+        this.listenToBeater(zip, el);
+    },
+
+    listenToBeater: function (zip, el) {
+        var beater = document.querySelector(this.data.src);
+        beater.addEventListener("time", function (event) {
+            if (zip.length == 0) {
+                el.emit('playtime', event.detail);
+            } else if (zip.find(function (element) {
+                    return element[0] == event.detail.beatCount && element[1] == event.detail.seg;
+                })) {
+                el.emit('playtime', event.detail);
+            }
+        });
+    },
+
+    generateMarkers: function (times) {
+        var el = this.el;
+        var multi = dialRadiusMultiplier++;
+        times.forEach(function (time) {
+            try {
+                var angle = (time[0] * (360 / noOfBeats)) + (time[1] * (360 / (noOfSegments * noOfBeats)));
+
+                var subElement = document.createElement("a-sphere");
+                subElement.setAttribute("radius", "0.03");
+                var clockFace = document.querySelector('#clock-face');
+                var parentRadius = clockFace.getAttribute('radius');
+
+                var startRad = 0.25;
+                var step = 0.032;
+                var rad = startRad + (multi * step);
+
+                var newX = Math.cos(angle * (Math.PI / 180)) * rad;
+                var newY = Math.sin(angle * (Math.PI / 180)) * rad;
+                subElement.setAttribute("position", newY + " -0.025 " + newX);
+
+                var color = el.getAttribute("material").color;
+                subElement.setAttribute("color", color);
+                clockFace.appendChild(subElement);
+
+                setFlashing(el, subElement);
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 });
@@ -135,68 +213,6 @@ AFRAME.registerComponent('cable', {
             self.el.emit("playtime");
         });
 
-    }
-});
-
-AFRAME.registerComponent('time-listener', {
-    schema: {
-        src: {type: 'string', default: ''},
-        beat: {type: 'array'},
-        seg: {type: 'array'},
-        display: {type: 'boolean', default: true}
-    },
-
-    init: function () {
-        var el = this.el;
-        var self = this;
-        var zip = this.data.beat.map(function (element, index) {
-            return [element, self.data.seg[index]];
-        });
-
-        if (this.data.display) {
-            this.generateMarkers(zip);
-        }
-        var beater = document.querySelector(this.data.src);
-        beater.addEventListener("time", function (event) {
-            if (zip.length == 0) {
-                el.emit('playtime', event.detail);
-            } else if (zip.find(function (element) {
-                    return element[0] == event.detail.beatCount && element[1] == event.detail.seg;
-                })) {
-                el.emit('playtime', event.detail);
-            }
-        });
-    },
-
-    generateMarkers: function (times) {
-        var el = this.el;
-        var multi = dialRadiusMultiplier++;
-        times.forEach(function (time) {
-            try {
-                var angle = (time[0] * (360 / noOfBeats)) + (time[1] * (360 / (noOfSegments * noOfBeats)));
-
-                var subElement = document.createElement("a-sphere");
-                subElement.setAttribute("radius", "0.03");
-                var clockFace = document.querySelector('#clock-face');
-                var parentRadius = clockFace.getAttribute('radius');
-
-                var startRad = 0.25;
-                var step = 0.032;
-                var rad = startRad + (multi * step);
-
-                var newX = Math.cos(angle * (Math.PI / 180)) * rad;
-                var newY = Math.sin(angle * (Math.PI / 180)) * rad;
-                subElement.setAttribute("position", newY + " -0.025 " + newX);
-
-                var color = el.getAttribute("material").color;
-                subElement.setAttribute("color", color);
-                clockFace.appendChild(subElement);
-
-                setFlashing(el, subElement);
-            } catch (error) {
-                console.log(error);
-            }
-        });
     }
 });
 
