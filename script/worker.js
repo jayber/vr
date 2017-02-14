@@ -4,9 +4,7 @@ var repeatCount = 0;
 var lastSegmentTime;
 
 var player;
-
-var soundTimes;
-
+var soundsByTimes;
 var soundList;
 
 function logInterval(count) {
@@ -43,14 +41,19 @@ function getTimedFunction(segmentDuration, noOfSegments, noOfBeats, noOfRepeats,
         }
         if (repeatCount == noOfRepeats) {
             //clearInterval(player);
-            close();
+            //close();
         } else {
             var now = Date.now();
 
             var nextCount = count + 1;
+            var nextBeat = 0;
+            var nextSegment = 0;
             if (nextCount < noOfSegments * noOfBeats) {
-                var nextBeat = Math.floor(nextCount / noOfSegments);
-                var nextSegment = nextCount % noOfSegments;
+                nextBeat = Math.floor(nextCount / noOfSegments);
+                nextSegment = nextCount % noOfSegments;
+            }
+
+            if (!(nextCount == noOfSegments * noOfBeats && repeatCount == noOfRepeats - 1)) {
                 schedule(soundTimes[nextBeat][nextSegment], segmentDuration);
             }
 
@@ -63,49 +66,55 @@ function getTimedFunction(segmentDuration, noOfSegments, noOfBeats, noOfRepeats,
     }
 }
 
+function schedule(sounds, when) {
+    if (sounds.length > 0) {
+        postMessage({name: 'schedule', sounds: sounds, when: when});
+    }
+}
+
+function indexSoundsByTime(noOfBeats, noOfSegments, soundList) {
+    var soundsByTimes = [noOfBeats];
+    for (var i = 0; i < noOfBeats; i++) {
+        soundsByTimes[i] = [noOfSegments];
+        for (var j = 0; j < noOfSegments; j++) {
+            soundsByTimes[i][j] = [];
+        }
+    }
+    soundList.forEach(function (element) {
+        element.times.forEach(function (time) {
+            soundsByTimes[time[0]][time[1]].push(element.name);
+        });
+    });
+    return soundsByTimes;
+}
+
 onmessage = function (event) {
     var payload = event.data;
     switch (payload.name) {
         case "start":
+            count = 0;
+            repeatCount = 0;
             lastSegmentTime = Date.now();
             var segmentDuration = payload.data[0];
             var noOfSegments = payload.data[1];
             var noOfBeats = payload.data[2];
             var noOfRepeats = payload.data[3];
+            var beatDuration = payload.data[4];
             lastExpectedInterval = segmentDuration;
             //player = setInterval(getTimedFunction(segmentDuration, noOfSegments, noOfBeats, noOfRepeats), segmentDuration);
 
-            if (soundTimes == undefined) {
-                soundTimes = [noOfBeats];
-                for (var i = 0; i < noOfBeats; i++) {
-                    soundTimes[i] = [noOfSegments];
-                    for (var j = 0; j < noOfSegments; j++) {
-                        soundTimes[i][j] = [];
-                    }
-                }
-                soundList.forEach(function (element) {
-                    element.times.forEach(function (time) {
-                        soundTimes[time[0]][time[1]].push(element.name);
-                    });
-                });
-            }
+            soundsByTimes = indexSoundsByTime(noOfBeats, noOfSegments, soundList);
 
-            schedule(soundTimes[0][0], segmentDuration);
-            setTimeout(getTimedFunction(segmentDuration, noOfSegments, noOfBeats, noOfRepeats, soundTimes), segmentDuration);
+            schedule(soundsByTimes[0][0], segmentDuration, beatDuration);
+            setTimeout(getTimedFunction(segmentDuration, noOfSegments, noOfBeats, noOfRepeats, soundsByTimes), segmentDuration);
             break;
+
         case "register-sound":
             if (soundList == undefined) {
                 soundList = [{name: payload.src, times: payload.times}];
             } else {
                 soundList.push({name: payload.src, times: payload.times});
             }
-
             break;
     }
 };
-
-function schedule(sounds, when) {
-    if (sounds.length > 0) {
-        postMessage({name: 'schedule', sounds: sounds, when: when});
-    }
-}

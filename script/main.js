@@ -10,9 +10,7 @@ var dialRadiusMultiplier = 0.03;
 
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 var worker = new Worker('script/worker.js');
-
-var sounds = {};
-
+var soundBuffersMap = {};
 
 function setFlashing(srcEntity, el) {
     if (srcEntity.hasAttribute("flash")) {
@@ -30,15 +28,16 @@ AFRAME.registerComponent('playable', {
     init: function () {
         var el = this.el;
         var self = this;
+        console.log("playable");
         worker.onmessage = function (event) {
             var eventName = event.data.name;
             if (eventName == 'log') {
                 console.log(event.data.message);
             } else if (eventName == 'schedule') {
                 console.log(JSON.stringify(event.data));
-                event.data.sounds.forEach(function (currentSound) {
+                event.data.sounds.forEach(function (soundName) {
                     var source = audioCtx.createBufferSource();
-                    source.buffer = sounds[currentSound];
+                    source.buffer = soundBuffersMap[soundName];
                     source.connect(audioCtx.destination);
                     source.start(event.data.when / 1000);
                 });
@@ -47,15 +46,16 @@ AFRAME.registerComponent('playable', {
             }
         };
 
-        document.querySelector("a-scene").addEventListener("loaded", function () {
-            el.addEventListener("click", function () {
-                self.start(el);
-            });
+        el.addEventListener("click", function () {
+            self.start();
         });
     },
 
-    start: function (src) {
-        worker.postMessage({name: "start", data: [segmentDuration, noOfSegments, noOfBeats, noOfRepeats]});
+    start: function () {
+        worker.postMessage({
+            name: "start",
+            data: [segmentDuration, noOfSegments, noOfBeats, noOfRepeats, beatDuration]
+        });
     }
 });
 
@@ -67,18 +67,13 @@ AFRAME.registerComponent('j-sound', {
     init: function () {
         var el = this.el;
         var self = this;
-        try {
-            var loader = new AudioSampleLoader();
-            loader.src = this.data.src;
-            loader.ctx = audioCtx;
-            loader.onload = function () {
-                sounds[self.data.src] = loader.response;
-            };
-            loader.send();
-
-        } catch (error) {
-            console.log(error);
-        }
+        var loader = new AudioSampleLoader();
+        loader.src = this.data.src;
+        loader.ctx = audioCtx;
+        loader.onload = function () {
+            soundBuffersMap[self.data.src] = loader.response;
+        };
+        loader.send();
     }
 });
 
@@ -178,41 +173,41 @@ AFRAME.registerComponent('cable', {
     init: function () {
         var self = this;
         var srcEntity = document.querySelector(self.data);
-        var doThis = function () {
-            try {
-                var start = srcEntity.object3D.getWorldPosition();
-                var instrumentFloor = new THREE.Vector3(start.x, 0, start.z);
-                var path = new THREE.CurvePath();
-                path.add(new THREE.LineCurve3(start, instrumentFloor));
-                path.add(new THREE.LineCurve3(instrumentFloor, new THREE.Vector3(0, 0, 0)));
-                var geometry = new THREE.TubeGeometry(path, 64, 0.015, 8, false);
 
-                var texture = new THREE.TextureLoader().load("img/stripe2.png");
-                texture.wrapS = THREE.RepeatWrapping;
-                texture.wrapT = THREE.RepeatWrapping;
-                texture.repeat.set(100, 1);
-
-                var material = new THREE.MeshBasicMaterial({
-                    map: texture,
-                    color: srcEntity.getAttribute("material").color
-                });
-                var tube = new THREE.Mesh(geometry, material);
-                self.el.setObject3D("mesh", tube);
-
-                setFlashing(srcEntity, self.el);
-            } catch (error) {
-                console.log(error);
-            }
-        };
         if (srcEntity.hasLoaded) {
-            doThis();
+            self.createCable(srcEntity);
         } else {
-            srcEntity.addEventListener('loaded', doThis);
+            srcEntity.addEventListener('loaded', function () {
+                self.createCable(srcEntity);
+            });
         }
         srcEntity.addEventListener('playtime', function () {
             self.el.emit("playtime");
         });
+    },
 
+    createCable: function (srcEntity) {
+        var self = this;
+        var start = srcEntity.object3D.getWorldPosition();
+        var instrumentFloor = new THREE.Vector3(start.x, 0, start.z);
+        var path = new THREE.CurvePath();
+        path.add(new THREE.LineCurve3(start, instrumentFloor));
+        path.add(new THREE.LineCurve3(instrumentFloor, new THREE.Vector3(0, 0, 0)));
+        var geometry = new THREE.TubeGeometry(path, 64, 0.015, 8, false);
+
+        var texture = new THREE.TextureLoader().load("img/stripe2.png");
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(100, 1);
+
+        var material = new THREE.MeshBasicMaterial({
+            map: texture,
+            color: srcEntity.getAttribute("material").color
+        });
+        var tube = new THREE.Mesh(geometry, material);
+        self.el.setObject3D("mesh", tube);
+
+        setFlashing(srcEntity, self.el);
     }
 });
 
