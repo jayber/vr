@@ -28,13 +28,12 @@ AFRAME.registerComponent('playable', {
     init: function () {
         var el = this.el;
         var self = this;
-        console.log("playable");
         worker.onmessage = function (event) {
             var eventName = event.data.name;
             if (eventName == 'log') {
                 console.log(event.data.message);
             } else if (eventName == 'schedule') {
-                console.log(JSON.stringify(event.data));
+                //console.log(JSON.stringify(event.data));
                 event.data.sounds.forEach(function (soundName) {
                     var source = audioCtx.createBufferSource();
                     source.buffer = soundBuffersMap[soundName];
