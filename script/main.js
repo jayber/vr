@@ -9,7 +9,7 @@ const noOfRepeats = 4;
 var dialRadiusMultiplier = 0.03;
 
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-var worker = new Worker('script/worker.js');
+var scheduler = new Scheduler();
 var soundBuffersMap = {};
 
 function setFlashing(srcEntity, el) {
@@ -28,34 +28,16 @@ AFRAME.registerComponent('playable', {
     init: function () {
         var el = this.el;
         var self = this;
-        worker.onmessage = function (event) {
-            var eventName = event.data.name;
-            if (eventName == 'log') {
-                console.log(event.data.message);
-            } else if (eventName == 'schedule') {
-                //console.log(JSON.stringify(event.data));
-                event.data.sounds.forEach(function (soundName) {
-                    var source = audioCtx.createBufferSource();
-                    source.buffer = soundBuffersMap[soundName];
-                    source.connect(audioCtx.destination);
-                    source.start(event.data.when / 1000);
-                });
-            } else {
-                el.emit(eventName, event.data.data);
-            }
-        };
 
         el.addEventListener("click", function () {
-            self.start();
+            self.start(el);
         });
     },
 
-    start: function () {
-        worker.postMessage({
-            name: "start",
-            data: [segmentDuration, noOfSegments, noOfBeats, noOfRepeats, beatDuration]
-        });
+    start: function (el) {
+        scheduler.start(segmentDuration, noOfSegments, noOfBeats, noOfRepeats, beatDuration, el);
     }
+
 });
 
 AFRAME.registerComponent('j-sound', {
@@ -96,7 +78,7 @@ AFRAME.registerComponent('time-listener', {
         }
 
         if (el.hasAttribute("j-sound")) {
-            worker.postMessage({name: "register-sound", src: el.getAttribute("j-sound").src, times: zip});
+            scheduler.registerSound(el.getAttribute("j-sound").src, zip);
         }
 
         this.listenToBeater(zip, el);
