@@ -37,7 +37,6 @@ AFRAME.registerComponent('playable', {
     start: function (el) {
         scheduler.start(segmentDuration, noOfSegments * noOfBeats, noOfRepeats, el);
     }
-
 });
 
 AFRAME.registerComponent('j-sound', {

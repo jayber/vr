@@ -12,6 +12,7 @@ function Scheduler() {
         self.soundsByTimes = self.indexSoundsBySegment(totalNoOfSegments, self.soundList);
 
         self.startTime = audioCtx.currentTime * 1000;
+
         window.requestAnimationFrame(function () {
             self.playCurrent(totalNoOfSegments)
         });
