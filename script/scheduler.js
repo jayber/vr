@@ -2,13 +2,13 @@ function Scheduler() {
 
     var self = this;
 
-    self.start = function (segmentDuration, noOfSegments, noOfBeats, noOfRepeats, beatDuration, el) {
+    self.start = function (segmentDuration, noOfSegments, noOfBeats, noOfRepeats, el) {
         self.el = el;
-        self.segmentDuration = segmentDuration;
         self.count = 0;
         self.repeatCount = 0;
+        self.segmentDuration = segmentDuration;
 
-        self.soundsByTimes = self.indexSoundsByTime(noOfBeats, noOfSegments, self.soundList);
+        self.soundsByTimes = self.indexSoundsBySegment(noOfBeats, noOfSegments, self.soundList);
 
         self.startTime = audioCtx.currentTime * 1000;
         window.requestAnimationFrame(self.playCurrent);
@@ -18,8 +18,9 @@ function Scheduler() {
         var critTime = self.count * self.segmentDuration;
         var elapsedTime = (audioCtx.currentTime * 1000) - self.startTime;
 
-        console.log("playCurrent - critTime: " + critTime + "; elapsedTime: " + Math.floor(elapsedTime));
         if (critTime < elapsedTime) {
+            console.log("playCurrent - critTime: " + critTime + "; elapsedTime: " + Math.floor(elapsedTime));
+            self.emitEvents(self.count, noOfSegments);
             self.play(self.soundsByTimes[self.count]);
             self.count++;
         }
@@ -29,7 +30,7 @@ function Scheduler() {
         }
     };
 
-    self.indexSoundsByTime = function (noOfBeats, noOfSegments, soundList) {
+    self.indexSoundsBySegment = function (noOfBeats, noOfSegments, soundList) {
         var allSegs = (noOfBeats * noOfSegments);
         var soundsByTimes = [allSegs];
         for (var i = 0; i < allSegs; i++) {
@@ -45,10 +46,11 @@ function Scheduler() {
         return soundsByTimes;
     };
 
-    self.emitEvents = function (beatCount, count, noOfSegments, now) {
+    self.emitEvents = function (count, noOfSegments) {
         var currentSegment = count % noOfSegments;
+        var beatCount = Math.floor(count / noOfSegments);
 
-        self.el.emit('time', {beatCount: beatCount, seg: currentSegment, now: now});
+        self.el.emit('time', {beatCount: beatCount, seg: currentSegment});
     };
 
     self.play = function (sounds) {

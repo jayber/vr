@@ -35,7 +35,7 @@ AFRAME.registerComponent('playable', {
     },
 
     start: function (el) {
-        scheduler.start(segmentDuration, noOfSegments, noOfBeats, noOfRepeats, beatDuration, el);
+        scheduler.start(segmentDuration, noOfSegments, noOfBeats, noOfRepeats, el);
     }
 
 });
@@ -206,14 +206,10 @@ AFRAME.registerComponent('animate-theta', {
         self.degreesPerBeat = (360 / noOfBeats);
         self.degreesPerSeg = self.degreesPerBeat / noOfSegments;
         el.addEventListener("playtime", function (event) {
-            var now = event.detail.now;
-            if (event.detail.seg === 0) {
-                self.lastBeatTime = now;
-            }
             var currentDegrees = ((event.detail.beatCount * noOfSegments) + event.detail.seg) * self.degreesPerSeg;
             try {
                 el.setAttribute("theta-length", currentDegrees + 0.05);    //OMFG i have no idea why i have to add this little number, but if i don't, it doesn't work!!
-                //console.log(el.getAttribute("theta-length") + " - beat="+event.detail.beatCount + "; seg="+event.detail.seg);
+                //console.log(el.getAttribute("theta-length") + "; current="+currentDegrees+" - beat="+event.detail.beatCount + "; seg="+event.detail.seg);
             } catch (error) {
                 console.log(error);
             }
