@@ -2,20 +2,23 @@ function Scheduler() {
 
     var self = this;
 
-    self.start = function (segmentDuration, noOfSegments, noOfBeats, noOfRepeats, el) {
+    self.start = function (segmentDuration, totalNoOfSegments, noOfRepeats, el) {
         self.el = el;
         self.count = 0;
         self.repeatCount = 0;
         self.segmentDuration = segmentDuration;
+        self.noOfRepeats = noOfRepeats;
 
-        self.soundsByTimes = self.indexSoundsBySegment(noOfBeats, noOfSegments, self.soundList);
+        self.soundsByTimes = self.indexSoundsBySegment(totalNoOfSegments, self.soundList);
 
         self.startTime = audioCtx.currentTime * 1000;
-        window.requestAnimationFrame(self.playCurrent);
+        window.requestAnimationFrame(function () {
+            self.playCurrent(totalNoOfSegments)
+        });
     };
 
-    self.playCurrent = function () {
-        var critTime = self.count * self.segmentDuration;
+    self.playCurrent = function (totalNoOfSegments) {
+        var critTime = (self.count * self.segmentDuration) + (self.repeatCount * totalNoOfSegments * self.segmentDuration);
         var elapsedTime = (audioCtx.currentTime * 1000) - self.startTime;
 
         if (critTime < elapsedTime) {
@@ -25,15 +28,22 @@ function Scheduler() {
             self.count++;
         }
 
-        if (self.count < self.soundsByTimes.length) {
-            window.requestAnimationFrame(self.playCurrent);
+        if (self.count < totalNoOfSegments) {
+            window.requestAnimationFrame(function () {
+                self.playCurrent(totalNoOfSegments)
+            });
+        } else if (self.repeatCount < self.noOfRepeats - 1) {
+            self.count = 0;
+            self.repeatCount++;
+            window.requestAnimationFrame(function () {
+                self.playCurrent(totalNoOfSegments)
+            });
         }
     };
 
-    self.indexSoundsBySegment = function (noOfBeats, noOfSegments, soundList) {
-        var allSegs = (noOfBeats * noOfSegments);
-        var soundsByTimes = [allSegs];
-        for (var i = 0; i < allSegs; i++) {
+    self.indexSoundsBySegment = function (totalNoOfSegments, soundList) {
+        var soundsByTimes = [totalNoOfSegments];
+        for (var i = 0; i < totalNoOfSegments; i++) {
             soundsByTimes[i] = [];
         }
 

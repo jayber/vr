@@ -1,4 +1,4 @@
-const bpm = 100;
+const bpm = 110;
 const beatDuration = 60000 / bpm;
 const noOfSegments = 4;
 const segmentDuration = Math.floor(beatDuration / noOfSegments);
@@ -35,7 +35,7 @@ AFRAME.registerComponent('playable', {
     },
 
     start: function (el) {
-        scheduler.start(segmentDuration, noOfSegments, noOfBeats, noOfRepeats, el);
+        scheduler.start(segmentDuration, noOfSegments * noOfBeats, noOfRepeats, el);
     }
 
 });
@@ -46,7 +46,6 @@ AFRAME.registerComponent('j-sound', {
         on: {type: 'array'}
     },
     init: function () {
-        var el = this.el;
         var self = this;
         var loader = new AudioSampleLoader();
         loader.src = this.data.src;
