@@ -13,7 +13,7 @@ function Scheduler() {
 
         self.startTime = audioCtx.currentTime * 1000;
 
-        var scriptNode = audioCtx.createScriptProcessor(4096, 1, 1);
+        var scriptNode = audioCtx.createScriptProcessor(512, 1, 1);
 
         var dummy = audioCtx.createOscillator();
         dummy.connect(scriptNode);
