@@ -42,12 +42,12 @@
 
     <a-circle bpm-label radius="0.4" scale="0.5 0.5 0.5" color="#999" side="both" position="0 1.33 0.05" rotation="-45 0 0" n-text="fontSize:1pt;width:0.5;height:0.1"></a-circle>
 
-    <a-box id="kick" flash="from:#6688ff; to:#fff"
+    <a-sphere id="kick" flash="from:#6688ff; to:#fff"
               playoff="#beater"
               j-sound="src:audio/kick.WAV; on:playtime; oneshot:true;"
               material="src:#noise-texture; repeat:5 5" color="#6688ff" position="1 1 1.5" radius="0.3"
               time-listener="src:#beater;beat: 0, 0, 2, 2, 3;seg: 0, 2, 0, 2, 2">
-    </a-box>
+    </a-sphere>
 
     <a-entity cable="#kick"></a-entity>
 
