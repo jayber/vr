@@ -35,7 +35,7 @@ AFRAME.registerComponent('playable', {
     },
 
     start: function (el) {
-        scheduler.start(segmentDuration, noOfSegments * noOfBeats, noOfRepeats, el);
+        scheduler.start(segmentDuration, noOfSegments * noOfBeats, noOfRepeats, noOfSegments, el);
     }
 });
 
@@ -105,7 +105,6 @@ AFRAME.registerComponent('time-listener', {
                 var subElement = document.createElement("a-sphere");
                 subElement.setAttribute("radius", "0.03");
                 var clockFace = document.querySelector('#clock-face');
-                var parentRadius = clockFace.getAttribute('radius');
 
                 var startRad = 0.25;
                 var step = 0.032;

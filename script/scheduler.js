@@ -2,7 +2,7 @@ function Scheduler() {
 
     var self = this;
 
-    self.start = function (segmentDuration, totalNoOfSegments, noOfRepeats, el) {
+    self.start = function (segmentDuration, totalNoOfSegments, noOfRepeats, noOfSegments, el) {
         self.el = el;
         self.count = 0;
         self.repeatCount = 0;
@@ -14,11 +14,11 @@ function Scheduler() {
         self.startTime = audioCtx.currentTime * 1000;
 
         window.requestAnimationFrame(function () {
-            self.playCurrent(totalNoOfSegments)
+            self.playCurrent(totalNoOfSegments, noOfSegments)
         });
     };
 
-    self.playCurrent = function (totalNoOfSegments) {
+    self.playCurrent = function (totalNoOfSegments, noOfSegments) {
         var critTime = (self.count * self.segmentDuration) + (self.repeatCount * totalNoOfSegments * self.segmentDuration);
         var elapsedTime = (audioCtx.currentTime * 1000) - self.startTime;
 
@@ -31,13 +31,13 @@ function Scheduler() {
 
         if (self.count < totalNoOfSegments) {
             window.requestAnimationFrame(function () {
-                self.playCurrent(totalNoOfSegments)
+                self.playCurrent(totalNoOfSegments, noOfSegments)
             });
         } else if (self.repeatCount < self.noOfRepeats - 1) {
             self.count = 0;
             self.repeatCount++;
             window.requestAnimationFrame(function () {
-                self.playCurrent(totalNoOfSegments)
+                self.playCurrent(totalNoOfSegments, noOfSegments)
             });
         }
     };
