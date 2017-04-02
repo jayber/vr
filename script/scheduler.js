@@ -13,12 +13,20 @@ function Scheduler() {
 
         self.startTime = audioCtx.currentTime * 1000;
 
-        window.requestAnimationFrame(function () {
-            self.playCurrent(totalNoOfSegments, noOfSegments)
-        });
+        var scriptNode = audioCtx.createScriptProcessor();
+
+        var dummy = audioCtx.createOscillator();
+        dummy.connect(scriptNode);
+
+        scriptNode.onaudioprocess = function (event) {
+            self.playCurrent(totalNoOfSegments, noOfSegments, dummy, scriptNode)
+        };
+
+        scriptNode.connect(audioCtx.destination);
+        dummy.start();
     };
 
-    self.playCurrent = function (totalNoOfSegments, noOfSegments) {
+    self.playCurrent = function (totalNoOfSegments, noOfSegments, dummy, scriptNode) {
         var critTime = (self.count * self.segmentDuration) + (self.repeatCount * totalNoOfSegments * self.segmentDuration);
         var elapsedTime = (audioCtx.currentTime * 1000) - self.startTime;
 
@@ -29,16 +37,15 @@ function Scheduler() {
             self.count++;
         }
 
-        if (self.count < totalNoOfSegments) {
-            window.requestAnimationFrame(function () {
-                self.playCurrent(totalNoOfSegments, noOfSegments)
-            });
-        } else if (self.repeatCount < self.noOfRepeats - 1) {
-            self.count = 0;
-            self.repeatCount++;
-            window.requestAnimationFrame(function () {
-                self.playCurrent(totalNoOfSegments, noOfSegments)
-            });
+        if (self.count == totalNoOfSegments) {
+            if (self.repeatCount < self.noOfRepeats - 1) {
+                self.count = 0;
+                self.repeatCount++;
+            } else {
+                console.log("stop");
+                scriptNode.disconnect(audioCtx.destination);
+                dummy.stop();
+            }
         }
     };
 
