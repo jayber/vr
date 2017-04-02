@@ -32,9 +32,15 @@ var control = new function Control() {
 
                 sself.el.setAttribute("color", "#33ff66");
 
-                switch (this.data) {
+                switch (sself.data) {
                     case "script":
                         self.scheduler = new ScriptNodeScheduler(sound.audioCtx);
+                        break;
+                    case "frame":
+                        self.scheduler = new RequestAnimationFrameScheduler(sound.audioCtx);
+                        break;
+                    case "audio":
+                        self.scheduler = new AudioContextScheduler(sound.audioCtx);
                         break;
                 }
             });
