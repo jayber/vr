@@ -11,6 +11,7 @@
 <body>
 
 <script src="script/scheduler.js"></script>
+<script src="script/sound.js"></script>
 <script src="script/main.js"></script>
 
 <a-scene debug altspace='vertical-align: bottom;' keyboard-shortcuts>
@@ -30,10 +31,16 @@
         <img id="stain-texture" src="img/texture1.jpg">
         <img id="tongue-texture" src="img/tongue.jpg">
         <img id="play-texture" src="img/play.png">
+        <img id="script-texture" src="img/script.png">
+        <img id="frame-texture" src="img/frame.png">
+        <img id="audio-texture" src="img/audio.png">
     </a-assets>
 
     <a-cylinder material="src:#galv-texture;" height="0.9" position="0 0.5 0" radius="0.3">
         <a-sphere id="beater" playable position="0 0.3 0.3" radius="0.1" material="src:#play-texture" rotation="0 -90 30"></a-sphere>
+        <a-sphere selectable="script" position="-0.1 0.135 0.3" radius="0.03" material="src:#script-texture" color="#33ff66" rotation="0 -90 30"></a-sphere>
+        <a-sphere selectable="frame" position="0 0.135 0.3" radius="0.03" material="src:#frame-texture" rotation="0 -90 30"></a-sphere>
+        <a-sphere selectable="audio" position="0.1 0.135 0.3" radius="0.03" material="src:#audio-texture" rotation="0 -90 30"></a-sphere>
     </a-cylinder>
 
     <a-cylinder id="clock-face" material="src:#stripe-texture;" height="0.05" rotation="-135 0 0" position="0 1.3 0" radius="0.4" side="double"></a-cylinder>
