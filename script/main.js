@@ -1,6 +1,7 @@
-new function Control() {
+new function () {
     var self = this;
-    self.dialRadiusMultiplier = 0.03;//
+
+    self.dialRadiusMultiplier = 0.03;
 
     self.scheduler = new AudioAndAnimationScheduler(sound.audioCtx);
 
@@ -22,18 +23,18 @@ new function Control() {
             var sself = this;
 
             el.addEventListener("click", function () {
-                if (sself.isStarted) {
-                    sself.isStarted = false;
-                    sself.stop();
+                if (self.isStarted) {
+                    sself.stop(el);
                 } else {
                     sself.start(el);
-                    sself.isStarted = true;
                 }
             });
         },
 
-        stop: function () {
+        stop: function (el) {
             self.scheduler.stop();
+            self.isStarted = false;
+            el.setAttribute("color", "#f99")
         },
 
         start: function (el) {
@@ -41,6 +42,8 @@ new function Control() {
             self.scheduler.start(sound.segmentDuration / 1000, sound.totalSegments, soundsByTimes, sound.soundBuffersMap, function (count) {
                 sound.emitEvents(count, el);
             });
+            self.isStarted = true;
+            el.setAttribute("color", "#4f0")
         }
     });
 

@@ -1,6 +1,6 @@
 var sound = new function Sound() {
     var self = this;
-//
+
     self.bpm = 110;
     self.beats = 4;
     self.segmentsPerBeat = 4;

@@ -2,7 +2,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     //ALL time is in SECONDS (not millis)
     var self = this;
 
-    self.audioCtx = audioCtx;//
+    self.audioCtx = audioCtx;
 
     self.start = function (secondsPerSegment, totalNoOfSegments, soundByTimes, soundBuffersMap, segmentListener) {
         console.log("Scheduler.start");
