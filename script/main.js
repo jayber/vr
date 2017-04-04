@@ -1,8 +1,8 @@
-var control = new function Control() {
+new function Control() {
     var self = this;
     self.dialRadiusMultiplier = 0.03;
 
-    self.scheduler = new RequestAnimationFrameScheduler(sound.audioCtx);
+    self.scheduler = new AudioAndAnimationScheduler(sound.audioCtx);
 
     self.setFlashing = function (srcEntity, el) {
         if (srcEntity.hasAttribute("flash")) {
@@ -16,50 +16,31 @@ var control = new function Control() {
         }
     };
 
-    AFRAME.registerComponent('selectable', {
-        schema: {type: 'string'},
-        init: function () {
-            var sself = this;
-
-            this.el.addEventListener("click", function () {
-
-                var siblings = document.querySelectorAll('[selectable]');
-
-                for (var i = 0; i < siblings.length; ++i) {
-                    var item = siblings[i];
-                    item.setAttribute("color", "#ffffff");
-                }
-
-                sself.el.setAttribute("color", "#33ff66");
-
-                switch (sself.data) {
-                    case "script":
-                        self.scheduler = new ScriptNodeScheduler(sound.audioCtx);
-                        break;
-                    case "frame":
-                        self.scheduler = new RequestAnimationFrameScheduler(sound.audioCtx);
-                        break;
-                    case "audio":
-                        self.scheduler = new AudioContextScheduler(sound.audioCtx);
-                        break;
-                }
-            });
-        }
-    });
-
     AFRAME.registerComponent('playable', {
         init: function () {
             var el = this.el;
             var sself = this;
 
             el.addEventListener("click", function () {
-                sself.start(el);
+                if (sself.isStarted) {
+                    sself.isStarted = false;
+                    sself.stop();
+                } else {
+                    sself.start(el);
+                    sself.isStarted = true;
+                }
             });
+        },
+
+        stop: function () {
+            self.scheduler.stop();
         },
 
         start: function (el) {
             var soundsByTimes = sound.indexSoundsBySegment();
-            self.scheduler.start(sound.segmentDuration, sound.totalNoOfSegments, sound.noOfRepeats, soundsByTimes, el);
+            self.scheduler.start(sound.segmentDuration / 1000, sound.totalSegments, soundsByTimes, sound.soundBuffersMap, function (count) {
+                sound.emitEvents(count, el);
+            });
         }
     });
 
@@ -120,7 +101,7 @@ var control = new function Control() {
             var multi = self.dialRadiusMultiplier++;
             times.forEach(function (time) {
                 try {
-                    var angle = (time[0] * (360 / sound.noOfBeats)) + (time[1] * (360 / (sound.noOfSegments * sound.noOfBeats)));
+                    var angle = (time[0] * (360 / sound.beats)) + (time[1] * (360 / (sound.segmentsPerBeat * sound.beats)));
 
                     var subElement = document.createElement("a-sphere");
                     subElement.setAttribute("radius", "0.03");
@@ -220,10 +201,10 @@ var control = new function Control() {
         init: function () {
             var self = this;
             var el = this.el;
-            self.degreesPerBeat = (360 / sound.noOfBeats);
-            self.degreesPerSeg = self.degreesPerBeat / sound.noOfSegments;
+            self.degreesPerBeat = (360 / sound.beats);
+            self.degreesPerSeg = self.degreesPerBeat / sound.segmentsPerBeat;
             el.addEventListener("playtime", function (event) {
-                var currentDegrees = ((event.detail.beatCount * sound.noOfSegments) + event.detail.seg) * self.degreesPerSeg;
+                var currentDegrees = ((event.detail.beatCount * sound.segmentsPerBeat) + event.detail.seg) * self.degreesPerSeg;
                 try {
                     el.setAttribute("theta-length", currentDegrees + 0.05);    //OMFG i have no idea why i have to add this little number, but if i don't, it doesn't work!!
                     //console.log(el.getAttribute("theta-length") + "; current="+currentDegrees+" - beat="+event.detail.beatCount + "; seg="+event.detail.seg);

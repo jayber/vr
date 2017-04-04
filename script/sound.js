@@ -1,16 +1,15 @@
 var sound = new function Sound() {
-
     var self = this;
 
     self.bpm = 110;
+    self.beats = 4;
+    self.segmentsPerBeat = 4;
+    self.totalSegments = self.segmentsPerBeat * self.beats;
     self.beatDuration = 60000 / self.bpm;
-    self.noOfSegments = 4;
-    self.segmentDuration = Math.floor(self.beatDuration / self.noOfSegments);
-    self.noOfBeats = 4;
-    self.noOfRepeats = 4;
+    self.segmentDuration = Math.floor(self.beatDuration / self.segmentsPerBeat);
+
     self.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     self.soundBuffersMap = {};
-    self.totalNoOfSegments = self.noOfSegments * self.noOfBeats;
 
     self.load = function (src) {
         var loader = new AudioSampleLoader();
@@ -30,33 +29,22 @@ var sound = new function Sound() {
         }
     };
 
-    self.play = function (sounds) {
-        if (sounds.length > 0) {
-            sounds.forEach(function (soundName) {
-                var source = self.audioCtx.createBufferSource();
-                source.buffer = self.soundBuffersMap[soundName];
-                source.connect(self.audioCtx.destination);
-                source.start();
-            });
-        }
-    };
-
     self.emitEvents = function (count, el) {
-        var currentSegment = count % self.noOfSegments;
-        var beatCount = Math.floor(count / self.noOfSegments);
+        var currentSegment = count % self.segmentsPerBeat;
+        var beatCount = Math.floor(count / self.segmentsPerBeat);
 
         el.emit('time', {beatCount: beatCount, seg: currentSegment});
     };
 
     self.indexSoundsBySegment = function () {
-        var soundsByTimes = [self.totalNoOfSegments];
-        for (var i = 0; i < self.totalNoOfSegments; i++) {
+        var soundsByTimes = [self.totalSegments];
+        for (var i = 0; i < self.totalSegments; i++) {
             soundsByTimes[i] = [];
         }
 
         self.soundList.forEach(function (element) {
             element.times.forEach(function (time) {
-                var index = ((Number(time[0]) * self.noOfSegments) + Number(time[1]));
+                var index = ((Number(time[0]) * self.segmentsPerBeat) + Number(time[1]));
                 soundsByTimes[index].push(element.name);
             });
         });
