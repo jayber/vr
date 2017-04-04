@@ -2,7 +2,7 @@ var control = new function Control() {
     var self = this;
     self.dialRadiusMultiplier = 0.03;
 
-    self.scheduler = new ScriptNodeScheduler(sound.audioCtx);
+    self.scheduler = new RequestAnimationFrameScheduler(sound.audioCtx);
 
     self.setFlashing = function (srcEntity, el) {
         if (srcEntity.hasAttribute("flash")) {
