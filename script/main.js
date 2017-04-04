@@ -1,6 +1,6 @@
 new function Control() {
     var self = this;
-    self.dialRadiusMultiplier = 0.03;
+    self.dialRadiusMultiplier = 0.03;//
 
     self.scheduler = new AudioAndAnimationScheduler(sound.audioCtx);
 
