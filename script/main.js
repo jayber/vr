@@ -41,6 +41,8 @@ new function () {
             var soundsByTimes = sound.indexSoundsBySegment();
             self.scheduler.start(sound.segmentDuration / 1000, sound.totalSegments, soundsByTimes, sound.soundBuffersMap, function (count) {
                 sound.emitEvents(count, el);
+            }, function (count) {
+                sound.emitOffEvents(count, el);
             });
             self.isStarted = true;
             el.setAttribute("color", "#4f0")
@@ -136,16 +138,9 @@ new function () {
             var el = this.el;
             var played = false;
 
-            el.addEventListener("playtime", function () {
-                played = true;
-            });
-
             var beater = document.querySelector(this.data);
-            beater.addEventListener("time", function (event) {
-                if (played) {
-                    played = false;
-                    el.emit('playoff');
-                }
+            beater.addEventListener("timeoff", function (event) {
+                el.emit('playoff');
             });
         }
     });

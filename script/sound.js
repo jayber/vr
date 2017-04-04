@@ -36,6 +36,13 @@ var sound = new function Sound() {
         el.emit('time', {beatCount: beatCount, seg: currentSegment});
     };
 
+    self.emitOffEvents = function (count, el) {
+        var currentSegment = count % self.segmentsPerBeat;
+        var beatCount = Math.floor(count / self.segmentsPerBeat);
+
+        el.emit('timeoff', {beatCount: beatCount, seg: currentSegment});
+    };
+
     self.indexSoundsBySegment = function () {
         var soundsByTimes = [self.totalSegments];
         for (var i = 0; i < self.totalSegments; i++) {

@@ -1,70 +1,84 @@
 function AudioAndAnimationScheduler(audioCtx) {
     //ALL time is in SECONDS (not millis)
     var self = this;
-
+    self.segmentOnLength = 0.1;
+    self.batchSegments = 4;
     self.audioCtx = audioCtx;
 
-    self.start = function (secondsPerSegment, totalNoOfSegments, soundByTimes, soundBuffersMap, segmentListener) {
+    self.start = function (secondsPerSegment, totalNoOfSegments, soundByTimes, soundBuffersMap, segmentOnListener, segmentOffListener) {
         console.log("Scheduler.start");
-        self.count = 0;
         self.secondsPerSegment = secondsPerSegment;
         self.soundBuffersMap = soundBuffersMap;
         self.totalSegments = totalNoOfSegments;
-        self.segmentListener = segmentListener;
-
+        self.segmentOnListener = segmentOnListener;
+        self.segmentOffListener = segmentOffListener;
         self.soundsByTimes = soundByTimes;
-        self.startTime = self.audioCtx.currentTime;
+
+        self.count = 0;
         self.playedCount = 0;
-        self.batchSize = 4;
-        self.offset = self.batchSize * self.secondsPerSegment;
         self.scheduleTime = 0;
-        self.schedOffset = self.offset;
+        self.segmentOffCount = 0;
 
         self.isRunning = true;
+        self.startTime = self.audioCtx.currentTime;
 
-        window.requestAnimationFrame(function () {
-            self.playAndSchedule();
-        });
+        window.requestAnimationFrame(self.playAndSchedule);
     };
 
     self.stop = function () {
         self.isRunning = false;
+        if (self.sourcesToCancel) {
+            for (var i = 0; i < self.sourcesToCancel.length; i++) {
+                var sourcesToCancel = self.sourcesToCancel[i];
+                if (sourcesToCancel) {
+                    sourcesToCancel.stop();
+                }
+            }
+        }
     };
 
     self.playAndSchedule = function () {
+        const offset = self.batchSegments * self.secondsPerSegment;
         const elapsedTime = self.audioCtx.currentTime - self.startTime;
-        self.scheduleSamples(elapsedTime);
-        self.fireEvent(elapsedTime);
+        self.scheduleSamples(elapsedTime, offset);
+        self.fireSegmentEvent(elapsedTime, offset);
         if (self.isRunning) {
-            window.requestAnimationFrame(function () {
-                self.playAndSchedule();
-            });
+            window.requestAnimationFrame(self.playAndSchedule);
         }
     };
 
-    self.scheduleSamples = function (elapsedTime) {
+    self.scheduleSamples = function (elapsedTime, offset) {
         if (self.scheduleTime < elapsedTime) {
             const nextIndex = self.playedCount % self.totalSegments;
-            const toIndex = nextIndex + self.batchSize;
-            const scheduleOffset = self.offset + (self.secondsPerSegment * self.totalSegments * Math.floor(self.playedCount / self.totalSegments));
+            const toIndex = nextIndex + self.batchSegments;
+            const scheduleOffset = offset + (self.secondsPerSegment * self.totalSegments * Math.floor(self.playedCount / self.totalSegments));
 
             self.scheduleFromStartTime(nextIndex, toIndex, scheduleOffset);
 
-            self.playedCount += self.batchSize;
-            self.scheduleTime = self.scheduleTime + self.offset;
+            self.playedCount += self.batchSegments;
+            self.scheduleTime = self.scheduleTime + offset;
         }
     };
 
-    self.fireEvent = function (elapsedTime) {
-        var nextSegmentTime = (self.count * self.secondsPerSegment) + self.offset;
+    self.fireSegmentEvent = function (elapsedTime, offset) {
+        var nextSegmentTime = (self.count * self.secondsPerSegment) + offset;
+
+        if (self.segmentOffCount < self.count && (nextSegmentTime < elapsedTime || (elapsedTime - self.segmentOffTime) > self.segmentOnLength)) {
+            console.log("fireSegmentOff - count: " + self.count + "; elapsedTime: " + elapsedTime);
+            self.segmentOffListener(self.count % self.totalSegments);
+            self.segmentOffCount = self.count;
+            self.segmentOffTime = elapsedTime;
+        }
+
         if (nextSegmentTime < elapsedTime) {
-            console.log("playCurrent - nextSegmentTime: " + nextSegmentTime + "; elapsedTime: " + Math.floor(elapsedTime));
-            self.segmentListener(self.count % self.totalSegments);
+            console.log("fireSegmentOn - nextSegmentTime: " + nextSegmentTime + "; elapsedTime: " + elapsedTime);
+            self.segmentOnListener(self.count % self.totalSegments);
             self.count++;
         }
     };
 
     self.scheduleFromStartTime = function (from, to, offset) {
+        self.sourcesToCancel = [to - from];
         for (var i = from; i < to; i++) {
             var sounds = self.soundsByTimes[i];
             if (sounds != undefined && sounds.length > 0) {
@@ -75,6 +89,7 @@ function AudioAndAnimationScheduler(audioCtx) {
                     var when = self.startTime + offset + (i * self.secondsPerSegment );
                     console.log("scheduling " + soundName + " for " + when + " with " + offset);
                     source.start(when);
+                    self.sourcesToCancel[i - from] = source;
                 });
             }
         }
