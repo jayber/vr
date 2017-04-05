@@ -38,10 +38,10 @@ new function () {
         },
 
         start: function (el) {
-            var soundsByTimes = sound.indexSoundsBySegment();
-            self.scheduler.start(sound.segmentDuration / 1000, sound.totalSegments, soundsByTimes, sound.soundBuffersMap);
+            var soundsBySegment = sound.indexSoundsBySegment();
+            self.scheduler.start(sound.segmentDuration, sound.totalSegments, soundsBySegment, sound.soundBuffersMap);
             self.isStarted = true;
-            el.setAttribute("color", "#4f0")
+            el.setAttribute("color", "#8d6")
         }
     });
 
@@ -94,7 +94,6 @@ new function () {
                     el.emit('playtime', beatTime);
                 }
             });
-
 
             self.scheduler.addEventListener("timeoff", function (count) {
                 el.emit('playoff');

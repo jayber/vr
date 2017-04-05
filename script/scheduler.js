@@ -1,8 +1,8 @@
 function AudioAndAnimationScheduler(audioCtx) {
     //ALL time is in SECONDS (not millis)
     var self = this;
-    self.segmentOnLength = 0.1;
-    self.batchSegments = 8;
+    self.timeOnLength = 0.1;
+    self.batchSegments = 4;
     self.audioCtx = audioCtx;
     self.listeners = {};
 
@@ -23,11 +23,11 @@ function AudioAndAnimationScheduler(audioCtx) {
         }
     };
 
-    self.start = function (secondsPerSegment, totalNoOfSegments, soundByTimes, soundBuffersMap) {
+    self.start = function (secondsPerSegment, totalNoOfSegments, soundsBySegment, soundBuffersMap) {
         console.log("Scheduler.start");
         self.secondsPerSegment = secondsPerSegment;
         self.totalSegments = totalNoOfSegments;
-        self.soundsByTimes = soundByTimes;
+        self.soundsBySegment = soundsBySegment;
         self.soundBuffersMap = soundBuffersMap;
 
         self.count = 0;
@@ -84,7 +84,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     self.fireSegmentEvents = function (elapsedTime, offset) {
         var nextSegmentTime = calcNextSegmentTime(offset, self.count);
 
-        if (self.segmentOffCount < self.count && (nextSegmentTime < elapsedTime || (elapsedTime - self.segmentOffTime) > self.segmentOnLength)) {
+        if (self.segmentOffCount < self.count && (nextSegmentTime < elapsedTime || (elapsedTime - self.segmentOffTime) > self.timeOnLength)) {
             console.log("fireSegmentOff - count: " + self.count + "; elapsedTime: " + elapsedTime);
             self.dispatch("timeoff", self.count % self.totalSegments);
             self.segmentOffCount = self.count;
@@ -102,7 +102,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     self.scheduleFromStartTime = function (from, to, offset) {
         self.sourcesToCancel = [];
         for (var i = from; i < to; i++) {
-            var sounds = self.soundsByTimes[i];
+            var sounds = self.soundsBySegment[i];
             if (sounds != undefined && sounds.length > 0) {
                 sounds.forEach(function (soundName) {
                     var source = self.audioCtx.createBufferSource();

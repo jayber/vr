@@ -5,8 +5,8 @@ var sound = new function Sound() {
     self.beats = 4;
     self.segmentsPerBeat = 4;
     self.totalSegments = self.segmentsPerBeat * self.beats;
-    self.beatDuration = 60000 / self.bpm;
-    self.segmentDuration = Math.floor(self.beatDuration / self.segmentsPerBeat);
+    self.beatDuration = 60 / self.bpm;
+    self.segmentDuration = self.beatDuration / self.segmentsPerBeat;
 
     self.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     self.soundBuffersMap = {};
