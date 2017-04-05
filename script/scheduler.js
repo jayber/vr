@@ -91,17 +91,11 @@ function AudioAndAnimationScheduler(audioCtx) {
             self.segmentOffTime = elapsedTime;
         }
 
-        var readAheadCount = self.count + 1;
-        var readAheadSegmentTime = calcNextSegmentTime(offset, readAheadCount);
-        while (readAheadSegmentTime < elapsedTime) {
-            self.count = readAheadCount++;
-            nextSegmentTime = calcNextSegmentTime(offset, self.count);
-            readAheadSegmentTime = calcNextSegmentTime(offset, readAheadCount);
-        }
-
-        if (nextSegmentTime < elapsedTime) {
+        while (nextSegmentTime < elapsedTime) {
             console.log("fireSegmentOn - nextSegmentTime: " + nextSegmentTime + "; elapsedTime: " + elapsedTime);
             self.dispatch("time", self.count % self.totalSegments);
+            self.count++;
+            nextSegmentTime = calcNextSegmentTime(offset, self.count);
         }
     };
 
