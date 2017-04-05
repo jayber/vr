@@ -109,10 +109,10 @@ new function () {
                     var angle = (time[0] * (360 / sound.beats)) + (time[1] * (360 / (sound.segmentsPerBeat * sound.beats)));
 
                     var subElement = document.createElement("a-sphere");
-                    subElement.setAttribute("radius", "0.025");
+                    subElement.setAttribute("radius", "0.03");
                     var clockFace = document.querySelector('#clock-face');
 
-                    var startRad = 0.177;
+                    var startRad = 0.134;
                     var step = 0.05;
                     var rad = startRad + (multi * step);
 
@@ -191,7 +191,7 @@ new function () {
             el.addEventListener("playtime", function (event) {
                 var currentDegrees = ((event.detail.beatCount * sound.segmentsPerBeat) + event.detail.seg) * self.degreesPerSeg;
                 try {
-                    el.setAttribute("theta-length", currentDegrees + 0.05);    //OMFG i have no idea why i have to add this little number, but if i don't, it doesn't work!!
+                    el.setAttribute("theta-start", currentDegrees + 0.05);    //OMFG i have no idea why i have to add this little number, but if i don't, it doesn't work!!
                     //console.log(el.getAttribute("theta-length") + "; current="+currentDegrees+" - beat="+event.detail.beatCount + "; seg="+event.detail.seg);
                 } catch (error) {
                     console.log(error);
