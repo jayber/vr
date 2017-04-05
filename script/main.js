@@ -39,11 +39,7 @@ new function () {
 
         start: function (el) {
             var soundsByTimes = sound.indexSoundsBySegment();
-            self.scheduler.start(sound.segmentDuration / 1000, sound.totalSegments, soundsByTimes, sound.soundBuffersMap, function (count) {
-                sound.emitEvents(count, el);
-            }, function (count) {
-                sound.emitOffEvents(count, el);
-            });
+            self.scheduler.start(sound.segmentDuration / 1000, sound.totalSegments, soundsByTimes, sound.soundBuffersMap);
             self.isStarted = true;
             el.setAttribute("color", "#4f0")
         }
@@ -89,14 +85,14 @@ new function () {
         },
 
         listenToBeater: function (zip, el) {
-            var beater = document.querySelector(this.data.src);
-            beater.addEventListener("time", function (event) {
+            self.scheduler.addEventListener("time", function (count) {
+                var beatTime = sound.convertToBeatTime(count);
                 if (zip.length == 0) {
-                    el.emit('playtime', event.detail);
+                    el.emit('playtime', beatTime);
                 } else if (zip.find(function (element) {
-                        return element[0] == event.detail.beatCount && element[1] == event.detail.seg;
+                        return element[0] == beatTime.beatCount && element[1] == beatTime.seg;
                     })) {
-                    el.emit('playtime', event.detail);
+                    el.emit('playtime', beatTime);
                 }
             });
         },
@@ -138,8 +134,7 @@ new function () {
             var el = this.el;
             var played = false;
 
-            var beater = document.querySelector(this.data);
-            beater.addEventListener("timeoff", function (event) {
+            self.scheduler.addEventListener("timeoff", function (count) {
                 el.emit('playoff');
             });
         }
