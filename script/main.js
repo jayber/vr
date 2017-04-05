@@ -1,7 +1,7 @@
 new function () {
     var self = this;
 
-    self.dialRadiusMultiplier = 0.03;
+    self.dialRadiusMultiplier = 0;
 
     self.scheduler = new AudioAndAnimationScheduler(sound.audioCtx);
 
@@ -60,7 +60,6 @@ new function () {
 
     AFRAME.registerComponent('time-listener', {
         schema: {
-            src: {type: 'string', default: ''},
             beat: {type: 'array'},
             seg: {type: 'array'},
             display: {type: 'boolean', default: true}
@@ -110,11 +109,11 @@ new function () {
                     var angle = (time[0] * (360 / sound.beats)) + (time[1] * (360 / (sound.segmentsPerBeat * sound.beats)));
 
                     var subElement = document.createElement("a-sphere");
-                    subElement.setAttribute("radius", "0.03");
+                    subElement.setAttribute("radius", "0.025");
                     var clockFace = document.querySelector('#clock-face');
 
-                    var startRad = 0.25;
-                    var step = 0.032;
+                    var startRad = 0.177;
+                    var step = 0.05;
                     var rad = startRad + (multi * step);
 
                     var newX = Math.cos(angle * (Math.PI / 180)) * rad;
