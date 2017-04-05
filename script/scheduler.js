@@ -8,11 +8,11 @@ function AudioAndAnimationScheduler(audioCtx) {
     self.start = function (secondsPerSegment, totalNoOfSegments, soundByTimes, soundBuffersMap, segmentOnListener, segmentOffListener) {
         console.log("Scheduler.start");
         self.secondsPerSegment = secondsPerSegment;
-        self.soundBuffersMap = soundBuffersMap;
         self.totalSegments = totalNoOfSegments;
         self.segmentOnListener = segmentOnListener;
         self.segmentOffListener = segmentOffListener;
         self.soundsByTimes = soundByTimes;
+        self.soundBuffersMap = soundBuffersMap;
 
         self.count = 0;
         self.playedCount = 0;
