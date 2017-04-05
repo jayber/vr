@@ -95,6 +95,11 @@ new function () {
                     el.emit('playtime', beatTime);
                 }
             });
+
+
+            self.scheduler.addEventListener("timeoff", function (count) {
+                el.emit('playoff');
+            });
         },
 
         generateMarkers: function (times) {
@@ -128,18 +133,6 @@ new function () {
         }
     });
 
-    AFRAME.registerComponent('playoff', {
-        schema: {type: 'string'},
-        init: function () {
-            var el = this.el;
-            var played = false;
-
-            self.scheduler.addEventListener("timeoff", function (count) {
-                el.emit('playoff');
-            });
-        }
-    });
-
     AFRAME.registerComponent('cable', {
         schema: {type: 'string'},
         init: function () {
@@ -167,7 +160,7 @@ new function () {
             path.add(new THREE.LineCurve3(instrumentFloor, new THREE.Vector3(0, 0, 0)));
             var geometry = new THREE.TubeGeometry(path, 64, 0.015, 8, false);
 
-            var texture = new THREE.TextureLoader().load("img/stripe2.png");
+            var texture = new THREE.TextureLoader().load("img/cable_stripe.png");
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.RepeatWrapping;
             texture.repeat.set(100, 1);
