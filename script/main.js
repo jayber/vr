@@ -108,7 +108,7 @@ new function () {
                     var angle = (time[0] * (360 / sound.beats)) + (time[1] * (360 / (sound.segmentsPerBeat * sound.beats)));
 
                     var subElement = document.createElement("a-sphere");
-                    subElement.setAttribute("radius", "0.029");
+                    subElement.setAttribute("radius", "0.027");
                     var clockFace = document.querySelector('#clock-face');
 
                     var startRad = 0.134;
