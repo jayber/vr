@@ -65,7 +65,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     };
 
     self.scheduleSamples = function (elapsedTime, offset) {
-        if (self.scheduleTime < elapsedTime) {
+        while (self.scheduleTime < elapsedTime) {
             const nextIndex = self.playedCount % self.totalSegments;
             const toIndex = nextIndex + self.batchSegments;
             const scheduleOffset = offset + (self.secondsPerSegment * self.totalSegments * Math.floor(self.playedCount / self.totalSegments));
