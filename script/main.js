@@ -1,7 +1,7 @@
 new function () {
     var self = this;
 
-    self.dialRadiusMultiplier = 0;
+    self.instrumentCount = 0;
 
     self.scheduler = new AudioAndAnimationScheduler(sound.audioCtx);
 
@@ -102,7 +102,7 @@ new function () {
 
         generateMarkers: function (times) {
             var el = this.el;
-            var multi = self.dialRadiusMultiplier++;
+            var instrumentCount = self.instrumentCount++;
             times.forEach(function (time) {
                 try {
                     var angle = (time[0] * (360 / sound.beats)) + (time[1] * (360 / (sound.segmentsPerBeat * sound.beats)));
@@ -113,7 +113,7 @@ new function () {
 
                     var startRad = 0.134;
                     var step = 0.05;
-                    var rad = startRad + (multi * step);
+                    var rad = startRad + (instrumentCount * step);
 
                     var newX = Math.cos(angle * (Math.PI / 180)) * rad;
                     var newY = Math.sin(angle * (Math.PI / 180)) * rad;
