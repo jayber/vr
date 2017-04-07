@@ -1,21 +1,7 @@
 new function () {
     var self = this;
-
-    self.instrumentCount = 0;
-
-    self.scheduler = new AudioAndAnimationScheduler(sound.audioCtx);
-
-    self.setFlashing = function (srcEntity, el) {
-        if (srcEntity.hasAttribute("flash")) {
-            var flash = srcEntity.getAttribute("flash");
-            srcEntity.addEventListener("playtime", function () {
-                el.object3DMap["mesh"].material.color.set(flash.to);
-            });
-            srcEntity.addEventListener("playoff", function () {
-                el.object3DMap["mesh"].material.color.set(flash.from);
-            });
-        }
-    };
+    var soundSettings = sound;
+    var scheduler = new AudioAndAnimationScheduler(soundSettings.audioCtx);
 
     AFRAME.registerComponent('playable', {
         init: function () {
@@ -31,102 +17,29 @@ new function () {
             });
         },
 
-        stop: function (el) {
-            self.scheduler.stop();
-            self.isStarted = false;
-            el.setAttribute("color", "#f99")
-        },
-
         start: function (el) {
-            var soundsBySegment = sound.indexSoundsBySegment();
-            self.scheduler.start(sound.segmentDuration, sound.totalSegments, soundsBySegment, sound.soundBuffersMap);
+            scheduler.start(soundSettings.segmentDuration, soundSettings.totalSegments, soundSettings.soundList, soundSettings.soundBuffersMap);
             self.isStarted = true;
             el.setAttribute("color", "#8d6")
-        }
-    });
-
-    AFRAME.registerComponent('j-sound', {
-        schema: {
-            src: {type: 'string', default: ''},
-            on: {type: 'array'}
         },
 
-        init: function () {
-            var self = this;
-            var src = this.data.src;
-            sound.load(src);
+        stop: function (el) {
+            scheduler.stop();
+            self.isStarted = false;
+            el.setAttribute("color", "#f99")
         }
     });
 
     AFRAME.registerComponent('time-listener', {
-        schema: {
-            beat: {type: 'array'},
-            seg: {type: 'array'},
-            display: {type: 'boolean', default: true}
-        },
-
         init: function () {
             var el = this.el;
-            var self = this;
-            var zip = this.data.beat.map(function (element, index) {
-                return [element, self.data.seg[index]];
+            scheduler.addEventListener("time", function (count) {
+                var beatTime = soundSettings.convertToBeatTime(count);
+                el.emit('playtime', beatTime);
             });
 
-            if (this.data.display) {
-                this.generateMarkers(zip);
-            }
-
-            if (el.hasAttribute("j-sound")) {
-                sound.registerSound(el.getAttribute("j-sound").src, zip);
-            }
-
-            this.listenToBeater(zip, el);
-        },
-
-        listenToBeater: function (zip, el) {
-            self.scheduler.addEventListener("time", function (count) {
-                var beatTime = sound.convertToBeatTime(count);
-                if (zip.length == 0) {
-                    el.emit('playtime', beatTime);
-                } else if (zip.find(function (element) {
-                        return element[0] == beatTime.beatCount && element[1] == beatTime.seg;
-                    })) {
-                    el.emit('playtime', beatTime);
-                }
-            });
-
-            self.scheduler.addEventListener("timeoff", function (count) {
+            scheduler.addEventListener("timeoff", function (count) {
                 el.emit('playoff');
-            });
-        },
-
-        generateMarkers: function (times) {
-            var el = this.el;
-            var instrumentCount = self.instrumentCount++;
-            times.forEach(function (time) {
-                try {
-                    var angle = (time[0] * (360 / sound.beats)) + (time[1] * (360 / (sound.segmentsPerBeat * sound.beats)));
-
-                    var subElement = document.createElement("a-sphere");
-                    subElement.setAttribute("radius", "0.027");
-                    var clockFace = document.querySelector('#clock-face');
-
-                    var startRad = 0.134;
-                    var step = 0.05;
-                    var rad = startRad + (instrumentCount * step);
-
-                    var newX = Math.cos(angle * (Math.PI / 180)) * rad;
-                    var newY = Math.sin(angle * (Math.PI / 180)) * rad;
-                    subElement.setAttribute("position", newY + " -0.025 " + newX);
-
-                    var color = el.getAttribute("material").color;
-                    subElement.setAttribute("color", color);
-                    clockFace.appendChild(subElement);
-
-                    self.setFlashing(el, subElement);
-                } catch (error) {
-                    console.log(error);
-                }
             });
         }
     });
@@ -170,14 +83,14 @@ new function () {
             var tube = new THREE.Mesh(geometry, material);
             sself.el.setObject3D("mesh", tube);
 
-            self.setFlashing(srcEntity, sself.el);
+            sound.setFlashing(srcEntity, sself.el);
         }
     });
 
     AFRAME.registerComponent('bpm-label', {
         init: function () {
             var el = this.el;
-            el.setAttribute("n-text", {text: sound.bpm + " BPM", fontSize: "1pt"});
+            el.setAttribute("n-text", {text: soundSettings.bpm + " BPM", fontSize: "1pt"});
         }
     });
 
@@ -185,10 +98,10 @@ new function () {
         init: function () {
             var self = this;
             var el = this.el;
-            self.degreesPerBeat = (360 / sound.beats);
-            self.degreesPerSeg = self.degreesPerBeat / sound.segmentsPerBeat;
+            self.degreesPerBeat = (360 / soundSettings.beats);
+            self.degreesPerSeg = self.degreesPerBeat / soundSettings.segmentsPerBeat;
             el.addEventListener("playtime", function (event) {
-                var currentDegrees = ((event.detail.beatCount * sound.segmentsPerBeat) + event.detail.seg) * self.degreesPerSeg;
+                var currentDegrees = ((event.detail.beatCount * soundSettings.segmentsPerBeat) + event.detail.seg) * self.degreesPerSeg;
                 try {
                     el.setAttribute("theta-start", currentDegrees + 0.05);    //OMFG i have no idea why i have to add this little number, but if i don't, it doesn't work!!
                     //console.log(el.getAttribute("theta-length") + "; current="+currentDegrees+" - beat="+event.detail.beatCount + "; seg="+event.detail.seg);
@@ -215,4 +128,15 @@ new function () {
             });
         }
     });
+
+    window.onload = function () {
+        var srcEntity = document.querySelector("a-scene");
+        if (srcEntity.hasLoaded) {
+            new ScoreLoader(scheduler, soundSettings);
+        } else {
+            srcEntity.addEventListener('loaded', function () {
+                new ScoreLoader(scheduler, soundSettings);
+            });
+        }
+    };
 };
