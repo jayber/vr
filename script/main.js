@@ -30,20 +30,6 @@ new function () {
         }
     });
 
-    AFRAME.registerComponent('time-listener', {
-        init: function () {
-            var el = this.el;
-            scheduler.addEventListener("time", function (count) {
-                var beatTime = soundSettings.convertToBeatTime(count);
-                el.emit('playtime', beatTime);
-            });
-
-            scheduler.addEventListener("timeoff", function (count) {
-                el.emit('playoff');
-            });
-        }
-    });
-
     AFRAME.registerComponent('cable', {
         schema: {type: 'string'},
         init: function () {
@@ -100,8 +86,9 @@ new function () {
             var el = this.el;
             self.degreesPerBeat = (360 / soundSettings.beats);
             self.degreesPerSeg = self.degreesPerBeat / soundSettings.segmentsPerBeat;
-            el.addEventListener("playtime", function (event) {
-                var currentDegrees = ((event.detail.beatCount * soundSettings.segmentsPerBeat) + event.detail.seg) * self.degreesPerSeg;
+            scheduler.addEventListener("time", function (count) {
+                var beatTime = soundSettings.convertToBeatTime(count);
+                var currentDegrees = ((beatTime.beatCount * soundSettings.segmentsPerBeat) + beatTime.seg) * self.degreesPerSeg;
                 try {
                     el.setAttribute("theta-start", currentDegrees + 0.05);    //OMFG i have no idea why i have to add this little number, but if i don't, it doesn't work!!
                     //console.log(el.getAttribute("theta-length") + "; current="+currentDegrees+" - beat="+event.detail.beatCount + "; seg="+event.detail.seg);

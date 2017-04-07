@@ -50,13 +50,13 @@ function ScoreLoader(scheduler, settings) {
     }
 
     function listenToSchedule(times, instrument) {
-        scheduler.addEventListener("time", function (count) {
-            var beatTime = settings.convertToBeatTime(count);
-            if (times.find(function (element) {
-                    return element.beat == beatTime.beatCount && element.seg == beatTime.seg;
-                })) {
+        const countTimes = times.map(function (time) {
+            return sound.convertTimeToCount(time);
+        });
+        scheduler.addCountListener(countTimes, function (count) {
+            const beatTime = sound.convertToBeatTime(count);
                 instrument.emit('playtime', beatTime);
-            }
+
         });
 
         scheduler.addEventListener("timeoff", function (count) {

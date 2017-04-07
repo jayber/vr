@@ -52,5 +52,9 @@ var sound = new function Sound() {
         var currentSegment = count % self.segmentsPerBeat;
         var beatCount = Math.floor(count / self.segmentsPerBeat);
         return {beatCount: beatCount, seg: currentSegment};
+    };
+
+    self.convertTimeToCount = function (time) {
+        return (self.segmentsPerBeat * time.beat) + time.seg;
     }
 };

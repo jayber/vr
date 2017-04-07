@@ -16,9 +16,19 @@ function AudioAndAnimationScheduler(audioCtx) {
     var totalSegments;
     var soundsBySegment;
     var soundBuffersMap;
+    var countListeners = [];
 
     var segmentOffTime;
     var sourcesToCancel;
+
+    self.addCountListener = function (times, listener) {
+        times.forEach(function (time) {
+            if (countListeners[time] == undefined) {
+                countListeners[time] = [];
+            }
+            countListeners[time].push(listener);
+        })
+    };
 
     self.addEventListener = function (type, listener) {
         if (!(type in listeners)) {
@@ -68,6 +78,16 @@ function AudioAndAnimationScheduler(audioCtx) {
         }
     }
 
+    function dispatchCount(count) {
+        if (countListeners[count] == undefined) {
+            return true;
+        }
+        var stack = countListeners[count];
+        for (var i = 0, l = stack.length; i < l; i++) {
+            stack[i].call(self, count);
+        }
+    }
+
     function playAndSchedule() {
         const offset = segmentsPerBatch * secondsPerSegment;
         const elapsedTime = audioCtx.currentTime - startTime;
@@ -100,14 +120,15 @@ function AudioAndAnimationScheduler(audioCtx) {
 
         if (segmentOffCount < count && (nextSegmentTime < elapsedTime || (elapsedTime - segmentOffTime) > timeOnLength)) {
             //console.log("fireSegmentOff - count: " + count + "; elapsedTime: " + elapsedTime);
-            //dispatch("timeoff", count % totalSegments);
+            dispatch("timeoff", count % totalSegments);
             segmentOffCount = count;
             segmentOffTime = elapsedTime;
         }
 
         while (nextSegmentTime < elapsedTime) {
             //console.log("fireSegmentOn - nextSegmentTime: " + nextSegmentTime + "; elapsedTime: " + elapsedTime);
-            //dispatch("time", count % totalSegments);
+            dispatch("time", count % totalSegments);
+            dispatchCount(count % totalSegments);
             count++;
             nextSegmentTime = calcNextSegmentTime(offset, count);
         }
