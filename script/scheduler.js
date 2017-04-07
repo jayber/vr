@@ -1,9 +1,9 @@
 function AudioAndAnimationScheduler(audioCtx) {
     //ALL time is in SECONDS (not millis)
-    var self = this;
-    var timeOnLength = 0.1;
-    var segmentsPerBatch = 64;
-    var listeners = {};
+    const self = this;
+    const timeOnLength = 0.1;
+    const segmentsPerBatch = 32;
+    const listeners = {};
 
     var count = 0;
     var segmentOffCount = 0;
@@ -12,12 +12,13 @@ function AudioAndAnimationScheduler(audioCtx) {
 
     var isRunning = false;
     var startTime;
-    var sourcesToCancel;
     var secondsPerSegment;
     var totalSegments;
     var soundsBySegment;
     var soundBuffersMap;
+
     var segmentOffTime;
+    var sourcesToCancel;
 
     self.addEventListener = function (type, listener) {
         if (!(type in listeners)) {
