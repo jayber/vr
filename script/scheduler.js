@@ -2,8 +2,8 @@ function AudioAndAnimationScheduler(audioCtx) {
     //ALL time is in SECONDS (not millis)
     const self = this;
     const timeOnLength = 0.1;
-    const segmentsPerBatch = 32;
-    const timeEventGranularity = 4;
+    const segmentsPerBatch = 16;
+    const timeEventGranularity = 2;
     const listeners = {};
 
     var count = 0;
