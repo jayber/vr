@@ -3,7 +3,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     const self = this;
     const timeOnLength = 0.1;
     const segmentsPerBatch = 32;
-    const timeEventGranularity = 1;
+    const timeEventGranularity = 4;
     const listeners = {};
 
     var count = 0;

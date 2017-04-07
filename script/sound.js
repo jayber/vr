@@ -3,7 +3,7 @@ var sound = new function Sound() {
 
     self.bpm = 110;
     self.beats = 4;
-    self.segmentsPerBeat = 16;
+    self.segmentsPerBeat = 32;
     self.totalSegments = self.segmentsPerBeat * self.beats;
     self.beatDuration = 60 / self.bpm;
     self.segmentDuration = self.beatDuration / self.segmentsPerBeat;
