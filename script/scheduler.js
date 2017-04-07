@@ -2,7 +2,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     //ALL time is in SECONDS (not millis)
     var self = this;
     self.timeOnLength = 0.1;
-    self.segmentsPerBatch = 16;
+    self.segmentsPerBatch = 64;
     self.audioCtx = audioCtx;
     self.listeners = {};
 
