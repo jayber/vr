@@ -38,9 +38,9 @@
     </a-cylinder>
 
     <a-cylinder id="clock-face" material="src:#studded-texture;repeat: 10 1" segments-radial="16" height="0.05" rotation="-135 0 0" position="0 1.3 0" radius="0.42" side="double">
-        <a-cylinder material="src:#noise-texture; repeat:5 5" height="0.055" geometry="radius: 0.42" theta-length="4" color="#f0eae0" side="double" animate-theta></a-cylinder>
-
-        <a-circle radius="0.3" scale="0.5 0.5 0.5" color="#080808" side="both" position="0 -0.03 0" rotation="90 0 0">
+        <a-circle material="src:#noise-texture; repeat:5 5" height="0.001" rotation="270 -90 0" position="0 -0.04 0" geometry="radius: 0.42" theta-length="4" color="#f0eae0" side="double" animate-theta></a-circle>
+        <!--color="#f0eae0" -->
+        <a-circle radius="0.3" scale="0.5 0.5 0.5" color="#080808" side="both" position="0 -0.05 0" rotation="90 0 0">
             <a-entity bpm-label position="0 0 0.05" n-text="fontSize:1pt;width:0.5;height:0.1"></a-entity>
         </a-circle>
     </a-cylinder>
