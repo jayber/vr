@@ -127,7 +127,7 @@ function AudioAndAnimationScheduler(audioCtx) {
 
         while (nextSegmentTime < elapsedTime) {
             //console.log("fireSegmentOn - nextSegmentTime: " + nextSegmentTime + "; elapsedTime: " + elapsedTime);
-            dispatch("time", count % totalSegments);
+            //dispatch("time", count % totalSegments);
             dispatchCount(count % totalSegments);
             count++;
             nextSegmentTime = calcNextSegmentTime(offset, count);
