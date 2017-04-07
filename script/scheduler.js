@@ -5,6 +5,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     const segmentsPerBatch = 16;
     const timeEventGranularity = 2;
     const listeners = {};
+    const countListeners = [];
 
     var count = 0;
     var segmentOffCount = 0;
@@ -17,7 +18,6 @@ function AudioAndAnimationScheduler(audioCtx) {
     var totalSegments;
     var soundsBySegment;
     var soundBuffersMap;
-    var countListeners = [];
 
     var segmentOffTime;
     var sourcesToCancel;
