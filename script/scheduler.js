@@ -3,6 +3,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     const self = this;
     const timeOnLength = 0.1;
     const segmentsPerBatch = 32;
+    const timeEventGranularity = 8;
     const listeners = {};
 
     var count = 0;
@@ -127,7 +128,9 @@ function AudioAndAnimationScheduler(audioCtx) {
 
         while (nextSegmentTime < elapsedTime) {
             //console.log("fireSegmentOn - nextSegmentTime: " + nextSegmentTime + "; elapsedTime: " + elapsedTime);
-            //dispatch("time", count % totalSegments);
+            if (count % timeEventGranularity == 0) {
+                dispatch("time", count % totalSegments);
+            }
             dispatchCount(count % totalSegments);
             count++;
             nextSegmentTime = calcNextSegmentTime(offset, count);
