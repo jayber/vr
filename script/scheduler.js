@@ -2,7 +2,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     //ALL time is in SECONDS (not millis)
     var self = this;
     self.timeOnLength = 0.1;
-    self.batchSegments = 8;
+    self.segmentsPerBatch = 16;
     self.audioCtx = audioCtx;
     self.listeners = {};
 
@@ -55,7 +55,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     };
 
     self.playAndSchedule = function () {
-        const offset = self.batchSegments * self.secondsPerSegment;
+        const offset = self.segmentsPerBatch * self.secondsPerSegment;
         const elapsedTime = self.audioCtx.currentTime - self.startTime;
         self.scheduleSamples(elapsedTime, offset);
         self.fireSegmentEvents(elapsedTime, offset);
@@ -67,12 +67,12 @@ function AudioAndAnimationScheduler(audioCtx) {
     self.scheduleSamples = function (elapsedTime, offset) {
         while (self.scheduleTime < elapsedTime) {
             const nextIndex = self.playedCount % self.totalSegments;
-            const toIndex = nextIndex + self.batchSegments;
+            const toIndex = nextIndex + self.segmentsPerBatch;
             const scheduleOffset = offset + (self.secondsPerSegment * self.totalSegments * Math.floor(self.playedCount / self.totalSegments));
 
             self.scheduleFromStartTime(nextIndex, toIndex, scheduleOffset);
 
-            self.playedCount += self.batchSegments;
+            self.playedCount += self.segmentsPerBatch;
             self.scheduleTime = self.scheduleTime + offset;
         }
     };
