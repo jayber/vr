@@ -100,14 +100,14 @@ function AudioAndAnimationScheduler(audioCtx) {
 
         if (segmentOffCount < count && (nextSegmentTime < elapsedTime || (elapsedTime - segmentOffTime) > timeOnLength)) {
             //console.log("fireSegmentOff - count: " + count + "; elapsedTime: " + elapsedTime);
-            dispatch("timeoff", count % totalSegments);
+            //dispatch("timeoff", count % totalSegments);
             segmentOffCount = count;
             segmentOffTime = elapsedTime;
         }
 
         while (nextSegmentTime < elapsedTime) {
             //console.log("fireSegmentOn - nextSegmentTime: " + nextSegmentTime + "; elapsedTime: " + elapsedTime);
-            dispatch("time", count % totalSegments);
+            //dispatch("time", count % totalSegments);
             count++;
             nextSegmentTime = calcNextSegmentTime(offset, count);
         }
