@@ -1,119 +1,132 @@
 function AudioAndAnimationScheduler(audioCtx) {
     //ALL time is in SECONDS (not millis)
     var self = this;
-    self.timeOnLength = 0.1;
-    self.segmentsPerBatch = 64;
-    self.audioCtx = audioCtx;
-    self.listeners = {};
+    var timeOnLength = 0.1;
+    var segmentsPerBatch = 64;
+    var listeners = {};
+
+    var count = 0;
+    var segmentOffCount = 0;
+    var playedCount = 0;
+    var scheduleTime = 0;
+
+    var isRunning = false;
+    var startTime;
+    var sourcesToCancel;
+    var secondsPerSegment;
+    var totalSegments;
+    var soundsBySegment;
+    var soundBuffersMap;
+    var segmentOffTime;
 
     self.addEventListener = function (type, listener) {
-        if (!(type in self.listeners)) {
-            self.listeners[type] = [];
+        if (!(type in listeners)) {
+            listeners[type] = [];
         }
-        self.listeners[type].push(listener);
+        listeners[type].push(listener);
     };
 
-    self.dispatch = function (type, param) {
-        if (!(type in self.listeners)) {
-            return true;
-        }
-        var stack = self.listeners[type];
-        for (var i = 0, l = stack.length; i < l; i++) {
-            stack[i].call(self, param);
-        }
-    };
-
-    self.start = function (secondsPerSegment, totalNoOfSegments, soundsBySegment, soundBuffersMap) {
+    self.start = function (secondsPerSegmentP, totalNoOfSegments, soundsBySegmentP, soundBuffers) {
         console.log("Scheduler.start");
-        self.secondsPerSegment = secondsPerSegment;
-        self.totalSegments = totalNoOfSegments;
-        self.soundsBySegment = soundsBySegment;
-        self.soundBuffersMap = soundBuffersMap;
+        secondsPerSegment = secondsPerSegmentP;
+        totalSegments = totalNoOfSegments;
+        soundsBySegment = soundsBySegmentP;
+        soundBuffersMap = soundBuffers;
 
-        self.count = 0;
-        self.playedCount = 0;
-        self.segmentOffCount = 0;
-        self.scheduleTime = 0;
+        count = 0;
+        segmentOffCount = 0;
+        playedCount = 0;
+        scheduleTime = 0;
 
-        self.isRunning = true;
-        self.startTime = self.audioCtx.currentTime;
+        startTime = audioCtx.currentTime;
+        isRunning = true;
 
-        window.requestAnimationFrame(self.playAndSchedule);
+        window.requestAnimationFrame(playAndSchedule);
     };
 
     self.stop = function () {
-        self.isRunning = false;
-        if (self.sourcesToCancel) {
-            for (var i = 0; i < self.sourcesToCancel.length; i++) {
-                var source = self.sourcesToCancel[i];
+        isRunning = false;
+        if (sourcesToCancel) {
+            for (var i = 0; i < sourcesToCancel.length; i++) {
+                var source = sourcesToCancel[i];
                 if (source) {
-                    console.log("Cancelling " + source);
+                    //console.log("Cancelling " + source);
                     source.stop();
                 }
             }
         }
     };
 
-    self.playAndSchedule = function () {
-        const offset = self.segmentsPerBatch * self.secondsPerSegment;
-        const elapsedTime = self.audioCtx.currentTime - self.startTime;
-        self.scheduleSamples(elapsedTime, offset);
-        self.fireSegmentEvents(elapsedTime, offset);
-        if (self.isRunning) {
-            window.requestAnimationFrame(self.playAndSchedule);
+    function dispatch(type, param) {
+        if (!(type in listeners)) {
+            return true;
         }
-    };
-
-    self.scheduleSamples = function (elapsedTime, offset) {
-        while (self.scheduleTime < elapsedTime) {
-            const nextIndex = self.playedCount % self.totalSegments;
-            const toIndex = nextIndex + self.segmentsPerBatch;
-            const scheduleOffset = offset + (self.secondsPerSegment * self.totalSegments * Math.floor(self.playedCount / self.totalSegments));
-
-            self.scheduleFromStartTime(nextIndex, toIndex, scheduleOffset);
-
-            self.playedCount += self.segmentsPerBatch;
-            self.scheduleTime = self.scheduleTime + offset;
+        var stack = listeners[type];
+        for (var i = 0, l = stack.length; i < l; i++) {
+            stack[i].call(self, param);
         }
-    };
-
-    function calcNextSegmentTime(offset, count) {
-        return ( count * self.secondsPerSegment) + offset;
     }
 
-    self.fireSegmentEvents = function (elapsedTime, offset) {
-        var nextSegmentTime = calcNextSegmentTime(offset, self.count);
+    function playAndSchedule() {
+        const offset = segmentsPerBatch * secondsPerSegment;
+        const elapsedTime = audioCtx.currentTime - startTime;
+        scheduleSamples(elapsedTime, offset);
+        fireSegmentEvents(elapsedTime, offset);
+        if (isRunning) {
+            window.requestAnimationFrame(playAndSchedule);
+        }
+    }
 
-        if (self.segmentOffCount < self.count && (nextSegmentTime < elapsedTime || (elapsedTime - self.segmentOffTime) > self.timeOnLength)) {
-            console.log("fireSegmentOff - count: " + self.count + "; elapsedTime: " + elapsedTime);
-            self.dispatch("timeoff", self.count % self.totalSegments);
-            self.segmentOffCount = self.count;
-            self.segmentOffTime = elapsedTime;
+    function scheduleSamples(elapsedTime, offset) {
+        while (scheduleTime < elapsedTime) {
+            const nextIndex = playedCount % totalSegments;
+            const toIndex = nextIndex + segmentsPerBatch;
+            const scheduleOffset = offset + (secondsPerSegment * totalSegments * Math.floor(playedCount / totalSegments));
+
+            scheduleFromStartTime(nextIndex, toIndex, scheduleOffset);
+
+            playedCount += segmentsPerBatch;
+            scheduleTime = scheduleTime + offset;
+        }
+    }
+
+    function calcNextSegmentTime(offset, count) {
+        return ( count * secondsPerSegment) + offset;
+    }
+
+    function fireSegmentEvents(elapsedTime, offset) {
+        var nextSegmentTime = calcNextSegmentTime(offset, count);
+
+        if (segmentOffCount < count && (nextSegmentTime < elapsedTime || (elapsedTime - segmentOffTime) > timeOnLength)) {
+            //console.log("fireSegmentOff - count: " + count + "; elapsedTime: " + elapsedTime);
+            dispatch("timeoff", count % totalSegments);
+            segmentOffCount = count;
+            segmentOffTime = elapsedTime;
         }
 
         while (nextSegmentTime < elapsedTime) {
-            console.log("fireSegmentOn - nextSegmentTime: " + nextSegmentTime + "; elapsedTime: " + elapsedTime);
-            self.dispatch("time", self.count % self.totalSegments);
-            self.count++;
-            nextSegmentTime = calcNextSegmentTime(offset, self.count);
+            //console.log("fireSegmentOn - nextSegmentTime: " + nextSegmentTime + "; elapsedTime: " + elapsedTime);
+            dispatch("time", count % totalSegments);
+            count++;
+            nextSegmentTime = calcNextSegmentTime(offset, count);
         }
-    };
+    }
 
-    self.scheduleFromStartTime = function (from, to, offset) {
-        self.sourcesToCancel = [];
+    function scheduleFromStartTime(from, to, offset) {
+        sourcesToCancel = [];
         for (var i = from; i < to; i++) {
-            var sounds = self.soundsBySegment[i];
+            var sounds = soundsBySegment[i];
             if (sounds != undefined && sounds.length > 0) {
                 sounds.forEach(function (soundName) {
-                    var source = self.audioCtx.createBufferSource();
-                    source.buffer = self.soundBuffersMap[soundName];
-                    source.connect(self.audioCtx.destination);
-                    var when = self.startTime + offset + (i * self.secondsPerSegment );
-                    console.log("scheduling " + soundName + " for " + when + " with " + offset);
+                    var source = audioCtx.createBufferSource();
+                    source.buffer = soundBuffersMap[soundName];
+                    source.connect(audioCtx.destination);
+                    var when = startTime + offset + (i * secondsPerSegment );
+                    //console.log("scheduling " + soundName + " for " + when + " with " + offset);
                     source.start(when);
-                    self.sourcesToCancel.push(source);
+                    sourcesToCancel.push(source);
                 });
             }
         }
-    };
+    }
 }
