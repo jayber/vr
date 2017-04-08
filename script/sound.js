@@ -1,4 +1,4 @@
-var sound = new function Sound() {
+function SoundSettings() {
     var self = this;
 
     self.bpm = 110;

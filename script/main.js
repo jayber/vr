@@ -1,6 +1,6 @@
 new function () {
     var self = this;
-    var soundSettings = sound;
+    var soundSettings = new SoundSettings();
     var scheduler = new AudioAndAnimationScheduler(soundSettings.audioCtx);
 
     AFRAME.registerComponent('playable', {
@@ -55,7 +55,7 @@ new function () {
             var path = new THREE.CurvePath();
             path.add(new THREE.LineCurve3(start, instrumentFloor));
             path.add(new THREE.LineCurve3(instrumentFloor, new THREE.Vector3(0, 0, 0)));
-            var geometry = new THREE.TubeGeometry(path, 64, 0.015, 8, false);
+            var geometry = new THREE.TubeGeometry(path, 64, 0.02, 8, false);
 
             var texture = new THREE.TextureLoader().load("img/cable_stripe.png");
             texture.wrapS = THREE.RepeatWrapping;
@@ -69,7 +69,7 @@ new function () {
             var tube = new THREE.Mesh(geometry, material);
             sself.el.setObject3D("mesh", tube);
 
-            sound.setFlashing(srcEntity, sself.el);
+            soundSettings.setFlashing(srcEntity, sself.el);
         }
     });
 
@@ -118,10 +118,10 @@ new function () {
     window.onload = function () {
         var srcEntity = document.querySelector("a-scene");
         if (srcEntity.hasLoaded) {
-            new ScoreLoader(scheduler, soundSettings);
+            loadScore(scheduler, soundSettings);
         } else {
             srcEntity.addEventListener('loaded', function () {
-                new ScoreLoader(scheduler, soundSettings);
+                loadScore(scheduler, soundSettings);
             });
         }
     };

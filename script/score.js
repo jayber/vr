@@ -6,7 +6,7 @@ var score = [
     {instrument: "beep", src: "audio/beep.wav", times: ["3:0/4", "3:1/4", "3:2/4", "3:3/4"]}
 ];
 
-function ScoreLoader(scheduler, settings) {
+function loadScore(scheduler, settings) {
     var instrumentCount = 0;
     var beatExp = /(\d*):/;
     var denomExp = /\/(\d*)/;
@@ -51,7 +51,7 @@ function ScoreLoader(scheduler, settings) {
 
     function listenToSchedule(times, instrument) {
         const countTimes = times.map(function (time) {
-            return sound.convertTimeToCount(time);
+            return settings.convertTimeToCount(time);
         });
         scheduler.addCountListener(countTimes, function (count) {
             instrument.emit('playtime');
