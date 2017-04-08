@@ -1,7 +1,7 @@
 var sound = new function Sound() {
     var self = this;
 
-    self.bpm = 300;
+    self.bpm = 110;
     self.beats = 4;
     self.segmentsPerBeat = 32;
     self.totalSegments = self.segmentsPerBeat * self.beats;
@@ -46,12 +46,6 @@ var sound = new function Sound() {
             var index = ((Number(time.beat) * self.segmentsPerBeat) + Number(time.seg));
             self.soundList[index].push(src);
         });
-    };
-
-    self.convertToBeatTime = function (count) {
-        var currentSegment = count % self.segmentsPerBeat;
-        var beatCount = Math.floor(count / self.segmentsPerBeat);
-        return {beatCount: beatCount, seg: currentSegment};
     };
 
     self.convertTimeToCount = function (time) {

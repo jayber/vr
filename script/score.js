@@ -54,22 +54,18 @@ function ScoreLoader(scheduler, settings) {
             return sound.convertTimeToCount(time);
         });
         scheduler.addCountListener(countTimes, function (count) {
-            const beatTime = sound.convertToBeatTime(count);
-                instrument.emit('playtime', beatTime);
-
+            instrument.emit('playtime');
         });
-
         scheduler.addEventListener("timeoff", function (count) {
             instrument.emit('playoff');
         });
     }
 
-    score.forEach(function (score) {
-        var instrument = document.querySelector("#" + score.instrument);
-        var times = parseTimes(score.times);
+    score.forEach(function (instrumentPart) {
+        var times = parseTimes(instrumentPart.times);
+        settings.registerSound(instrumentPart.src, times);
+        var instrument = document.querySelector("#" + instrumentPart.instrument);
         generateMarkers(times, instrument);
-
-        settings.registerSound(score.src, times);
         listenToSchedule(times, instrument);
     });
 }
