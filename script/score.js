@@ -1,12 +1,13 @@
-var score = {
-    "kick": {src: "audio/kick.WAV", times: ["0:0/4", "0:2/4", "2:0/4", "2:2/4", "3:2/4"]},
-    "hat": {src: "audio/hat.WAV", times: ["1:0/4", "3:0/4"]},
-    "snare": {src: "audio/snare.WAV", times: ["3:1/4", "3:3/4"]},
-    "bork": {src: "audio/blork.wav", times: ["3:0/4"]},
-    "beep": {src: "audio/beep.wav", times: ["3:0/4", "3:1/4", "3:2/4", "3:3/4"]}
-};
-
 function loadScore(settings) {
+
+    var score = {
+        "kick": {src: "audio/kick.WAV", times: ["0:0/4", "0:2/4", "2:0/4", "2:2/4", "3:2/4"]},
+        "hat": {src: "audio/hat.WAV", times: ["1:0/4", "3:0/4"]},
+        "snare": {src: "audio/snare.WAV", times: ["3:1/4", "3:3/4"]},
+        "bork": {src: "audio/blork.wav", times: ["3:0/4"]},
+        "beep": {src: "audio/beep.wav", times: ["3:0/4", "3:1/4", "3:2/4", "3:3/4"]}
+    };
+
     var beatExp = /(\d*):/;
     var denomExp = /\/(\d*)/;
     var nomExp = /:(\d*)\//;
@@ -29,4 +30,6 @@ function loadScore(settings) {
         instrumentPart.parsedTimes = parsedTimes;
         settings.registerSound(instrumentPart.src, parsedTimes);
     });
+
+    return score;
 }

@@ -4,7 +4,7 @@ new function () {
     var scheduler = new AudioAndAnimationScheduler(soundSettings.audioCtx);
     var instrumentCount = 0;
 
-    loadScore(soundSettings);
+    var score = loadScore(soundSettings);
 
     AFRAME.registerComponent('playable', {
         init: function () {
@@ -37,11 +37,11 @@ new function () {
         schema: {type: 'string'},
         init: function () {
             var el = this.el;
-            this.color = el.getAttribute("material").color;
-            this.generateMarkers(score[this.data].parsedTimes, el);
             this.listenToSchedule(score[this.data].parsedTimes, el);
-            this.createCable(el);
+            this.color = el.getAttribute("material").color;
             this.flash(el, el);
+            this.generateMarkers(score[this.data].parsedTimes, el);
+            this.createCable(el);
         },
 
         flash: function (el, target) {
