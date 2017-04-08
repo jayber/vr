@@ -31,6 +31,7 @@
         <img id="rock-texture" src="img/rock.jpg">
         <img id="cloud-texture" src="img/cloud.jpg">
         <img id="play-texture" src="img/play.png">
+        <img id="cable-texture" src="img/cable_stripe.png">
     </a-assets>
 
     <a-cylinder material="src:#galv-texture;" height="0.9" position="0 0.5 0" color="#9999ff" radius="0.3">
@@ -38,50 +39,36 @@
     </a-cylinder>
 
     <a-cylinder id="clock-face" material="src:#studded-texture;repeat: 10 1" segments-radial="16" height="0.05" rotation="-135 0 0" position="0 1.3 0" radius="0.42" side="double">
-        <a-circle material="src:#noise-texture; repeat:5 5" height="0.001" rotation="270 -90 0" position="0 -0.04 -0.01" geometry="radius: 0.42" theta-length="4" color="#f0eae0" side="double" animate-theta></a-circle>
+        <a-circle material="src:#noise-texture; repeat:5 5" rotation="-90 -90 0" position="0 -0.028 -0.005" geometry="radius: 0.42" theta-length="4" color="#f0eae0" side="double" animate-theta></a-circle>
 
         <a-circle radius="0.3" scale="0.5 0.5 0.5" material="src:#noise-texture; repeat:5 5" color="#181818" side="both" position="0 -0.045 -0.01" rotation="90 0 0">
             <a-entity bpm-label position="0 0 0.05" n-text="fontSize:1pt;width:0.5;height:0.1"></a-entity>
         </a-circle>
     </a-cylinder>
 
-
-    <a-sphere id="kick" flash="from:#6688ff; to:#fff"
-              material="src:#noise-texture; repeat:5 5" color="#6688ff" position="1 1 1.5" radius="0.3">
+    <a-sphere instrument="kick" material="src:#noise-texture; repeat:5 5" color="#6688ff" position="1 1 1.5" radius="0.3">
     </a-sphere>
 
-    <a-entity cable="#kick"></a-entity>
-
-    <a-box id="hat" depth="0.5" height="0.5" width="0.5"
-           flash="from:#ff6688; to:#fff"
+    <a-box instrument="hat" depth="0.5" height="0.5" width="0.5"
            material="src:#copper-texture;color: #ff6688" position="-1 1 1.5">
     </a-box>
 
-    <a-entity cable="#hat"></a-entity>
-
-    <a-tetrahedron id="snare" rotation="215 45 45" radius="0.6" flash="from:#b0d8b0; to:#fff"
+    <a-tetrahedron instrument="snare" rotation="215 45 45" radius="0.6"
                    material="src:#green-texture;color:#b0d8b0" position="-1.7 1 -0.8">
     </a-tetrahedron>
 
-    <a-entity cable="#snare"></a-entity>
-
     <a-cylinder height="1" radius="0.08" position="0 1.2 -1.5" material="src:#stain-texture"></a-cylinder>
-    <a-sphere id="bork" material="src:#tongue-texture;color:#aaf" flash="from:#ca9; to:#fff"
+    <a-sphere instrument="bork" material="src:#tongue-texture;color:#aaf"
               position="0 1 -1.5" radius="0.15">
     </a-sphere>
 
-    <a-entity cable="#bork"></a-entity>
-
-    <a-cone id="beep" height="0.7" radius-top="0.2" radius-bottom="0.38" open-ended="true" color="#ffc34e"
-            flash="from:#ffc34e; to:#fff"
+    <a-cone instrument="beep" height="0.7" radius-top="0.2" radius-bottom="0.38" open-ended="true" color="#ffc34e"
             material="src:#rock-texture;side:double" position="1.7 1.1 -0.8">
 
         <a-torus radius="0.15" rotation="90 0 0" radius-tubular="0.029" position="0 0.2 0" material="src:#cloud-texture;color:#ffe8c0;">
             <a-animation attribute="position" from="0 0.2 0" to="0 2 0" begin="playtime" dur="500" fill="none" easing="linear"></a-animation>
         </a-torus>
     </a-cone>
-
-    <a-entity cable="#beep"></a-entity>
 
 </a-scene>
 

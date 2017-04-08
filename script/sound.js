@@ -11,18 +11,6 @@ function SoundSettings() {
     self.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     self.soundBuffersMap = {};
 
-    self.setFlashing = function (srcEntity, el) {
-        if (srcEntity.hasAttribute("flash")) {
-            var flash = srcEntity.getAttribute("flash");
-            srcEntity.addEventListener("playtime", function () {
-                el.object3DMap["mesh"].material.color.set(flash.to);
-            });
-            srcEntity.addEventListener("playoff", function () {
-                el.object3DMap["mesh"].material.color.set(flash.from);
-            });
-        }
-    };
-
     self.load = function (src) {
         var loader = new AudioSampleLoader();
         loader.src = src;

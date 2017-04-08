@@ -2,6 +2,9 @@ new function () {
     var self = this;
     var soundSettings = new SoundSettings();
     var scheduler = new AudioAndAnimationScheduler(soundSettings.audioCtx);
+    var instrumentCount = 0;
+
+    loadScore(soundSettings);
 
     AFRAME.registerComponent('playable', {
         init: function () {
@@ -30,26 +33,64 @@ new function () {
         }
     });
 
-    AFRAME.registerComponent('cable', {
+    AFRAME.registerComponent('instrument', {
         schema: {type: 'string'},
         init: function () {
-            var self = this;
-            var srcEntity = document.querySelector(self.data);
+            var el = this.el;
+            this.color = el.getAttribute("material").color;
+            this.generateMarkers(score[this.data].parsedTimes, el);
+            this.listenToSchedule(score[this.data].parsedTimes, el);
+            this.createCable(el);
+            this.flash(el, el);
+        },
 
-            if (srcEntity.hasLoaded) {
-                self.createCable(srcEntity);
-            } else {
-                srcEntity.addEventListener('loaded', function () {
-                    self.createCable(srcEntity);
-                });
-            }
-            srcEntity.addEventListener('playtime', function () {
-                self.el.emit("playtime");
+        flash: function (el, target) {
+            var self = this;
+            el.addEventListener("playtime", function () {
+                target.setAttribute('color', "#fff");
+            });
+            el.addEventListener("playoff", function () {
+                target.setAttribute('color', self.color);
+            });
+        },
+
+        generateMarkers: function (times, el) {
+            var count = instrumentCount++;
+            var self = this;
+            times.forEach(function (time) {
+                var angle = (time.beat * (360 / soundSettings.beats)) + (time.seg * (360 / (soundSettings.segmentsPerBeat * soundSettings.beats)));
+                var startRad = 0.134;
+                var step = 0.05;
+                var rad = startRad + (instrumentCount * step);
+                var newX = Math.cos(angle * (Math.PI / 180)) * rad;
+                var newY = Math.sin(angle * (Math.PI / 180)) * rad;
+
+                var subElement = document.createElement("a-sphere");
+                subElement.setAttribute("radius", "0.027");
+                subElement.setAttribute("position", newY + " -0.025 " + newX);
+
+                subElement.setAttribute("color", self.color);
+                self.flash(el, subElement);
+
+                var clockFace = document.querySelector('#clock-face');
+                clockFace.appendChild(subElement);
+            });
+        },
+
+        listenToSchedule: function (times, el) {
+            const countTimes = times.map(function (time) {
+                return soundSettings.convertTimeToCount(time);
+            });
+            scheduler.addCountListener(countTimes, function (count) {
+                el.emit('playtime');
+            });
+            scheduler.addEventListener("timeoff", function (count) {
+                el.emit('playoff');
             });
         },
 
         createCable: function (srcEntity) {
-            var sself = this;
+            var self = this;
             var start = srcEntity.object3D.getWorldPosition();
             var instrumentFloor = new THREE.Vector3(start.x, 0, start.z);
             var path = new THREE.CurvePath();
@@ -57,7 +98,8 @@ new function () {
             path.add(new THREE.LineCurve3(instrumentFloor, new THREE.Vector3(0, 0, 0)));
             var geometry = new THREE.TubeGeometry(path, 64, 0.02, 8, false);
 
-            var texture = new THREE.TextureLoader().load("img/cable_stripe.png");
+            var materialSrc = "img/cable_stripe.png";
+            var texture = new THREE.TextureLoader().load(materialSrc);
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.RepeatWrapping;
             texture.repeat.set(100, 1);
@@ -67,9 +109,22 @@ new function () {
                 color: srcEntity.getAttribute("material").color
             });
             var tube = new THREE.Mesh(geometry, material);
-            sself.el.setObject3D("mesh", tube);
+            var cableElement = document.createElement("a-entity");
+            cableElement.setObject3D("mesh", tube);
+            document.querySelector("a-scene").appendChild(cableElement);
 
-            soundSettings.setFlashing(srcEntity, sself.el);
+            flash(srcEntity, cableElement);
+
+            function flash() {
+                var white = new THREE.Color();
+                var startingColor = new THREE.Color(self.color);
+                srcEntity.addEventListener("playtime", function () {
+                    tube.material.color = white;
+                });
+                srcEntity.addEventListener("playoff", function () {
+                    tube.material.color = startingColor;
+                });
+            }
         }
     });
 
@@ -97,32 +152,4 @@ new function () {
             });
         }
     });
-
-    AFRAME.registerComponent('flash', {
-        schema: {
-            from: {type: 'string', default: ''},
-            delay: {type: 'number', default: ''}
-        },
-        init: function () {
-            var el = this.el;
-            var self = this;
-            el.addEventListener("playtime", function () {
-                el.setAttribute('material', 'color', self.data.to);
-            });
-            el.addEventListener("playoff", function () {
-                el.setAttribute('material', 'color', self.data.from);
-            });
-        }
-    });
-
-    window.onload = function () {
-        var srcEntity = document.querySelector("a-scene");
-        if (srcEntity.hasLoaded) {
-            loadScore(scheduler, soundSettings);
-        } else {
-            srcEntity.addEventListener('loaded', function () {
-                loadScore(scheduler, soundSettings);
-            });
-        }
-    };
 };

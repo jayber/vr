@@ -1,13 +1,12 @@
-var score = [
-    {instrument: "kick", src: "audio/kick.WAV", times: ["0:0/4", "0:2/4", "2:0/4", "2:2/4", "3:2/4"]},
-    {instrument: "hat", src: "audio/hat.WAV", times: ["1:0/4", "3:0/4"]},
-    {instrument: "snare", src: "audio/snare.WAV", times: ["3:1/4", "3:3/4"]},
-    {instrument: "bork", src: "audio/blork.wav", times: ["3:0/4"]},
-    {instrument: "beep", src: "audio/beep.wav", times: ["3:0/4", "3:1/4", "3:2/4", "3:3/4"]}
-];
+var score = {
+    "kick": {src: "audio/kick.WAV", times: ["0:0/4", "0:2/4", "2:0/4", "2:2/4", "3:2/4"]},
+    "hat": {src: "audio/hat.WAV", times: ["1:0/4", "3:0/4"]},
+    "snare": {src: "audio/snare.WAV", times: ["3:1/4", "3:3/4"]},
+    "bork": {src: "audio/blork.wav", times: ["3:0/4"]},
+    "beep": {src: "audio/beep.wav", times: ["3:0/4", "3:1/4", "3:2/4", "3:3/4"]}
+};
 
-function loadScore(scheduler, settings) {
-    var instrumentCount = 0;
+function loadScore(settings) {
     var beatExp = /(\d*):/;
     var denomExp = /\/(\d*)/;
     var nomExp = /:(\d*)\//;
@@ -24,48 +23,10 @@ function loadScore(scheduler, settings) {
         return parsedTimes;
     }
 
-    function generateMarkers(times, el) {
-        var count = instrumentCount++;
-        times.forEach(function (time) {
-            var angle = (time.beat * (360 / settings.beats)) + (time.seg * (360 / (settings.segmentsPerBeat * settings.beats)));
-
-            var subElement = document.createElement("a-sphere");
-            subElement.setAttribute("radius", "0.027");
-            var clockFace = document.querySelector('#clock-face');
-
-            var startRad = 0.134;
-            var step = 0.05;
-            var rad = startRad + (instrumentCount * step);
-
-            var newX = Math.cos(angle * (Math.PI / 180)) * rad;
-            var newY = Math.sin(angle * (Math.PI / 180)) * rad;
-            subElement.setAttribute("position", newY + " -0.025 " + newX);
-
-            var color = el.getAttribute("material").color;
-            subElement.setAttribute("color", color);
-            clockFace.appendChild(subElement);
-
-            settings.setFlashing(el, subElement);
-        });
-    }
-
-    function listenToSchedule(times, instrument) {
-        const countTimes = times.map(function (time) {
-            return settings.convertTimeToCount(time);
-        });
-        scheduler.addCountListener(countTimes, function (count) {
-            instrument.emit('playtime');
-        });
-        scheduler.addEventListener("timeoff", function (count) {
-            instrument.emit('playoff');
-        });
-    }
-
-    score.forEach(function (instrumentPart) {
-        var times = parseTimes(instrumentPart.times);
-        settings.registerSound(instrumentPart.src, times);
-        var instrument = document.querySelector("#" + instrumentPart.instrument);
-        generateMarkers(times, instrument);
-        listenToSchedule(times, instrument);
+    Object.keys(score).forEach(function (key, index) {
+        var instrumentPart = score[key];
+        var parsedTimes = parseTimes(instrumentPart.times);
+        instrumentPart.parsedTimes = parsedTimes;
+        settings.registerSound(instrumentPart.src, parsedTimes);
     });
 }
