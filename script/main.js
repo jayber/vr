@@ -63,7 +63,7 @@ new function () {
             this.listenToSchedule(score[this.data].parsedTimes, el, this);
             this.color = el.getAttribute("material").color;
             this.flash(el, el);
-            this.generateMarkers(score[this.data].parsedTimes, el);
+            this.generateMarkers(score[this.data].parsedTimes);
             this.createCable(el);
         },
 
@@ -83,11 +83,11 @@ new function () {
             });
         },
 
-        generateMarkers: function (times, el) {
+        generateMarkers: function (times) {
             var count = instrumentCount++;
             var self = this;
             times.forEach(function (time) {
-                new Marker(time, self, el);
+                new Marker(soundSettings.convertTimeToCount(time), self, count);
             });
         },
 
@@ -168,17 +168,17 @@ new function () {
         }
     });
 
-    function Marker(time, instrument) {
-        var angle = (time.beat * (360 / soundSettings.beats)) + (time.seg * (360 / (soundSettings.segmentsPerBeat * soundSettings.beats)));
-        var startRad = 0.134;
-        var step = 0.05;
-        var rad = startRad + (instrumentCount * step);
-        var newX = Math.cos(angle * (Math.PI / 180)) * rad;
-        var newY = Math.sin(angle * (Math.PI / 180)) * rad;
+    function Marker(count, instrument, instrumentCount) {
+        var angle = count * (2 * Math.PI / soundSettings.totalSegments);
+        var startRadius = 0.175;
+        var radiusStep = 0.05;
+        var radius = startRadius + (instrumentCount * radiusStep);
+        var newX = Math.cos(angle) * radius;
+        var newY = Math.sin(angle) * radius;
 
         var subElement = document.createElement("a-sphere");
         subElement.setAttribute("radius", "0.027");
-        subElement.setAttribute("position", newY + " -0.025 " + newX);
+        subElement.setAttribute("position", newX + " 0.025 " + newY);
 
         subElement.setAttribute("color", instrument.color);
         instrument.flash(instrument.el, subElement);
