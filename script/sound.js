@@ -21,6 +21,11 @@ function SoundSettings() {
         loader.send();
     };
 
+    self.removeTriggerTime = function (count, src) {
+        var index = self.soundList[count].indexOf(src);
+        self.soundList[count].splice(index, 1);
+    };
+
     self.registerSound = function (src, times) {
         self.load(src);
         if (self.soundList == undefined) {
@@ -31,7 +36,7 @@ function SoundSettings() {
         }
 
         times.forEach(function (time) {
-            var index = ((Number(time.beat) * self.segmentsPerBeat) + Number(time.seg));
+            var index = self.convertTimeToCount(time);
             self.soundList[index].push(src);
         });
     };
@@ -39,4 +44,4 @@ function SoundSettings() {
     self.convertTimeToCount = function (time) {
         return (self.segmentsPerBeat * time.beat) + time.seg;
     }
-};
+}

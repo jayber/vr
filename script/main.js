@@ -1,10 +1,32 @@
 new function () {
     var self = this;
     var soundSettings = new SoundSettings();
+    var score = loadScore(soundSettings);
     var scheduler = new AudioAndAnimationScheduler(soundSettings.audioCtx);
     var instrumentCount = 0;
 
-    var score = loadScore(soundSettings);
+    AFRAME.registerComponent('timer', {
+        init: function () {
+            var el = this.el;
+            var self = this;
+
+            el.addEventListener("raycaster-intersected", function (event) {
+                self.intersectionPoint = event.detail.intersection.point;
+            });
+            el.addEventListener("click", function (event) {
+
+                var subElement = document.createElement("a-sphere");
+                subElement.setAttribute("radius", "0.027");
+                var point = self.intersectionPoint;
+                subElement.setAttribute("position", point.x + " " + point.y + " " + point.z);
+
+                subElement.setAttribute("color", "#faa");
+
+                document.querySelector("a-scene").appendChild(subElement);
+
+            });
+        }
+    });
 
     AFRAME.registerComponent('playable', {
         init: function () {
@@ -37,11 +59,18 @@ new function () {
         schema: {type: 'string'},
         init: function () {
             var el = this.el;
-            this.listenToSchedule(score[this.data].parsedTimes, el);
+            soundSettings.registerSound(score[this.data].src, score[this.data].parsedTimes);
+            this.listenToSchedule(score[this.data].parsedTimes, el, this);
             this.color = el.getAttribute("material").color;
             this.flash(el, el);
             this.generateMarkers(score[this.data].parsedTimes, el);
             this.createCable(el);
+        },
+
+        removeTime: function (time) {
+            var count = soundSettings.convertTimeToCount(time);
+            soundSettings.removeTriggerTime(count, score[this.data].src);
+            scheduler.removeCountListener(count, this.countListener);
         },
 
         flash: function (el, target) {
@@ -58,32 +87,18 @@ new function () {
             var count = instrumentCount++;
             var self = this;
             times.forEach(function (time) {
-                var angle = (time.beat * (360 / soundSettings.beats)) + (time.seg * (360 / (soundSettings.segmentsPerBeat * soundSettings.beats)));
-                var startRad = 0.134;
-                var step = 0.05;
-                var rad = startRad + (instrumentCount * step);
-                var newX = Math.cos(angle * (Math.PI / 180)) * rad;
-                var newY = Math.sin(angle * (Math.PI / 180)) * rad;
-
-                var subElement = document.createElement("a-sphere");
-                subElement.setAttribute("radius", "0.027");
-                subElement.setAttribute("position", newY + " -0.025 " + newX);
-
-                subElement.setAttribute("color", self.color);
-                self.flash(el, subElement);
-
-                var clockFace = document.querySelector('#clock-face');
-                clockFace.appendChild(subElement);
+                new Marker(time, self, el);
             });
         },
 
-        listenToSchedule: function (times, el) {
+        listenToSchedule: function (times, el, self) {
             const countTimes = times.map(function (time) {
                 return soundSettings.convertTimeToCount(time);
             });
-            scheduler.addCountListener(countTimes, function (count) {
+            self.countListener = function (count) {
                 el.emit('playtime');
-            });
+            };
+            scheduler.addCountListener(countTimes, self.countListener);
             scheduler.addEventListener("timeoff", function (count) {
                 el.emit('playoff');
             });
@@ -152,4 +167,28 @@ new function () {
             });
         }
     });
+
+    function Marker(time, instrument) {
+        var angle = (time.beat * (360 / soundSettings.beats)) + (time.seg * (360 / (soundSettings.segmentsPerBeat * soundSettings.beats)));
+        var startRad = 0.134;
+        var step = 0.05;
+        var rad = startRad + (instrumentCount * step);
+        var newX = Math.cos(angle * (Math.PI / 180)) * rad;
+        var newY = Math.sin(angle * (Math.PI / 180)) * rad;
+
+        var subElement = document.createElement("a-sphere");
+        subElement.setAttribute("radius", "0.027");
+        subElement.setAttribute("position", newY + " -0.025 " + newX);
+
+        subElement.setAttribute("color", instrument.color);
+        instrument.flash(instrument.el, subElement);
+
+        var clockFace = document.querySelector('#clock-face');
+        clockFace.appendChild(subElement);
+
+        subElement.addEventListener("click", function () {
+            clockFace.removeChild(subElement);
+            instrument.removeTime(time);
+        });
+    }
 };

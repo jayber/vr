@@ -31,6 +31,11 @@ function AudioAndAnimationScheduler(audioCtx) {
         })
     };
 
+    self.removeCountListener = function (time, listener) {
+        var index = countListeners[time].indexOf(listener);
+        countListeners[time].splice(index, 1);
+    };
+
     self.addEventListener = function (type, listener) {
         if (!(type in listeners)) {
             listeners[type] = [];

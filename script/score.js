@@ -26,9 +26,7 @@ function loadScore(settings) {
 
     Object.keys(score).forEach(function (key, index) {
         var instrumentPart = score[key];
-        var parsedTimes = parseTimes(instrumentPart.times);
-        instrumentPart.parsedTimes = parsedTimes;
-        settings.registerSound(instrumentPart.src, parsedTimes);
+        instrumentPart.parsedTimes = parseTimes(instrumentPart.times);
     });
 
     return score;
