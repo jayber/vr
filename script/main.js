@@ -3,7 +3,8 @@ new function () {
     var soundSettings = new SoundSettings();
     var score = loadScore(soundSettings);
     var scheduler = new AudioAndAnimationScheduler(soundSettings.audioCtx);
-    var instrumentCount = 0;
+    var markers = new Markers(soundSettings);
+    var instruments = [];
 
     AFRAME.registerComponent('timer', {
         init: function () {
@@ -13,17 +14,19 @@ new function () {
             el.addEventListener("raycaster-intersected", function (event) {
                 self.intersectionPoint = event.detail.intersection.point;
             });
+
             el.addEventListener("click", function (event) {
+                if (!event.hasRemoved) {
+                    var point = self.intersectionPoint;
+                    el.object3D.worldToLocal(point);
+                    var data = markers.toInstrumentAndCount(point.x, point.z);
+                    console.log(data);
 
-                var subElement = document.createElement("a-sphere");
-                subElement.setAttribute("radius", "0.027");
-                var point = self.intersectionPoint;
-                subElement.setAttribute("position", point.x + " " + point.y + " " + point.z);
-
-                subElement.setAttribute("color", "#faa");
-
-                document.querySelector("a-scene").appendChild(subElement);
-
+                    var instrument = instruments[data.instrumentNumber];
+                    markers.marker(data.count, instrument, data.instrumentNumber);
+                    scheduler.addCountListener(data.count, instrument.countListener);
+                    soundSettings.addTriggerTime(data.count, score[instrument.data].src);
+                }
             });
         }
     });
@@ -58,6 +61,7 @@ new function () {
     AFRAME.registerComponent('instrument', {
         schema: {type: 'string'},
         init: function () {
+            instruments.push(this);
             var el = this.el;
             soundSettings.registerSound(score[this.data].src, score[this.data].parsedTimes);
             this.listenToSchedule(score[this.data].parsedTimes, el, this);
@@ -67,8 +71,7 @@ new function () {
             this.createCable(el);
         },
 
-        removeTime: function (time) {
-            var count = soundSettings.convertTimeToCount(time);
+        removeTime: function (count) {
             soundSettings.removeTriggerTime(count, score[this.data].src);
             scheduler.removeCountListener(count, this.countListener);
         },
@@ -84,21 +87,18 @@ new function () {
         },
 
         generateMarkers: function (times) {
-            var count = instrumentCount++;
+            var instrumentIndex = instruments.length - 1;
             var self = this;
             times.forEach(function (time) {
-                new Marker(soundSettings.convertTimeToCount(time), self, count);
+                markers.marker(time.count, self, instrumentIndex);
             });
         },
 
         listenToSchedule: function (times, el, self) {
-            const countTimes = times.map(function (time) {
-                return soundSettings.convertTimeToCount(time);
-            });
-            self.countListener = function (count) {
+            self.countListener = function (time) {
                 el.emit('playtime');
             };
-            scheduler.addCountListener(countTimes, self.countListener);
+            scheduler.addCountsListener(times, self.countListener);
             scheduler.addEventListener("timeoff", function (count) {
                 el.emit('playoff');
             });
@@ -168,27 +168,4 @@ new function () {
         }
     });
 
-    function Marker(count, instrument, instrumentCount) {
-        var angle = count * (2 * Math.PI / soundSettings.totalSegments);
-        var startRadius = 0.175;
-        var radiusStep = 0.05;
-        var radius = startRadius + (instrumentCount * radiusStep);
-        var newX = Math.cos(angle) * radius;
-        var newY = Math.sin(angle) * radius;
-
-        var subElement = document.createElement("a-sphere");
-        subElement.setAttribute("radius", "0.027");
-        subElement.setAttribute("position", newX + " 0.025 " + newY);
-
-        subElement.setAttribute("color", instrument.color);
-        instrument.flash(instrument.el, subElement);
-
-        var clockFace = document.querySelector('#clock-face');
-        clockFace.appendChild(subElement);
-
-        subElement.addEventListener("click", function () {
-            clockFace.removeChild(subElement);
-            instrument.removeTime(time);
-        });
-    }
 };

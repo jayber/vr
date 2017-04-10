@@ -22,12 +22,16 @@ function AudioAndAnimationScheduler(audioCtx) {
     var segmentOffTime;
     var sourcesToCancel;
 
-    self.addCountListener = function (times, listener) {
+    self.addCountListener = function (time, listener) {
+        if (countListeners[time] == undefined) {
+            countListeners[time] = [];
+        }
+        countListeners[time].push(listener);
+    };
+
+    self.addCountsListener = function (times, listener) {
         times.forEach(function (time) {
-            if (countListeners[time] == undefined) {
-                countListeners[time] = [];
-            }
-            countListeners[time].push(listener);
+            self.addCountListener(time.count, listener);
         })
     };
 

@@ -26,6 +26,13 @@ function SoundSettings() {
         self.soundList[count].splice(index, 1);
     };
 
+    self.addTriggerTime = function (count, src) {
+        var index = self.soundList[count].indexOf(src);
+        if (index < 0) {
+            self.soundList[count].push(src);
+        }
+    };
+
     self.registerSound = function (src, times) {
         self.load(src);
         if (self.soundList == undefined) {
@@ -36,12 +43,15 @@ function SoundSettings() {
         }
 
         times.forEach(function (time) {
-            var index = self.convertTimeToCount(time);
-            self.soundList[index].push(src);
+            self.soundList[time.count].push(src);
         });
     };
 
     self.convertTimeToCount = function (time) {
-        return (self.segmentsPerBeat * time.beat) + time.seg;
+        return self.convertTimeToCount2(time.beat, time.seg);
+    };
+
+    self.convertTimeToCount2 = function (beat, seg) {
+        return (self.segmentsPerBeat * beat) + seg;
     }
 }
