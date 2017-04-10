@@ -34,7 +34,6 @@ function Markers(soundSettings) {
         subElement.setAttribute("color", instrument.color);
 
         subElement.addEventListener("click", function (event) {
-            console.log("remove");
             clockFace.removeChild(subElement);
             instrument.removeTime(count);
             event.hasRemoved = true;

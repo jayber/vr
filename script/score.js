@@ -8,16 +8,15 @@ function loadScore(settings) {
         "beep": {src: "audio/beep.wav", times: ["3:0/4", "3:1/4", "3:2/4", "3:3/4"]}
     };
 
-    var beatExp = /(\d*):/;
-    var denomExp = /\/(\d*)/;
-    var nomExp = /:(\d*)\//;
+    var beatExp = /(\d*):(\d*)\/(\d*)/;
 
     function parseTimes(times) {
         var parsedTimes = [];
         times.forEach(function (time) {
-            var beat = beatExp.exec(time)[1];
-            var denom = denomExp.exec(time)[1];
-            var nom = nomExp.exec(time)[1];
+            var capture = beatExp.exec(time);
+            var beat = capture[1];
+            var nom = capture[2];
+            var denom = capture[3];
             var seg = (settings.segmentsPerBeat / denom) * nom;
             var element = {beat: beat, seg: seg, count: settings.convertTimeToCount(beat, seg)};
             parsedTimes.push(element);
