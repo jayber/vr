@@ -1,10 +1,31 @@
 (function () {
     var self = this;
+
     var soundSettings = new SoundSettings();
     var score = loadScore(soundSettings);
     var scheduler = new AudioAndAnimationScheduler(soundSettings.audioCtx);
     var markers = new Markers(soundSettings);
     var instruments = [];
+
+    AFRAME.registerComponent('bpm-change', {
+        schema: {type: 'string'},
+        init: function () {
+            var el = this.el;
+            var self = this;
+
+            el.addEventListener("click", function (event) {
+                if (!event.handled) {
+                    if (self.data == "up") {
+                        soundSettings.setBpm(soundSettings.bpm + 1);
+                    } else {
+                        soundSettings.setBpm(soundSettings.bpm - 1);
+                    }
+                    event.handled = true;
+                }
+            });
+        }
+    });
+
 
     AFRAME.registerComponent('timer', {
         init: function () {
@@ -16,7 +37,7 @@
             });
 
             el.addEventListener("click", function (event) {
-                if (!event.hasRemoved) {
+                if (!event.handled) {
                     var newPoint;
                     var point = self.intersectionPoint;
                     if (point == undefined) {
@@ -31,12 +52,16 @@
                     } else {
                         newPoint = {x: point.x, y: point.z};
                     }
-                    var data = markers.toInstrumentAndCount(newPoint.x, newPoint.y);
 
-                    var instrument = instruments[data.instrumentNumber];
-                    markers.marker(data.count, instrument, data.instrumentNumber);
-                    scheduler.addCountListener(data.count, instrument.countListener);
-                    soundSettings.addTriggerTime(data.count, score[instrument.data].src);
+                    var data = markers.toInstrumentAndCount(newPoint.x, newPoint.y);
+                    if (data.instrumentNumber > -1) {
+                        var instrument = instruments[data.instrumentNumber];
+                        markers.marker(data.count, instrument, data.instrumentNumber);
+                        scheduler.addCountListener(data.count, instrument.countListener);
+                        soundSettings.addTriggerTime(data.count, score[instrument.data].src);
+
+                        event.handled = true;
+                    }
                 }
             });
         }
@@ -57,7 +82,7 @@
         },
 
         start: function (el) {
-            scheduler.start(soundSettings.segmentDuration, soundSettings.totalSegments, soundSettings.soundList, soundSettings.soundBuffersMap);
+            scheduler.start(soundSettings.getSegmentDuration(), soundSettings.totalSegments, soundSettings.soundList, soundSettings.soundBuffersMap);
             self.isStarted = true;
             el.setAttribute("color", "#8d6")
         },
@@ -158,6 +183,9 @@
         init: function () {
             var el = this.el;
             el.setAttribute("n-text", {text: soundSettings.bpm + " BPM", fontSize: "1pt"});
+            soundSettings.addEventListener("bpm-change", function (event) {
+                el.setAttribute("n-text", {text: event + " BPM", fontSize: "1pt"});
+            })
         }
     });
 

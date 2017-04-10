@@ -5,11 +5,37 @@ function SoundSettings() {
     self.beats = 4;
     self.segmentsPerBeat = 32;
     self.totalSegments = self.segmentsPerBeat * self.beats;
-    self.beatDuration = 60 / self.bpm;
-    self.segmentDuration = self.beatDuration / self.segmentsPerBeat;
 
     self.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     self.soundBuffersMap = {};
+
+    var listeners = {};
+
+    self.addEventListener = function (type, listener) {
+        if (!(type in listeners)) {
+            listeners[type] = [];
+        }
+        listeners[type].push(listener);
+    };
+
+    self.setBpm = function (bpm) {
+        self.bpm = bpm;
+        dispatch("bpm-change", bpm);
+    };
+
+    function dispatch(type, param) {
+        if (!(type in listeners)) {
+            return true;
+        }
+        var stack = listeners[type];
+        for (var i = 0, l = stack.length; i < l; i++) {
+            stack[i].call(self, param);
+        }
+    }
+
+    self.getSegmentDuration = function () {
+        return 60 / self.bpm / self.segmentsPerBeat;
+    };
 
     self.load = function (src) {
         var loader = new AudioSampleLoader();

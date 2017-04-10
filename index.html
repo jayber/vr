@@ -33,6 +33,8 @@
         <img id="cloud-texture" src="img/cloud.jpg">
         <img id="play-texture" src="img/play.png">
         <img id="cable-texture" src="img/cable_stripe.png">
+        <img id="up-arrow" src="img/up_arrow.png">
+        <img id="down-arrow" src="img/down_arrow.png">
     </a-assets>
 
     <a-cylinder material="src:#galv-texture;" height="0.9" position="0 0.5 0" color="#9999ff" radius="0.3">
@@ -43,7 +45,10 @@
         <a-circle material="src:#noise-texture; repeat:5 5" rotation="90 0 0" position="0 0.028 0.005" geometry="radius: 0.405" side="double" theta-length="4" color="#f0eae0" animate-theta></a-circle>
 
         <a-circle radius="0.3" scale="0.5 0.5 0.5" material="src:#noise-texture; repeat:5 5" color="#181818" position="0 0.03 0" rotation="-90 0 0">
-            <a-entity bpm-label position="0 0 0.05" rotation="0 0 -90" n-text="fontSize:1pt;width:0.5;height:0.1"></a-entity>
+            <a-circle altspace-cursor-collider bpm-change="up" radius="0.08" rotation="0 0 -90" material="src:#up-arrow" position="0.15 0 0.01"></a-circle>
+
+            <a-entity bpm-label position="0 0 0.01" rotation="0 0 -90" n-text="fontSize:1pt;width:0.5;height:0.1"></a-entity>
+            <a-circle altspace-cursor-collider bpm-change="down" radius="0.08" rotation="0 0 -90" material="src:#down-arrow" position="-0.15 0 0.01"></a-circle>
         </a-circle>
     </a-cylinder>
 

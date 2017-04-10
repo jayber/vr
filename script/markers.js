@@ -36,7 +36,7 @@ function Markers(soundSettings) {
         subElement.addEventListener("click", function (event) {
             clockFace.removeChild(subElement);
             instrument.removeTime(count);
-            event.hasRemoved = true;
+            event.handled = true;
         });
     }
 }
