@@ -17,7 +17,6 @@ function Markers(soundSettings) {
     };
 
     this.marker = function (count, instrument, instrumentIndex) {
-        console.log("add");
         var angle = count * (2 * Math.PI / soundSettings.totalSegments);
         var radius = startRadius + (instrumentIndex * radiusStep);
         var newX = Math.cos(angle) * radius;
@@ -27,11 +26,12 @@ function Markers(soundSettings) {
         subElement.setAttribute("radius", "0.027");
         subElement.setAttribute("position", newX + " 0.025 " + newY);
 
-        subElement.setAttribute("color", instrument.color);
         instrument.flash(instrument.el, subElement);
 
         var clockFace = document.querySelector('#clock-face');
         clockFace.appendChild(subElement);
+        subElement.setAttribute("material", "src", "#noise-texture");
+        subElement.setAttribute("color", instrument.color);
 
         subElement.addEventListener("click", function (event) {
             console.log("remove");
