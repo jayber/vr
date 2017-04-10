@@ -1,4 +1,4 @@
-new function () {
+(function () {
     var self = this;
     var soundSettings = new SoundSettings();
     var score = loadScore(soundSettings);
@@ -17,10 +17,21 @@ new function () {
 
             el.addEventListener("click", function (event) {
                 if (!event.hasRemoved) {
+                    var newPoint;
                     var point = self.intersectionPoint;
+                    if (point == undefined) {
+                        point = event.detail.point;
+                    }
                     el.object3D.worldToLocal(point);
-                    var data = markers.toInstrumentAndCount(point.x, point.z);
-                    console.log(data);
+
+                    //this is utter craziness and just reflects that i don't understand rotation etc
+                    //but it does work!
+                    if (self.intersectionPoint == undefined) {
+                        newPoint = {x: point.y, y: point.z};
+                    } else {
+                        newPoint = {x: point.x, y: point.z};
+                    }
+                    var data = markers.toInstrumentAndCount(newPoint.x, newPoint.y);
 
                     var instrument = instruments[data.instrumentNumber];
                     markers.marker(data.count, instrument, data.instrumentNumber);
@@ -167,5 +178,4 @@ new function () {
             });
         }
     });
-
-};
+})();

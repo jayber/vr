@@ -3,16 +3,13 @@ function Markers(soundSettings) {
     var radiusStep = 0.05;
 
     this.toInstrumentAndCount = function (x, y) {
-
         var radius = Math.sqrt((x * x) + (y * y));
-        console.log({x: x, y: y, radius: radius});
         var instCount = (radius - startRadius) / radiusStep;
 
         var angle = Math.atan2(y, x);
         if (angle < 0) {
             angle = (2 * Math.PI) - Math.abs(angle)
         }
-        console.log({angle: angle});
 
         var count = (angle / (2 * Math.PI / soundSettings.totalSegments)) % soundSettings.totalSegments;
 
