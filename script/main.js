@@ -17,8 +17,10 @@
                 if (!event.handled) {
                     if (self.data == "up") {
                         soundSettings.setBpm(soundSettings.bpm + 1);
+                        scheduler.stop();
                     } else {
                         soundSettings.setBpm(soundSettings.bpm - 1);
+                        scheduler.stop();
                     }
                     event.handled = true;
                 }
@@ -74,23 +76,29 @@
 
             el.addEventListener("click", function () {
                 if (self.isStarted) {
-                    sself.stop(el);
+                    sself.stop();
                 } else {
-                    sself.start(el);
+                    sself.start();
                 }
+            });
+
+            scheduler.addEventListener("start", function () {
+                self.isStarted = true;
+                el.setAttribute("color", "#8d6")
+            });
+
+            scheduler.addEventListener("stop", function () {
+                self.isStarted = false;
+                el.setAttribute("color", "#f99")
             });
         },
 
-        start: function (el) {
-            scheduler.start(soundSettings.getSegmentDuration(), soundSettings.totalSegments, soundSettings.soundList, soundSettings.soundBuffersMap);
-            self.isStarted = true;
-            el.setAttribute("color", "#8d6")
+        start: function () {
+            scheduler.start(soundSettings);
         },
 
-        stop: function (el) {
+        stop: function () {
             scheduler.stop();
-            self.isStarted = false;
-            el.setAttribute("color", "#f99")
         }
     });
 

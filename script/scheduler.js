@@ -3,7 +3,16 @@ function AudioAndAnimationScheduler(audioCtx) {
     const self = this;
     const timeOnLength = 0.1;
     const segmentsPerBatch = 32;
-    const timeEventGranularity = 4;
+
+    function getGrain() {
+        if (isGearVR) {
+            return 4;
+        } else {
+            return 1;
+        }
+    }
+
+    const timeEventGranularity = getGrain();
     const listeners = {};
     const countListeners = [];
 
@@ -14,10 +23,7 @@ function AudioAndAnimationScheduler(audioCtx) {
 
     var isRunning = false;
     var startTime;
-    var secondsPerSegment;
-    var totalSegments;
-    var soundsBySegment;
-    var soundBuffersMap;
+    var soundSettings;
 
     var segmentOffTime;
     var sourcesToCancel;
@@ -47,12 +53,9 @@ function AudioAndAnimationScheduler(audioCtx) {
         listeners[type].push(listener);
     };
 
-    self.start = function (secondsPerSegmentP, totalNoOfSegments, soundsBySegmentP, soundBuffers) {
+    self.start = function (soundSettingsP) {
         console.log("Scheduler.start");
-        secondsPerSegment = secondsPerSegmentP;
-        totalSegments = totalNoOfSegments;
-        soundsBySegment = soundsBySegmentP;
-        soundBuffersMap = soundBuffers;
+        soundSettings = soundSettingsP;
 
         count = 0;
         segmentOffCount = 0;
@@ -63,6 +66,7 @@ function AudioAndAnimationScheduler(audioCtx) {
         isRunning = true;
 
         window.requestAnimationFrame(playAndSchedule);
+        dispatch("start");
     };
 
     self.stop = function () {
@@ -76,6 +80,7 @@ function AudioAndAnimationScheduler(audioCtx) {
                 }
             }
         }
+        dispatch("stop");
     };
 
     function dispatch(type, param) {
@@ -99,7 +104,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     }
 
     function playAndSchedule() {
-        const offset = segmentsPerBatch * secondsPerSegment;
+        const offset = segmentsPerBatch * soundSettings.getSegmentDuration();
         const elapsedTime = audioCtx.currentTime - startTime;
         scheduleSamples(elapsedTime, offset);
         fireSegmentEvents(elapsedTime, offset);
@@ -110,9 +115,9 @@ function AudioAndAnimationScheduler(audioCtx) {
 
     function scheduleSamples(elapsedTime, offset) {
         while (scheduleTime < elapsedTime) {
-            const nextIndex = playedCount % totalSegments;
+            const nextIndex = playedCount % soundSettings.totalSegments;
             const toIndex = nextIndex + segmentsPerBatch;
-            const scheduleOffset = offset + (secondsPerSegment * totalSegments * Math.floor(playedCount / totalSegments));
+            const scheduleOffset = offset + (soundSettings.getSegmentDuration() * soundSettings.totalSegments * Math.floor(playedCount / soundSettings.totalSegments));
 
             scheduleFromStartTime(nextIndex, toIndex, scheduleOffset);
 
@@ -122,7 +127,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     }
 
     function calcNextSegmentTime(offset, count) {
-        return ( count * secondsPerSegment) + offset;
+        return ( count * soundSettings.getSegmentDuration()) + offset;
     }
 
     function fireSegmentEvents(elapsedTime, offset) {
@@ -130,7 +135,7 @@ function AudioAndAnimationScheduler(audioCtx) {
 
         if (segmentOffCount < count && (nextSegmentTime < elapsedTime || (elapsedTime - segmentOffTime) > timeOnLength)) {
             //console.log("fireSegmentOff - count: " + count + "; elapsedTime: " + elapsedTime);
-            dispatch("timeoff", count % totalSegments);
+            dispatch("timeoff", count % soundSettings.totalSegments);
             segmentOffCount = count;
             segmentOffTime = elapsedTime;
         }
@@ -138,9 +143,9 @@ function AudioAndAnimationScheduler(audioCtx) {
         while (nextSegmentTime < elapsedTime) {
             //console.log("fireSegmentOn - nextSegmentTime: " + nextSegmentTime + "; elapsedTime: " + elapsedTime);
             if (count % timeEventGranularity == 0) {
-                dispatch("time", count % totalSegments);
+                dispatch("time", count % soundSettings.totalSegments);
             }
-            dispatchCount(count % totalSegments);
+            dispatchCount(count % soundSettings.totalSegments);
             count++;
             nextSegmentTime = calcNextSegmentTime(offset, count);
         }
@@ -149,13 +154,13 @@ function AudioAndAnimationScheduler(audioCtx) {
     function scheduleFromStartTime(from, to, offset) {
         sourcesToCancel = [];
         for (var i = from; i < to; i++) {
-            var sounds = soundsBySegment[i];
+            var sounds = soundSettings.soundList[i];
             if (sounds != undefined && sounds.length > 0) {
                 sounds.forEach(function (soundName) {
                     var source = audioCtx.createBufferSource();
-                    source.buffer = soundBuffersMap[soundName];
+                    source.buffer = soundSettings.soundBuffersMap[soundName];
                     source.connect(audioCtx.destination);
-                    var when = startTime + offset + (i * secondsPerSegment );
+                    var when = startTime + offset + (i * soundSettings.getSegmentDuration() );
                     //console.log("scheduling " + soundName + " for " + when + " with " + offset);
                     source.start(when);
                     sourcesToCancel.push(source);
