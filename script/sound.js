@@ -47,11 +47,7 @@ function SoundSettings() {
         });
     };
 
-    self.convertTimeToCount = function (time) {
-        return self.convertTimeToCount2(time.beat, time.seg);
-    };
-
-    self.convertTimeToCount2 = function (beat, seg) {
+    self.convertTimeToCount = function (beat, seg) {
         return (self.segmentsPerBeat * beat) + seg;
     }
 }

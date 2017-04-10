@@ -19,7 +19,7 @@ function loadScore(settings) {
             var denom = denomExp.exec(time)[1];
             var nom = nomExp.exec(time)[1];
             var seg = (settings.segmentsPerBeat / denom) * nom;
-            var element = {beat: beat, seg: seg, count: settings.convertTimeToCount2(beat, seg)};
+            var element = {beat: beat, seg: seg, count: settings.convertTimeToCount(beat, seg)};
             parsedTimes.push(element);
         });
         return parsedTimes;
