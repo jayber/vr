@@ -17,17 +17,15 @@
                 if (!event.handled) {
                     if (self.data == "up") {
                         soundSettings.setBpm(soundSettings.bpm + 1);
-                        scheduler.stop();
                     } else {
                         soundSettings.setBpm(soundSettings.bpm - 1);
-                        scheduler.stop();
                     }
+                    scheduler.stop();
                     event.handled = true;
                 }
             });
         }
     });
-
 
     AFRAME.registerComponent('timer', {
         init: function () {
@@ -76,9 +74,9 @@
 
             el.addEventListener("click", function () {
                 if (self.isStarted) {
-                    sself.stop();
+                    scheduler.stop();
                 } else {
-                    sself.start();
+                    scheduler.start(soundSettings);
                 }
             });
 
@@ -91,14 +89,6 @@
                 self.isStarted = false;
                 el.setAttribute("color", "#f99")
             });
-        },
-
-        start: function () {
-            scheduler.start(soundSettings);
-        },
-
-        stop: function () {
-            scheduler.stop();
         }
     });
 

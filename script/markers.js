@@ -7,8 +7,9 @@ function Markers(soundSettings) {
         var instCount = (radius - startRadius) / radiusStep;
 
         var angle = Math.atan2(y, x);
+        //this fixes minus values produced over 180d
         if (angle < 0) {
-            angle = (2 * Math.PI) - Math.abs(angle)
+            angle = (2 * Math.PI) + angle;
         }
 
         var count = (angle / (2 * Math.PI / soundSettings.totalSegments)) % soundSettings.totalSegments;
