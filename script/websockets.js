@@ -64,6 +64,7 @@ function WebSocketHandler(dispatcher, target) {
     //var host = window.location.host;
     var host = "34.252.241.144";
     var ws;
+    var tries = 1;
     init();
 
     function init() {
@@ -73,14 +74,19 @@ function WebSocketHandler(dispatcher, target) {
         ws = new WebSocket("ws://" + host + "/ws");
 
         ws.onclose = function () {
-            console.log("ws closed! - trying to reopen");
-            setTimeout(function () {
-                try {
-                    init();
-                } catch (e) {
-                    console.error(e);
-                }
-            }, 1000);
+            if (tries < 500) {
+                tries = tries * 5;
+                console.log("ws closed! - trying to reopen in " + tries + " seconds");
+                setTimeout(function () {
+                    try {
+                        init();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }, 1000 * tries);
+            } else {
+                console.log("ws closed! - giving up");
+            }
         };
 
         ws.onopen = function () {
@@ -90,7 +96,7 @@ function WebSocketHandler(dispatcher, target) {
         };
 
         ws.onerror = function (error) {
-            console.log("ws errored! " + error);
+            console.log("ws errored! " + JSON.stringify(error));
         };
 
         ws.onmessage = function (event) {
