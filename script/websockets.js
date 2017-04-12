@@ -2,7 +2,13 @@ function EventDispatcher(scheduler, soundSettings, instruments, markers, score) 
     var self = this;
     var localTarget = new LocalTarget(scheduler, soundSettings, instruments, markers, score);
     self.target = localTarget;
-    var wsTarget = new WebSocketHandler(self, localTarget);
+
+    try {
+        var wsTarget = new WebSocketHandler(self, localTarget);
+    } catch (e) {
+        console.error(e);
+        console.log("continuing in single player mode");
+    }
 
     self.start = function () {
         self.target.start();
