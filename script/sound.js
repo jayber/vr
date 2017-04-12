@@ -73,6 +73,6 @@ function SoundSettings() {
     };
 
     self.convertTimeToCount = function (beat, seg) {
-        return (self.segmentsPerBeat * beat) + seg;
+        return Math.round((self.segmentsPerBeat * beat) + seg);
     }
 }

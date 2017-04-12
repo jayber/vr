@@ -6,6 +6,7 @@
     var scheduler = new AudioAndAnimationScheduler(soundSettings.audioCtx);
     var markers = new Markers(soundSettings);
     var instruments = [];
+    var events = new EventDispatcher(scheduler, soundSettings, instruments, markers, score);
 
     AFRAME.registerComponent('bpm-change', {
         schema: {type: 'string'},
@@ -16,11 +17,10 @@
             el.addEventListener("click", function (event) {
                 if (!event.handled) {
                     if (self.data == "up") {
-                        soundSettings.setBpm(soundSettings.bpm + 1);
+                        events.incrementBpm();
                     } else {
-                        soundSettings.setBpm(soundSettings.bpm - 1);
+                        events.decrementBpm();
                     }
-                    scheduler.stop();
                     event.handled = true;
                 }
             });
@@ -55,11 +55,7 @@
 
                     var data = markers.toInstrumentAndCount(newPoint.x, newPoint.y);
                     if (data.instrumentNumber > -1) {
-                        var instrument = instruments[data.instrumentNumber];
-                        markers.marker(data.count, instrument, data.instrumentNumber);
-                        scheduler.addCountListener(data.count, instrument.countListener);
-                        soundSettings.addTriggerTime(data.count, score[instrument.data].src);
-
+                        events.addPlayTrigger(data, events);
                         event.handled = true;
                     }
                 }
@@ -74,9 +70,9 @@
 
             el.addEventListener("click", function () {
                 if (self.isStarted) {
-                    scheduler.stop();
+                    events.stop();
                 } else {
-                    scheduler.start(soundSettings);
+                    events.start();
                 }
             });
 
@@ -124,7 +120,7 @@
             var instrumentIndex = instruments.length - 1;
             var self = this;
             times.forEach(function (time) {
-                markers.marker(time.count, self, instrumentIndex);
+                markers.marker(time.count, self, instrumentIndex, events);
             });
         },
 

@@ -5,7 +5,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     const segmentsPerBatch = 32;
 
     function getGrain() {
-        if (isGearVR) {
+        if (isGearVR()) {
             return 8;
         } else {
             return 1;

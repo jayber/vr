@@ -17,13 +17,19 @@ function Markers(soundSettings) {
         return {instrumentNumber: Math.round(instCount), count: Math.round(count)};
     };
 
-    this.marker = function (count, instrument, instrumentIndex) {
+    this.marker = function (count, instrument, instrumentIndex, events) {
         var angle = count * (2 * Math.PI / soundSettings.totalSegments);
         var radius = startRadius + (instrumentIndex * radiusStep);
         var newX = Math.cos(angle) * radius;
         var newY = Math.sin(angle) * radius;
 
         var subElement = document.createElement("a-sphere");
+
+        function getSubElementId() {
+            return instrument.data + count;
+        }
+
+        subElement.setAttribute("id", getSubElementId());
         subElement.setAttribute("radius", "0.027");
         subElement.setAttribute("position", newX + " 0.025 " + newY);
 
@@ -35,8 +41,7 @@ function Markers(soundSettings) {
         subElement.setAttribute("color", instrument.color);
 
         subElement.addEventListener("click", function (event) {
-            clockFace.removeChild(subElement);
-            instrument.removeTime(count);
+            events.removePlayTrigger(instrumentIndex, count, getSubElementId());
             event.handled = true;
         });
     }
