@@ -55,7 +55,8 @@ function LocalTarget(scheduler, soundSettings, instruments, markers, score) {
 
 function WebSocketHandler(dispatcher, target) {
     var self = this;
-    var loc = window.location;
+    //var host = window.location.host;
+    var host = "34.252.241.144";
     var ws;
     init();
 
@@ -63,7 +64,66 @@ function WebSocketHandler(dispatcher, target) {
         if (ws != undefined) {
             ws.close();
         }
-        ws = new WebSocket("ws://" + loc.host + "/ws");
+        ws = new WebSocket("ws://" + host + "/ws");
+
+        ws.onclose = function () {
+            console.log("ws closed! - trying to reopen");
+            setTimeout(function () {
+                try {
+                    init();
+                } catch (e) {
+                    console.error(e);
+                }
+            }, 1000);
+        };
+
+        ws.onopen = function () {
+            dispatcher.target = self;
+            console.log("ws opened");
+            self.emit(JSON.stringify({event: "unroll"}));
+        };
+
+        ws.onerror = function (error) {
+            console.log("ws errored! " + error);
+        };
+
+        ws.onmessage = function (event) {
+            var msg = JSON.parse(event.data);
+            var data = msg.data;
+
+            switch (msg.event) {
+                case "removePlayTrigger":
+                    console.log("ws received:removePlayTrigger");
+                    target.removePlayTrigger(msg.data.instrumentIndex, msg.data.count, msg.data.elementId);
+                    break;
+                case "addPlayTrigger":
+                    console.log("ws received:addPlayTrigger");
+                    target.addPlayTrigger(msg.data, dispatcher);
+                    break;
+                case "incrementBpm":
+                    console.log("ws received:incrementBpm");
+                    target.incrementBpm();
+                    break;
+                case "decrementBpm":
+                    console.log("ws received:decrementBpm");
+                    target.decrementBpm();
+                    break;
+                case "start":
+                    console.log("ws received:start");
+                    target.start();
+                    break;
+                case "stop":
+                    console.log("ws received:stop");
+                    target.stop();
+                    break;
+                case "message":
+                    console.log(msg.data);
+                    break;
+                case "ping":
+                    console.log("ping");
+                    break;
+            }
+        };
     }
 
     self.start = function () {
@@ -92,58 +152,5 @@ function WebSocketHandler(dispatcher, target) {
 
     self.emit = function (message) {
         ws.send(message);
-    };
-
-    ws.onclose = function () {
-        console.log("ws closed! - trying to reopen");
-        try {
-            init();
-        } catch (e) {
-            console.error(e);
-        }
-    };
-
-    ws.onopen = function () {
-        dispatcher.target = self;
-        console.log("ws opened");
-    };
-
-    ws.onerror = function (error) {
-        console.log("ws errored! " + error);
-    };
-
-    ws.onmessage = function (event) {
-        var msg = JSON.parse(event.data);
-        var data = msg.data;
-
-        switch (msg.event) {
-            case "removePlayTrigger":
-                console.log("ws received:removePlayTrigger");
-                target.removePlayTrigger(msg.data.instrumentIndex, msg.data.count, msg.data.elementId);
-                break;
-            case "addPlayTrigger":
-                console.log("ws received:addPlayTrigger");
-                target.addPlayTrigger(msg.data, dispatcher);
-                break;
-            case "incrementBpm":
-                console.log("ws received:incrementBpm");
-                target.incrementBpm();
-                break;
-            case "decrementBpm":
-                console.log("ws received:decrementBpm");
-                target.decrementBpm();
-                break;
-            case "start":
-                console.log("ws received:start");
-                target.start();
-                break;
-            case "stop":
-                console.log("ws received:stop");
-                target.stop();
-                break;
-            case "message":
-                console.log(msg.data);
-                break;
-        }
     };
 }
