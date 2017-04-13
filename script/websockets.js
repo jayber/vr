@@ -61,8 +61,8 @@ function LocalTarget(scheduler, soundSettings, instruments, markers, score) {
 
 function WebSocketHandler(dispatcher, target) {
     var self = this;
-    var host = window.location.host;
-    //var host = "34.252.241.144";
+    //var host = window.location.host;
+    var host = "34.252.241.144";
     var ws;
     var tries = 1;
     init();
@@ -92,7 +92,14 @@ function WebSocketHandler(dispatcher, target) {
         ws.onopen = function () {
             dispatcher.target = self;
             console.log("ws opened");
-            self.emit(JSON.stringify({event: "unroll"}));
+            var sceneEl = document.querySelector("a-scene");
+            if (sceneEl.hasLoaded) {
+                self.emit(JSON.stringify({event: "unroll"}));
+            } else {
+                sceneEl.addEventListener("loaded", function () {
+                    self.emit(JSON.stringify({event: "unroll"}));
+                });
+            }
         };
 
         ws.onerror = function (error) {
