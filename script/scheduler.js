@@ -157,13 +157,15 @@ function AudioAndAnimationScheduler(audioCtx) {
             var sounds = soundSettings.soundList[i];
             if (sounds != undefined && sounds.length > 0) {
                 sounds.forEach(function (soundName) {
-                    var source = audioCtx.createBufferSource();
-                    source.buffer = soundSettings.soundBuffersMap[soundName];
-                    source.connect(audioCtx.destination);
                     var when = startTime + offset + (i * soundSettings.getSegmentDuration() );
-                    //console.log("scheduling " + soundName + " for " + when + " with " + offset);
-                    source.start(when);
-                    sourcesToCancel.push(source);
+                    if (when > audioCtx.currentTime) {
+                        var source = audioCtx.createBufferSource();
+                        source.buffer = soundSettings.soundBuffersMap[soundName];
+                        source.connect(audioCtx.destination);
+                        //console.log("scheduling " + soundName + " for " + when + " with " + offset);
+                        source.start(when);
+                        sourcesToCancel.push(source);
+                    }
                 });
             }
         }
