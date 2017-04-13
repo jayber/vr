@@ -61,8 +61,8 @@ function LocalTarget(scheduler, soundSettings, instruments, markers, score) {
 
 function WebSocketHandler(dispatcher, target) {
     var self = this;
-    //var host = window.location.host;
-    var host = "34.252.241.144";
+    var host = window.location.host;
+    //var host = "vr.beatlab.co";
     var ws;
     var tries = 1;
     init();
