@@ -36,14 +36,23 @@ function SoundSettings() {
         return 60 / self.bpm / self.segmentsPerBeat;
     };
 
-    self.load = function (src) {
-        var loader = new AudioSampleLoader();
-        loader.src = src;
-        loader.ctx = self.audioCtx;
-        loader.onload = function () {
-            self.soundBuffersMap[src] = loader.response;
-        };
-        loader.send();
+    self.load = function (sources) {
+        return new Promise(function (resolve, reject) {
+            var completedCount = 0;
+            sources.forEach(function (src) {
+                var loader = new AudioSampleLoader();
+                loader.src = src;
+                loader.ctx = self.audioCtx;
+                loader.onload = function () {
+                    self.soundBuffersMap[src] = loader.response;
+                    completedCount++;
+                    if (completedCount == sources.length) {
+                        resolve("Success");
+                    }
+                };
+                loader.send();
+            })
+        });
     };
 
     self.removeTriggerTime = function (count, src) {
@@ -59,7 +68,6 @@ function SoundSettings() {
     };
 
     self.registerSound = function (src, times) {
-        self.load(src);
         if (self.soundList == undefined) {
             self.soundList = [self.totalSegments];
             for (var i = 0; i < self.totalSegments; i++) {

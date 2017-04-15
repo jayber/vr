@@ -1,12 +1,28 @@
+function reportException(e) {
+    var data;
+    if (e.error != undefined) {
+        data = {message: e.error.message, stack: e.error.stack};
+    } else {
+        data = {message: e.message, stack: ""};
+    }
+    $.get("error", data);
+}
+
+window.addEventListener('error', function (e) {
+    reportException(e);
+});
+
 (function () {
     var self = this;
 
     var soundSettings = new SoundSettings();
-    var score = loadScore(soundSettings);
+    var scoreLoader = new ScoreLoader(soundSettings);
+    var score = scoreLoader.score;
     var scheduler = new AudioAndAnimationScheduler(soundSettings.audioCtx);
     var markers = new Markers(soundSettings);
     var instruments = [];
-    var events = new EventDispatcher(scheduler, soundSettings, instruments, markers, score);
+    var events = new EventDispatcher(scheduler, soundSettings, instruments, markers, score, scoreLoader);
+
 
     AFRAME.registerComponent('bpm-change', {
         schema: {type: 'string'},

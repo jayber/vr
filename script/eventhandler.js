@@ -1,10 +1,10 @@
-function EventDispatcher(scheduler, soundSettings, instruments, markers, score) {
+function EventDispatcher(scheduler, soundSettings, instruments, markers, score, scoreLoader) {
     var self = this;
     var localTarget = new LocalTarget(scheduler, soundSettings, instruments, markers, score);
     self.target = localTarget;
 
     try {
-        var wsTarget = new WebSocketHandler(self, localTarget);
+        new WebSocketHandler(self, localTarget, scoreLoader);
     } catch (e) {
         console.error(e);
         console.log("continuing in single player mode");
@@ -59,7 +59,7 @@ function LocalTarget(scheduler, soundSettings, instruments, markers, score) {
     }
 }
 
-function WebSocketHandler(dispatcher, target) {
+function WebSocketHandler(dispatcher, target, scoreLoader) {
     var self = this;
     var host = window.location.host;
     //var host = "vr.beatlab.co";
@@ -94,10 +94,14 @@ function WebSocketHandler(dispatcher, target) {
             console.log("ws opened");
             var sceneEl = document.querySelector("a-scene");
             if (sceneEl.hasLoaded) {
-                self.emit(JSON.stringify({event: "unroll"}));
+                scoreLoader.addLoadListener(function () {
+                    self.emit(JSON.stringify({event: "unroll"}));
+                });
             } else {
                 sceneEl.addEventListener("loaded", function () {
-                    self.emit(JSON.stringify({event: "unroll"}));
+                    scoreLoader.addLoadListener(function () {
+                        self.emit(JSON.stringify({event: "unroll"}));
+                    });
                 });
             }
         };
