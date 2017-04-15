@@ -1,6 +1,6 @@
 function SoundSettings() {
     var self = this;
-    self.bpm = 110;
+    self.bpm = 130;
     self.beats = 4;
     self.segmentsPerBeat = 32;
     self.totalSegments = self.segmentsPerBeat * self.beats;

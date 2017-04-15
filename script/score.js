@@ -26,9 +26,9 @@ function ScoreLoader(settings) {
      "beep": {src: "audio/beep.wav", times: ["3:0/4", "3:1/4", "3:2/4", "3:3/4"]}
      };*/
     self.score = {
-        "kick": {src: "audio/kick2.wav", times: ["0:0/4", "0:2/4", "2:2/4", "3:0/4"]},
+        "kick": {src: "audio/kick2.wav", times: ["0:0/4", "0:2/4", "2:7/16", "2:7/8"]},
         "hat": {src: "audio/hat2.wav", times: ["0:2/4", "1:2/4", "2:2/4", "3:2/4"]},
-        "snare": {src: "audio/snare2.wav", times: ["1:0/4", "2:0/4", "3:0/4"]},
+        "snare": {src: "audio/snare2.wav", times: ["1:0/4", "2:1/4", "3:0/4"]},
         "bork": {src: "audio/guitar.wav", times: []},
         "beep": {src: "audio/siren.wav", times: []}
     };
