@@ -55,9 +55,9 @@ function ScoreLoader(settings) {
 
         sources.push(instrumentPart.src);
     });
-    /*
+
      var promise = settings.load(sources);
      promise.then(function () {
      dispatchLoad();
-     });*/
+     });
 }
