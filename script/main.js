@@ -1,11 +1,16 @@
 function reportException(e) {
     var data;
-    if (e.error != undefined) {
-        data = {message: e.error.message, stack: e.error.stack};
-    } else {
-        data = {message: e.message, stack: ""};
+    try {
+        if (e.error) {
+            data = {message: e.error.message, stack: e.error.stack};
+        } else if (e.message) {
+            data = {message: e.message, stack: ""};
+        } else {
+            data = JSON.stringify(e);
+        }
+        $.get("error", data);
+    } catch (e) {
     }
-    $.get("error", data);
 }
 
 window.addEventListener('error', function (e) {
@@ -207,12 +212,8 @@ window.addEventListener('error', function (e) {
             self.degreesPerSeg = self.degreesPerBeat / soundSettings.segmentsPerBeat;
             scheduler.addEventListener("time", function (count) {
                 var currentDegrees = count * self.degreesPerSeg;
-                try {
-                    el.setAttribute("theta-start", currentDegrees + 0.05);    //OMFG i have no idea why i have to add this little number, but if i don't, it doesn't work!!
-                    //console.log(el.getAttribute("theta-length") + "; current="+currentDegrees+" - beat="+event.detail.beatCount + "; seg="+event.detail.seg);
-                } catch (error) {
-                    console.log(error);
-                }
+                el.setAttribute("theta-start", currentDegrees + 0.05);    //OMFG i have no idea why i have to add this little number, but if i don't, it doesn't work!!
+                //console.log(el.getAttribute("theta-length") + "; current="+currentDegrees+" - beat="+event.detail.beatCount + "; seg="+event.detail.seg);
             });
         }
     });

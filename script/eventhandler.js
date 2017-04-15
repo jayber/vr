@@ -6,7 +6,7 @@ function EventDispatcher(scheduler, soundSettings, instruments, markers, score, 
     try {
         new WebSocketHandler(self, localTarget, scoreLoader);
     } catch (e) {
-        console.error(e);
+        reportException(e);
         console.log("continuing in single player mode");
     }
 
@@ -81,11 +81,11 @@ function WebSocketHandler(dispatcher, target, scoreLoader) {
                     try {
                         init();
                     } catch (e) {
-                        console.error(e);
+                        reportException(e);
                     }
                 }, 1000 * tries);
             } else {
-                console.log("ws closed! - giving up");
+                reportException({message: "ws closed! - giving up"});
             }
         };
 
@@ -107,7 +107,7 @@ function WebSocketHandler(dispatcher, target, scoreLoader) {
         };
 
         ws.onerror = function (error) {
-            console.log("ws errored! " + JSON.stringify(error));
+            reportException({message: "ws errored! " + JSON.stringify(error)});
         };
 
         ws.onmessage = function (event) {
@@ -142,19 +142,14 @@ function WebSocketHandler(dispatcher, target, scoreLoader) {
                 case "message":
                     console.log(msg.data);
                     break;
-                case "ping":
-                    console.log("ping");
-                    break;
             }
         };
     }
 
     self.start = function () {
-        console.log("emitting:start");
         self.emit(JSON.stringify({event: "start"}));
     };
     self.stop = function () {
-        console.log("emitting:stop");
         self.emit(JSON.stringify({event: "stop"}));
     };
     self.incrementBpm = function () {
