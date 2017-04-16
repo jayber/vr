@@ -150,9 +150,6 @@ function WebSocketHandler(dispatcher, target, scoreLoader) {
                     case "message":
                         console.log(msg.data);
                         break;
-                    case "ping":
-                        console.log("ping");
-                        break;
                 }
             };
         });
