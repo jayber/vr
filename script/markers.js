@@ -12,9 +12,11 @@ function Markers(soundSettings) {
             angle = (2 * Math.PI) + angle;
         }
 
-        var count = (angle / (2 * Math.PI / soundSettings.totalSegments)) % soundSettings.totalSegments;
+        var count = (angle / (2 * Math.PI / (soundSettings.totalSegments - 1)) % soundSettings.totalSegments);
 
-        return {instrumentNumber: Math.round(instCount), count: Math.round(count)};
+        var result = {instrumentNumber: Math.round(instCount), count: Math.round(count)};
+        //console.log(result);
+        return result;
     };
 
     this.marker = function (count, instrument, instrumentIndex, events) {
