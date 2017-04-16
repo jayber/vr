@@ -1,16 +1,19 @@
 function reportException(e) {
     var data;
-    try {
-        if (e.error) {
-            data = {message: e.error.message, stack: e.error.stack};
-        } else if (e.message) {
-            data = {message: e.message, stack: ""};
-        } else {
-            data = JSON.stringify(e);
+    altspace.getUser().then(function (user) {
+        try {
+            if (e.error) {
+                data = {userId: user.userId, message: e.error.message, stack: e.error.stack};
+            } else if (e.message) {
+                data = {userId: user.userId, message: e.message, stack: ""};
+            } else {
+                e.userId = user.userId;
+                data = JSON.stringify(e);
+            }
+            $.get("error", data);
+        } catch (e) {
         }
-        $.get("error", data);
-    } catch (e) {
-    }
+    });
 }
 
 window.addEventListener('error', function (e) {

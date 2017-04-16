@@ -17,14 +17,6 @@ function ScoreLoader(settings) {
         }
     }
 
-    /*
-     var score = {
-     "kick": {src: "audio/kick.WAV", times: ["0:0/4", "0:2/4", "2:0/4", "2:2/4", "3:2/4"]},
-     "hat": {src: "audio/hat.WAV", times: ["1:0/4", "3:0/4"]},
-     "snare": {src: "audio/snare.WAV", times: ["3:1/4", "3:3/4"]},
-     "bork": {src: "audio/blork.wav", times: ["3:0/4"]},
-     "beep": {src: "audio/beep.wav", times: ["3:0/4", "3:1/4", "3:2/4", "3:3/4"]}
-     };*/
     self.score = {
         "kick": {src: "audio/kick2.wav", times: ["0:0/4", "0:2/4", "2:7/16", "2:7/8"]},
         "hat": {src: "audio/hat2.wav", times: ["0:2/4", "1:2/4", "2:2/4", "3:2/4"]},
@@ -53,7 +45,6 @@ function ScoreLoader(settings) {
     Object.keys(self.score).forEach(function (key, index) {
         var instrumentPart = self.score[key];
         instrumentPart.parsedTimes = parseTimes(instrumentPart.times);
-
         sources.push(instrumentPart.src);
     });
 
