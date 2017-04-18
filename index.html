@@ -19,7 +19,7 @@
 <script src="script/eventhandler.js"></script>
 <script src="script/main.js"></script>
 
-<a-scene altspace='vertical-align: bottom;' keyboard-shortcuts sync-system>
+<a-scene altspace='fullspace: true; vertical-align: bottom;' keyboard-shortcuts sync-system>
     <a-entity position="0 0 1.5" camera="userHeight: 1.6" look-controls wasd-controls>
         <a-cursor color="#2E3A87"></a-cursor>
     </a-entity>
@@ -41,8 +41,8 @@
     </a-assets>
 
     <a-entity
-            position="1 1 1"
-            rotation="-30 0 0"
+            position="-1 -1 -1"
+            rotation="0 0 0"
             n-text="fontSize: 2; text: text you can read comfortably"
             n-cockpit-parent>
     </a-entity>
