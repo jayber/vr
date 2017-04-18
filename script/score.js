@@ -7,7 +7,7 @@ function ScoreLoader(settings) {
     self.addLoadListener = function (listener) {
         loadListeners.push(listener);
         if (loaded) {
-            dispatchLoad();
+            listener.call(self);
         }
     };
 

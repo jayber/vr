@@ -31,7 +31,6 @@ window.addEventListener('error', function (e) {
     var instruments = [];
     var events = new EventDispatcher(scheduler, soundSettings, instruments, markers, score, scoreLoader);
 
-
     AFRAME.registerComponent('bpm-change', {
         schema: {type: 'string'},
         init: function () {
@@ -90,7 +89,6 @@ window.addEventListener('error', function (e) {
     AFRAME.registerComponent('playable', {
         init: function () {
             var el = this.el;
-            var sself = this;
 
             el.addEventListener("click", function () {
                 if (self.isStarted) {
@@ -123,6 +121,18 @@ window.addEventListener('error', function (e) {
             this.flash(el, el);
             this.generateMarkers(score[this.data].parsedTimes);
             this.createCable(el);
+            this.makeClickable(this, el);
+        },
+
+        makeClickable: function (self, el) {
+            el.setAttribute("altspace-cursor-collider");
+            el.addEventListener("click", function () {
+                soundSettings.play(score[self.data].src);
+                el.emit("playtime");
+                setTimeout(function () {
+                    el.emit("playoff")
+                }, 150);
+            });
         },
 
         removeTime: function (count) {

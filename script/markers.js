@@ -27,11 +27,9 @@ function Markers(soundSettings) {
 
         var subElement = document.createElement("a-sphere");
 
-        function getSubElementId() {
-            return instrument.data + count;
-        }
+        var subElementId = instrument.data + count;
 
-        subElement.setAttribute("id", getSubElementId());
+        subElement.setAttribute("id", subElementId);
         subElement.setAttribute("radius", "0.027");
         subElement.setAttribute("position", newX + " 0.025 " + newY);
 
@@ -43,7 +41,7 @@ function Markers(soundSettings) {
         subElement.setAttribute("color", instrument.color);
 
         subElement.addEventListener("click", function (event) {
-            events.removePlayTrigger(instrumentIndex, count, getSubElementId());
+            events.removePlayTrigger(instrumentIndex, count, subElementId);
             event.handled = true;
         });
     }
