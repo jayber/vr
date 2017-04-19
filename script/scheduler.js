@@ -81,6 +81,7 @@ function AudioAndAnimationScheduler(audioCtx) {
             }
         }
         dispatch("stop");
+        dispatch("timeoff", count % soundSettings.totalSegments);
     };
 
     function dispatch(type, param) {
