@@ -85,6 +85,11 @@
         </a-cylinder>
 
         <a-cylinder timer altspace-cursor-collider id="clock-face" material="src:#studded-texture;repeat: 10 1" segments-radial="16" height="0.05" rotation="0 90 40" position="0 1.3 0" radius="0.405" n-mesh-collider="convex:false">
+            <a-ring ring="beep" radius-outer="0.355" radius-inner="0.350" rotation="-90 0 0" position="0 0.026 0.003"></a-ring>
+            <a-ring ring="bork" radius-outer="0.305" radius-inner="0.300" rotation="-90 0 0" position="0 0.026 0.003"></a-ring>
+            <a-ring ring="snare" radius-outer="0.255" radius-inner="0.250" rotation="-90 0 0" position="0 0.026 0.003"></a-ring>
+            <a-ring ring="hat" radius-outer="0.205" radius-inner="0.200" rotation="-90 0 0" position="0 0.026 0.003"></a-ring>
+
             <a-circle material="src:#noise-texture; repeat:5 5" rotation="90 0 0" position="0 0.028 0.005" geometry="radius: 0.405" side="double" theta-length="4" color="#f0eae0" animate-theta></a-circle>
 
             <a-circle radius="0.3" scale="0.5 0.5 0.5" material="src:#noise-texture; repeat:5 5" color="#181818" position="0 0.03 0" rotation="-90 0 0">

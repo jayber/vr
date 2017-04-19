@@ -31,6 +31,20 @@ window.addEventListener('error', function (e) {
     var instruments = [];
     var events = new EventDispatcher(scheduler, soundSettings, instruments, markers, score, scoreLoader);
 
+    AFRAME.registerComponent('ring', {
+        schema: {type: 'string'},
+        init: function () {
+            var el = this.el;
+            var self = this;
+
+            var target = document.querySelector("[instrument^=\"" + this.data + "\"]");
+
+            target.addEventListener("loaded", function (event) {
+                el.setAttribute("color", target.getAttribute("material").color);
+            });
+        }
+    });
+
     AFRAME.registerComponent('mute', {
         init: function () {
             var el = this.el;
