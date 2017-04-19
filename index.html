@@ -40,31 +40,45 @@
         <img id="down-arrow" src="img/down_arrow.png">
         <img id="volume-control" src="img/volume_control.png">
         <img id="mute" src="img/mute.png">
-        <img id="muted" src="img/muted.png">
+        <img id="unmute" src="img/unmute.png">
+        <img id="plus" src="img/plus.png">
+        <img id="minus" src="img/minus.png">
     </a-assets>
 
     <a-entity>
-        <a-circle mute
-                  transparent="true"
-                  altspace-cursor-collider
-                  n-sphere-collider
-                  material="src:#mute;"
-                  position="-0.686 0.022 -1"
-                  scale="0.04 0.04 0.04"
-                  rotation="0 0 0"
-                  n-cockpit-parent>
-        </a-circle>
+        <a-entity position="0.6 -0.1 -1">
+            <a-circle volume-control="down"
+                      transparent="true"
+                      altspace-cursor-collider
+                      n-sphere-collider
+                      material="src:#minus;"
+                      position="0.126 0 0"
+                      scale="0.04 0.04 0.04"
+                      rotation="0 0 0"
+                      n-cockpit-parent>
+            </a-circle>
 
-        <a-circle volume-control
-                  transparent="true"
-                  altspace-cursor-collider
-                  n-sphere-collider
-                  material="src:#volume-control;"
-                  position="-0.434 0.022 -1"
-                  scale="0.04 0.04 0.04"
-                  rotation="0 0 0"
-                  n-cockpit-parent>
-        </a-circle>
+            <a-circle volume-control="up"
+                      transparent="true"
+                      altspace-cursor-collider
+                      n-sphere-collider
+                      material="src:#plus;"
+                      scale="0.04 0.04 0.04"
+                      rotation="0 0 0"
+                      n-cockpit-parent>
+            </a-circle>
+
+            <a-circle mute
+                      transparent="true"
+                      altspace-cursor-collider
+                      n-sphere-collider
+                      material="src:#mute;"
+                      position="0.252 0 0"
+                      scale="0.04 0.04 0.04"
+                      rotation="0 0 0"
+                      n-cockpit-parent>
+            </a-circle>
+        </a-entity>
 
         <a-cylinder material="src:#galv-texture;" height="0.9" position="0 0.5 0" color="#9999ff" radius="0.3">
             <a-sphere id="beater" playable position="0 0.3 0.3" radius="0.1" material="src:#play-texture" rotation="0 -90 30" color="#ddd"></a-sphere>

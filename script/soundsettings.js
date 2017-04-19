@@ -93,5 +93,13 @@ function SoundSettings() {
         source.buffer = self.soundBuffersMap[src];
         source.connect(self.audioCtx.destination);
         source.start();
+    };
+
+    self.incrementVol = function () {
+        gain.gain.value = gain.gain.value + 0.1;
+    };
+
+    self.decrementVol = function () {
+        gain.gain.value = gain.gain.value - 0.1;
     }
 }

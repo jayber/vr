@@ -39,9 +39,12 @@ window.addEventListener('error', function (e) {
                 console.log("muted");
                 soundSettings.mute = !soundSettings.mute;
                 if (soundSettings.mute) {
-                    el.setAttribute("material", "src", "#muted");
+                    el.setAttribute("material", "src", "#unmute");
+                    el.setAttribute("color", "#aaa");
+
                 } else {
                     el.setAttribute("material", "src", "#mute");
+                    el.setAttribute("color", "#fff");
                 }
             });
         }
@@ -61,6 +64,22 @@ window.addEventListener('error', function (e) {
                         events.decrementBpm();
                     }
                     event.handled = true;
+                }
+            });
+        }
+    });
+
+    AFRAME.registerComponent('volume-control', {
+        schema: {type: 'string'},
+        init: function () {
+            var el = this.el;
+            var self = this;
+
+            el.addEventListener("click", function (event) {
+                if (self.data == "up") {
+                    soundSettings.incrementVol();
+                } else {
+                    soundSettings.decrementVol();
                 }
             });
         }
