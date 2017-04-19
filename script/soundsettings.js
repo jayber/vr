@@ -6,7 +6,11 @@ function SoundSettings() {
     self.totalSegments = self.segmentsPerBeat * self.beats;
 
     self.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var gain = self.audioCtx.createGain();
+    gain.connect(self.audioCtx.destination);
+    self.output = gain;
     self.soundBuffersMap = {};
+    self.mute = false;
 
     var listeners = {};
 

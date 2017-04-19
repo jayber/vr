@@ -31,6 +31,22 @@ window.addEventListener('error', function (e) {
     var instruments = [];
     var events = new EventDispatcher(scheduler, soundSettings, instruments, markers, score, scoreLoader);
 
+    AFRAME.registerComponent('mute', {
+        init: function () {
+            var el = this.el;
+            var self = this;
+            el.addEventListener("click", function (event) {
+                console.log("muted");
+                soundSettings.mute = !soundSettings.mute;
+                if (soundSettings.mute) {
+                    el.setAttribute("material", "src", "#muted");
+                } else {
+                    el.setAttribute("material", "src", "#mute");
+                }
+            });
+        }
+    });
+
     AFRAME.registerComponent('bpm-change', {
         schema: {type: 'string'},
         init: function () {
