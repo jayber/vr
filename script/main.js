@@ -239,7 +239,7 @@ window.addEventListener('error', function (e) {
             var tube = new THREE.Mesh(geometry, material);
             var cableElement = document.createElement("a-entity");
             cableElement.setObject3D("mesh", tube);
-            document.querySelector("a-scene").appendChild(cableElement);
+            document.querySelector("#root").appendChild(cableElement);
 
             flash(srcEntity, cableElement);
 
