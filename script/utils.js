@@ -1,3 +1,3 @@
 function isGearVR() {
-    return /SamsungBrowser.+Mobile VR/i.test(navigator.userAgent);
+    return /Mobile/i.test(navigator.userAgent);
 }
