@@ -105,8 +105,10 @@ function AudioAndAnimationScheduler(audioCtx) {
     }
 
     function playAndSchedule() {
+
         const offset = segmentsPerBatch * soundSettings.getSegmentDuration();
         const elapsedTime = audioCtx.currentTime - startTime;
+        $.get("log", {message: "requestAnimationFrame elapsedTime: " + Math.floor(elapsedTime * 1000)});
         scheduleSamples(elapsedTime, offset);
         fireSegmentEvents(elapsedTime, offset);
         if (isRunning) {
