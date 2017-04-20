@@ -19,7 +19,7 @@
 <script src="script/eventhandler.js"></script>
 <script src="script/main.js"></script>
 
-<a-scene altspace='fullspace: true;' keyboard-shortcuts sync-system>
+<a-scene altspace="vertical-align: bottom" keyboard-shortcuts sync-system>
     <a-entity position="0 0 1.5" camera="userHeight: 1.6" look-controls wasd-controls>
         <a-cursor color="#2E3A87"></a-cursor>
     </a-entity>
@@ -79,9 +79,10 @@
         </a-circle>
     </a-entity>
 
-    <a-entity id="root" position="3.5 0 -7">
+    <!--<a-entity id="root" position="3.5 0 -7">-->
+    <a-entity id="root">
 
-        <a-cylinder material="src:#galv-texture;" height="0.9" position="0 0.5 0" color="#667" radius="0.3">
+        <a-cylinder material="src:#galv-texture;" height="0.9" position="0 0.5 0" color="#556" radius="0.3">
             <a-sphere id="beater" playable position="0 0.3 0.3" radius="0.1" material="src:#play-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
         </a-cylinder>
 
