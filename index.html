@@ -19,18 +19,8 @@
 <script src="script/eventhandler.js"></script>
 <script src="script/main.js"></script>
 
-<div style="color:#fff">
-<p>This SHOULD lag as soon as setInterval runs less that once every 250ms</p>
-<div id="intervalCount">0</div>
-<p>This should NEVER lag (at least not more than the time between runs of requestAnimationFrame) since it is just the
-    seconds since the app started.</p>
-<div id="rafCount">0</div>
-
-<p>Count the beeps (from 0) to tell if the timers above are out</p>
-</div>
-
-<a-scene altspace="vertical-align:bottom" keyboard-shortcuts sync-system>
-    <!--<a-scene altspace="fullspace: true" keyboard-shortcuts sync-system>-->
+<!--<a-scene altspace="vertical-align:bottom" keyboard-shortcuts sync-system>-->
+<a-scene altspace="fullspace: true" keyboard-shortcuts sync-system>
     <a-entity position="0 0 1.5" camera="userHeight: 1.6" look-controls wasd-controls>
         <a-cursor color="#2E3A87"></a-cursor>
     </a-entity>
@@ -90,8 +80,20 @@
         </a-circle>
     </a-entity>
 
-    <!--<a-entity id="root" position="3.5 0 -7">-->
-    <a-entity id="root">
+    <a-entity id="root" position="3.5 0 -7">
+        <!--<a-entity id="root">-->
+
+        <a-circle onclick="runTest()" altspace-cursor-collider color="#000" position="0 3 0" side="double">
+
+            <a-entity position="0 0 0.1" scale="0.5">
+                <a-entity n-text="fontSize:1pt;width:3;height:0.1;text:'This SHOULD lag as soon as setInterval runs less that once every 250ms'" position="0 0.5 0"></a-entity>
+                <a-entity id="intervalCount" n-text="fontSize:1pt;width:1;height:0.1;text:'0'" position="0 0.3 0"></a-entity>
+                <a-entity n-text="fontSize:1pt;width:3;height:0.1;text:'This should NEVER lag (at least not more than the time between runs of requestAnimationFrame) since it is just the
+                seconds since the app started.'"></a-entity>
+                <a-entity id="rafCount" n-text="fontSize:1pt;width:3;height:0.1;text:'0'" position="0 -0.3 0"></a-entity>
+                <a-entity n-text="fontSize:1pt;width:3;height:0.1;text:'Count the beeps (from 0) to tell if the timers above are out'" position="0 -0.5 0"></a-entity>
+            </a-entity>
+        </a-circle>
 
         <a-cylinder material="src:#galv-texture;" height="0.9" position="0 0.5 0" color="#556" radius="0.3">
             <a-sphere id="beater" playable position="0 0.3 0.3" radius="0.1" material="src:#play-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
@@ -144,13 +146,6 @@
 
 <script>
 
-    var scene = document.querySelector("a-scene");
-    if (scene.hasLoaded) {
-        runTest();
-    } else {
-        scene.addEventListener("loaded", runTest);
-    }
-
     function runTest() {
         var intervalCountDiv = document.querySelector("#intervalCount");
         var rafCountDiv = document.querySelector("#rafCount");
@@ -161,12 +156,12 @@
 
         setInterval(function () {
             intervalCount += 0.25;
-            intervalCountDiv.innerHTML = intervalCount;
+            intervalCountDiv.setAttribute("n-text", "text", intervalCount);
         }, 250);
 
         var timingFunction = function () {
             rafCount = (new Date().getTime() - startTime) / 1000;
-            rafCountDiv.innerHTML = rafCount;
+            rafCountDiv.setAttribute("n-text", "text", rafCount);
             window.requestAnimationFrame(timingFunction);
         };
 
