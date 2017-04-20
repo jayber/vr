@@ -133,7 +133,9 @@ window.addEventListener('error', function (e) {
                         newPoint = {x: point.x, y: point.z};
                     }
 
+                    serverLog("starting point: " + JSON.stringify(newPoint));
                     var data = markers.toInstrumentAndCount(newPoint.x, newPoint.y);
+                    serverLog("instrument and count: " + JSON.stringify(data));
                     if (data.instrumentNumber > -1) {
                         events.addPlayTrigger(data, events);
                         event.handled = true;
