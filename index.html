@@ -83,15 +83,14 @@
     <a-entity id="root" position="3.5 0 -7">
         <!--<a-entity id="root">-->
 
-        <a-circle onclick="runTest()" altspace-cursor-collider color="#000" position="0 3 0" side="double">
+        <a-circle onclick="toggleTest()" altspace-cursor-collider color="#000" position="0 3 0" side="double">
 
             <a-entity position="0 0 0.1" scale="0.5">
-                <a-entity n-text="fontSize:1pt;width:3;height:0.1;text:'This SHOULD lag as soon as setInterval runs less that once every 250ms'" position="0 0.5 0"></a-entity>
-                <a-entity id="intervalCount" n-text="fontSize:1pt;width:1;height:0.1;text:'0'" position="0 0.3 0"></a-entity>
-                <a-entity n-text="fontSize:1pt;width:3;height:0.1;text:'This should NEVER lag (at least not more than the time between runs of requestAnimationFrame) since it is just the
-                seconds since the app started.'"></a-entity>
-                <a-entity id="rafCount" n-text="fontSize:1pt;width:3;height:0.1;text:'0'" position="0 -0.3 0"></a-entity>
-                <a-entity n-text="fontSize:1pt;width:3;height:0.1;text:'Count the beeps (from 0) to tell if the timers above are out'" position="0 -0.5 0"></a-entity>
+                <a-entity n-text="fontSize:1pt;width:3;height:0.1;text:SHOULD lag- setInterval" position="0 0.5 0"></a-entity>
+                <a-entity id="intervalCount" n-text="fontSize:1pt;width:1;height:0.1;text:0" position="0 0.3 0"></a-entity>
+                <a-entity n-text="fontSize:1pt;width:3;height:0.1;text:NEVER lag - requestAnimationFrame seconds since the app started."></a-entity>
+                <a-entity id="rafCount" n-text="fontSize:1pt;width:3;height:0.1;text:0" position="0 -0.3 0"></a-entity>
+                <a-entity n-text="fontSize:1pt;width:3;height:0.1;text:Count the beeps (from 0) to tell if the timers above are out" position="0 -0.5 0"></a-entity>
             </a-entity>
         </a-circle>
 
@@ -146,39 +145,60 @@
 
 <script>
 
+    var intervalfunction;
+    var isRunning = false;
+
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var source = audioCtx.createBufferSource();
+    var loader = new AudioSampleLoader();
+    loader.src = "audio/sec.wav";
+    loader.ctx = audioCtx;
+    loader.onload = function () {
+        source.buffer = loader.response;
+        source.connect(audioCtx.destination);
+        source.loop = true;
+    };
+    loader.send();
+
     function runTest() {
+        isRunning = true;
         var intervalCountDiv = document.querySelector("#intervalCount");
         var rafCountDiv = document.querySelector("#rafCount");
-        var intervalCount = -0;
-        var rafCount = 0;
+        var intervalCount = 0.000;
+        var rafCount = 0.000;
 
         var startTime = new Date().getTime();
 
-        setInterval(function () {
+        intervalfunction = setInterval(function () {
             intervalCount += 0.25;
-            intervalCountDiv.setAttribute("n-text", "text", intervalCount);
+            intervalCountDiv.setAttribute("n-text", "text", Math.floor(intervalCount));
         }, 250);
 
         var timingFunction = function () {
             rafCount = (new Date().getTime() - startTime) / 1000;
-            rafCountDiv.setAttribute("n-text", "text", rafCount);
-            window.requestAnimationFrame(timingFunction);
+            rafCountDiv.setAttribute("n-text", "text", Math.floor(rafCount));
+            if (isRunning) {
+                window.requestAnimationFrame(timingFunction);
+            }
         };
 
-        var loader = new AudioSampleLoader();
-        loader.src = "audio/sec.wav";
-        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        loader.ctx = audioCtx;
-        loader.onload = function () {
-            var source = audioCtx.createBufferSource();
-            source.buffer = loader.response;
-            source.connect(audioCtx.destination);
-            source.loop = true;
-            source.start();
-        };
-        loader.send();
+        source.start();
 
         timingFunction();
+    }
+
+    function stopTest() {
+        isRunning = false;
+        clearInterval(intervalfunction);
+        source.stop();
+    }
+
+    function toggleTest() {
+        if (isRunning) {
+            stopTest();
+        } else {
+            runTest();
+        }
     }
 </script>
 
