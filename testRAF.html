@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="lib/AudioSampleLoader.js"></script>
+</head>
+<body>
+<p>This SHOULD lag as soon as setInterval runs less that once every 250ms</p>
+
+<div id="intervalCount">0</div>
+<p>This should NEVER lag (at least not more than the time between runs of requestAnimationFrame) since it is just the
+    seconds since the app started.</p>
+
+<div id="rafCount">0</div>
+
+Count the beeps (from 0) to tell if the timers above are out
+
+<script>
+    var intervalCountDiv = document.querySelector("#intervalCount");
+    var rafCountDiv = document.querySelector("#rafCount");
+    var intervalCount = -0;
+    var rafCount = 0;
+
+    var startTime = new Date().getTime();
+
+    setInterval(function () {
+        intervalCount += 0.25;
+        intervalCountDiv.innerHTML = intervalCount;
+    }, 250);
+
+    var timingFunction = function () {
+        rafCount = (new Date().getTime() - startTime) / 1000;
+        rafCountDiv.innerHTML = rafCount;
+        window.requestAnimationFrame(timingFunction);
+    };
+
+
+    var loader = new AudioSampleLoader();
+    loader.src = "audio/sec.wav";
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    loader.ctx = audioCtx;
+    loader.onload = function () {
+        var source = audioCtx.createBufferSource();
+        source.buffer = loader.response;
+        source.connect(audioCtx.destination);
+        source.loop = true;
+        source.start();
+    };
+    loader.send();
+
+    timingFunction();
+</script>
+</body>
+</html>
