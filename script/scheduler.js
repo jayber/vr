@@ -6,7 +6,7 @@ function AudioAndAnimationScheduler(audioCtx) {
 
     function getGrain() {
         if (isGearVR()) {
-            return 16;
+            return 32;
         } else {
             return 1;
         }
