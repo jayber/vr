@@ -28,41 +28,6 @@
 
 <p>Count the beeps (from 0) to tell if the timers above are out</p>
 
-<script>
-    var intervalCountDiv = document.querySelector("#intervalCount");
-    var rafCountDiv = document.querySelector("#rafCount");
-    var intervalCount = -0;
-    var rafCount = 0;
-
-    var startTime = new Date().getTime();
-
-    setInterval(function () {
-        intervalCount += 0.25;
-        intervalCountDiv.innerHTML = intervalCount;
-    }, 250);
-
-    var timingFunction = function () {
-        rafCount = (new Date().getTime() - startTime) / 1000;
-        rafCountDiv.innerHTML = rafCount;
-        window.requestAnimationFrame(timingFunction);
-    };
-
-    var loader = new AudioSampleLoader();
-    loader.src = "audio/sec.wav";
-    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    loader.ctx = audioCtx;
-    loader.onload = function () {
-        var source = audioCtx.createBufferSource();
-        source.buffer = loader.response;
-        source.connect(audioCtx.destination);
-        source.loop = true;
-        source.start();
-    };
-    loader.send();
-
-    timingFunction();
-</script>
-
 <a-scene altspace="fullspace: true" keyboard-shortcuts sync-system>
     <a-entity position="0 0 1.5" camera="userHeight: 1.6" look-controls wasd-controls>
         <a-cursor color="#2E3A87"></a-cursor>
@@ -173,6 +138,53 @@
         </a-cone>
     </a-entity>
 </a-scene>
+
+
+<script>
+
+    var scene = document.querySelector("a-scene");
+    if (scene.hasLoaded) {
+        runTest();
+    } else {
+        scene.addEventListener("loaded", runTest);
+    }
+
+    function runTest() {
+        var intervalCountDiv = document.querySelector("#intervalCount");
+        var rafCountDiv = document.querySelector("#rafCount");
+        var intervalCount = -0;
+        var rafCount = 0;
+
+        var startTime = new Date().getTime();
+
+        setInterval(function () {
+            intervalCount += 0.25;
+            intervalCountDiv.innerHTML = intervalCount;
+        }, 250);
+
+        var timingFunction = function () {
+            rafCount = (new Date().getTime() - startTime) / 1000;
+            rafCountDiv.innerHTML = rafCount;
+            window.requestAnimationFrame(timingFunction);
+        };
+
+        var loader = new AudioSampleLoader();
+        loader.src = "audio/sec.wav";
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        loader.ctx = audioCtx;
+        loader.onload = function () {
+            var source = audioCtx.createBufferSource();
+            source.buffer = loader.response;
+            source.connect(audioCtx.destination);
+            source.loop = true;
+            source.start();
+        };
+        loader.send();
+
+        timingFunction();
+    }
+</script>
+
 
 </body>
 </html>
