@@ -16,12 +16,20 @@ function reportException(e) {
     });
 }
 
+function serverLog(message) {
+    altspace.getUser().then(function (user) {
+        $.get("log", {userId: user.userId, message: message});
+    });
+}
+
 window.addEventListener('error', function (e) {
     reportException(e);
 });
 
 (function () {
     var self = this;
+
+    serverLog("userAgent: " + navigator.userAgent + "; isGear: " + isGearVR());
 
     var soundSettings = new SoundSettings();
     var scoreLoader = new ScoreLoader(soundSettings);
