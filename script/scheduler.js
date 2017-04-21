@@ -141,14 +141,14 @@ function AudioAndAnimationScheduler(audioCtx) {
             segmentOffTime = elapsedTime;
         }
 
-        while (nextSegmentTime < elapsedTime) {
-            //console.log("fireSegmentOn - nextSegmentTime: " + nextSegmentTime + "; elapsedTime: " + elapsedTime);
-            if (count % timeEventGranularity == 0) {
-                dispatch("time", count % soundSettings.totalSegments);
+        if (nextSegmentTime < elapsedTime) {
+            var pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
+            while (pendingNextSegmentTime < elapsedTime) {
+                count++;
+                pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             }
+            dispatch("time", count % soundSettings.totalSegments);
             dispatchCount(count % soundSettings.totalSegments);
-            count++;
-            nextSegmentTime = calcNextSegmentTime(offset, count);
         }
     }
 
