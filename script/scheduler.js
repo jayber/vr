@@ -144,11 +144,11 @@ function AudioAndAnimationScheduler(audioCtx) {
         if (nextSegmentTime < elapsedTime) {
             var pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             while (pendingNextSegmentTime < elapsedTime) {
+                dispatchCount(count % soundSettings.totalSegments);
                 count++;
                 pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             }
             dispatch("time", count % soundSettings.totalSegments);
-            dispatchCount(count % soundSettings.totalSegments);
         }
     }
 
