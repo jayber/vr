@@ -20,7 +20,7 @@
 <script src="script/main.js"></script>
 
 <!--<a-scene altspace="vertical-align:bottom" keyboard-shortcuts sync-system>-->
-<a-scene altspace="fullspace: true" keyboard-shortcuts sync-system position="3.5 0 -7">
+<a-scene altspace="fullspace: true" keyboard-shortcuts sync-system>
     <a-entity position="0 0 1.5" camera="userHeight: 1.6" look-controls wasd-controls>
         <a-cursor color="#2E3A87"></a-cursor>
     </a-entity>
@@ -80,8 +80,8 @@
         </a-circle>
     </a-entity>
 
-    <!--<a-entity id="root" >-->
-        <!--<a-entity id="root">-->
+    <!--<a-entity id="root" position="3.5 0 -7">-->
+    <a-entity id="root">
 
         <a-circle onclick="toggleTest()" altspace-cursor-collider color="#000" position="0 3 0" side="double" scale="0.5 0.5 0.5">
 
@@ -139,7 +139,7 @@
                 <a-animation attribute="position" from="0 0.2 0" to="0 2 0" begin="playtime" dur="500" fill="none" easing="linear"></a-animation>
             </a-torus>
         </a-cone>
-    <!--</a-entity>-->
+    </a-entity>
 </a-scene>
 
 
