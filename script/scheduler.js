@@ -149,6 +149,7 @@ function AudioAndAnimationScheduler(audioCtx) {
                 pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             }
             dispatch("time", count % soundSettings.totalSegments);
+            dispatchCount(count % soundSettings.totalSegments);
         }
     }
 
