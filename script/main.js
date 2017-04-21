@@ -123,7 +123,9 @@ window.addEventListener('error', function (e) {
                     if (point == undefined) {
                         point = event.detail.point;
                     }
+                    serverLog("world point: " + JSON.stringify(point));
                     el.object3D.worldToLocal(point);
+                    serverLog("localised point: " + JSON.stringify(point));
 
                     //this is utter craziness and just reflects that i don't understand rotation etc
                     //but it does work!
