@@ -83,8 +83,7 @@
     <!--<a-entity id="root" position="3.5 0 -7">-->
     <a-entity id="root">
 
-        <a-circle onclick="toggleTest()" altspace-cursor-collider color="#000" position="0 3 0" side="double" scale="0.5 0.5 0.5">
-
+        <a-circle onclick="toggleTest()" altspace-cursor-collider color="#000" position="0 2.2 0" side="double" scale="0.5 0.5 0.5">
             <a-entity position="0 0 0.1">
                 <a-entity n-text="fontSize:1pt;width:1.8;height:0.1;text:SHOULD lag- setInterval:" position="0 0.6 0"></a-entity>
                 <a-entity id="intervalCount" n-text="fontSize:1pt;width:1;height:0.1;text:0" position="0 0.45 0"></a-entity>
@@ -105,9 +104,9 @@
             <a-ring ring="hat" radius-outer="0.230" radius-inner="0.228" rotation="-90 0 0" position="0 0.038 0"></a-ring>
             <a-ring ring="kick" radius-outer="0.180" radius-inner="0.178" rotation="-90 0 0" position="0 0.038 0"></a-ring>
 
-            <a-circle material="src:#noise-texture; repeat:5 5" rotation="90 0 0" position="0 0.028 0.005" geometry="radius: 0.405" side="double" theta-length="4" color="#f0eae0" animate-theta></a-circle>
+            <a-circle material="src:#noise-texture; repeat:5 5" rotation="90 0 0" position="0 0.04 0.005" geometry="radius: 0.405" side="double" theta-length="4" color="#f0eae0" animate-theta></a-circle>
 
-            <a-circle radius="0.3" scale="0.5 0.5 0.5" material="src:#noise-texture; repeat:5 5" color="#181818" position="0 0.03 0" rotation="-90 0 0">
+            <a-circle radius="0.3" scale="0.5 0.5 0.5" material="src:#noise-texture; repeat:5 5" color="#181818" position="0 0.045 0" rotation="-90 0 0">
                 <a-circle altspace-cursor-collider bpm-change="up" radius="0.08" rotation="0 0 -90" material="src:#up-arrow" position="0.15 0 0.01"></a-circle>
 
                 <a-entity bpm-label position="0 0 0.01" rotation="0 0 -90" n-text="fontSize:1pt;width:0.5;height:0.1"></a-entity>
@@ -149,16 +148,15 @@
     var isRunning = false;
 
     var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    var source = audioCtx.createBufferSource();
+    var buffer;
     var loader = new AudioSampleLoader();
     loader.src = "audio/sec.wav";
     loader.ctx = audioCtx;
     loader.onload = function () {
-        source.buffer = loader.response;
-        source.connect(audioCtx.destination);
-        source.loop = true;
+        buffer = loader.response;
     };
     loader.send();
+    var source;
 
     function runTest() {
         isRunning = true;
@@ -182,6 +180,10 @@
             }
         };
 
+        source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(audioCtx.destination);
+        source.loop = true;
         source.start();
 
         timingFunction();
