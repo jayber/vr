@@ -194,9 +194,9 @@ window.addEventListener('error', function (e) {
             el.setAttribute("altspace-cursor-collider");
             el.addEventListener("click", function () {
                 soundSettings.play(score[self.data].src);
-                el.emit("playtime");
+                self.dispatchFlash();
                 setTimeout(function () {
-                    el.emit("playoff")
+                    self.dispatchUnflash();
                 }, 150);
             });
         },
