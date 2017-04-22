@@ -148,7 +148,9 @@ function AudioAndAnimationScheduler(audioCtx) {
                 count++;
                 pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             }
-            dispatch("time", count % soundSettings.totalSegments);
+            if (count % timeEventGranularity == 0) {
+                dispatch("time", count % soundSettings.totalSegments);
+            }
             dispatchCount(count % soundSettings.totalSegments);
         }
     }
