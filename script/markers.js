@@ -1,4 +1,4 @@
-function Markers(soundSettings) {
+function Markers(soundSettings, events) {
     var startRadius = 0.175;
     var radiusStep = 0.05;
 
@@ -19,9 +19,9 @@ function Markers(soundSettings) {
         return result;
     };
 
-    this.marker = function (count, instrument, instrumentIndex, events) {
+    this.marker = function (count, instrument) {
         var angle = count * (2 * Math.PI / soundSettings.totalSegments);
-        var radius = startRadius + (instrumentIndex * radiusStep);
+        var radius = startRadius + (instrument.instrumentIndex * radiusStep);
         var newX = Math.cos(angle) * radius;
         var newY = Math.sin(angle) * radius;
 
@@ -41,7 +41,7 @@ function Markers(soundSettings) {
         subElement.setAttribute("color", instrument.color);
 
         subElement.addEventListener("click", function (event) {
-            events.removePlayTrigger(instrumentIndex, count, subElementId);
+            events.removePlayTrigger(instrument.instrumentIndex, count, subElementId);
             event.handled = true;
         });
     }

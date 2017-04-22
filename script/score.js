@@ -1,21 +1,6 @@
 function ScoreLoader(settings) {
 
     var self = this;
-    var loadListeners = [];
-    var loaded = false;
-
-    self.addLoadListener = function (listener) {
-        loadListeners.push(listener);
-        if (loaded) {
-            listener.call(self);
-        }
-    };
-
-    function dispatchLoad() {
-        for (var i = 0, l = loadListeners.length; i < l; i++) {
-            loadListeners[i].call(self);
-        }
-    }
 
     self.score = {
         "kick": {src: "audio/kick2.wav", times: ["0:0/4", "0:2/4", "2:7/16", "2:7/8"]},
@@ -48,8 +33,5 @@ function ScoreLoader(settings) {
         sources.push(instrumentPart.src);
     });
 
-    var promise = settings.load(sources);
-    promise.then(function () {
-        dispatchLoad();
-    });
+    self.loaded = settings.load(sources);
 }
