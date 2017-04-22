@@ -33,7 +33,7 @@ function Markers(soundSettings) {
         subElement.setAttribute("radius", "0.027");
         subElement.setAttribute("position", newX + " 0.025 " + newY);
 
-        instrument.flash(instrument.el, subElement);
+        instrument.flash(subElement);
 
         var clockFace = document.querySelector('#clock-face');
         clockFace.appendChild(subElement);

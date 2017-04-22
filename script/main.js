@@ -179,10 +179,15 @@ window.addEventListener('error', function (e) {
             soundSettings.registerSound(score[this.data].src, score[this.data].parsedTimes);
             this.listenToSchedule(score[this.data].parsedTimes, el, this);
             this.color = el.getAttribute("material").color;
-            this.flash(el, el);
             this.generateMarkers(score[this.data].parsedTimes);
             this.createCable(el);
             this.makeClickable(this, el);
+        },
+
+        addTrigger: function (data, events) {
+            markers.marker(data.count, this, data.instrumentNumber, events);
+            scheduler.addCountListener(data.count, this.countListener);
+            soundSettings.addTriggerTime(data.count, score[this.data].src);
         },
 
         makeClickable: function (self, el) {
@@ -201,16 +206,6 @@ window.addEventListener('error', function (e) {
             scheduler.removeCountListener(count, this.countListener);
         },
 
-        flash: function (el, target) {
-            var self = this;
-            el.addEventListener("playtime", function () {
-                target.setAttribute('color', "#fff");
-            });
-            el.addEventListener("playoff", function () {
-                target.setAttribute('color', self.color);
-            });
-        },
-
         generateMarkers: function (times) {
             var instrumentIndex = instruments.length - 1;
             var self = this;
@@ -220,51 +215,45 @@ window.addEventListener('error', function (e) {
         },
 
         listenToSchedule: function (times, el, self) {
+            self.flasherElements = [el];
+            self.flash = function (target) {
+                self.flasherElements.push(target);
+            };
             self.countListener = function (time) {
-                el.emit('playtime');
+                self.dispatchFlash();
+            };
+            self.dispatchFlash = function () {
+                self.flasherElements.forEach(function (target) {
+                    target.setAttribute('material', 'color', "#fff");
+                });
+            };
+            self.dispatchUnflash = function () {
+                self.flasherElements.forEach(function (target) {
+                    target.setAttribute('material', 'color', self.color);
+                });
             };
             scheduler.addCountsListener(times, self.countListener);
             scheduler.addEventListener("timeoff", function (count) {
-                el.emit('playoff');
+                self.dispatchUnflash();
             });
         },
 
-        createCable: function (srcEntity) {
+        createCable: function (el) {
             var self = this;
-            var start = srcEntity.object3D.getWorldPosition();
+            var start = el.object3D.getWorldPosition();
             var instrumentFloor = new THREE.Vector3(start.x, 0, start.z);
             var path = new THREE.CurvePath();
             path.add(new THREE.LineCurve3(start, instrumentFloor));
             path.add(new THREE.LineCurve3(instrumentFloor, new THREE.Vector3(0, 0, 0)));
             var geometry = new THREE.TubeGeometry(path, 64, 0.02, 8, false);
 
-            var materialSrc = "img/cable_stripe.png";
-            var texture = new THREE.TextureLoader().load(materialSrc);
-            texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat.set(100, 1);
-
-            var material = new THREE.MeshBasicMaterial({
-                map: texture,
-                color: srcEntity.getAttribute("material").color
-            });
-            var tube = new THREE.Mesh(geometry, material);
+            var tube = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({}));
             var cableElement = document.createElement("a-entity");
             cableElement.setObject3D("mesh", tube);
             document.querySelector("#root").appendChild(cableElement);
 
-            flash(srcEntity, cableElement);
-
-            function flash() {
-                var white = new THREE.Color();
-                var startingColor = new THREE.Color(self.color);
-                srcEntity.addEventListener("playtime", function () {
-                    tube.material.color = white;
-                });
-                srcEntity.addEventListener("playoff", function () {
-                    tube.material.color = startingColor;
-                });
-            }
+            cableElement.setAttribute('material', {color: self.color, src: "#cable-texture", repeat: '100 1'});
+            self.flash(cableElement);
         }
     });
 

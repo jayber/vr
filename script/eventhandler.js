@@ -48,9 +48,7 @@ function LocalTarget(scheduler, soundSettings, instruments, markers, score) {
     };
     self.addPlayTrigger = function (data, events) {
         var instrument = instruments[data.instrumentNumber];
-        markers.marker(data.count, instrument, data.instrumentNumber, events);
-        scheduler.addCountListener(data.count, instrument.countListener);
-        soundSettings.addTriggerTime(data.count, score[instrument.data].src);
+        instrument.addTrigger(data, events);
     };
     self.removePlayTrigger = function (instrumentIndex, count, elementId) {
         var subElement = document.querySelector("#" + elementId);

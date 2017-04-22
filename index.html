@@ -82,16 +82,16 @@
 
     <!--<a-entity id="root" position="3.5 0 -7">-->
     <a-entity id="root">
-
-        <a-circle onclick="toggleTest()" altspace-cursor-collider color="#000" position="0 2.2 0" side="double" scale="0.5 0.5 0.5">
-            <a-entity position="0 0 0.1">
-                <a-entity n-text="fontSize:1pt;width:1.8;height:0.1;text:SHOULD lag- setInterval:" position="0 0.6 0"></a-entity>
-                <a-entity id="intervalCount" n-text="fontSize:1pt;width:1;height:0.1;text:0" position="0 0.45 0"></a-entity>
-                <a-entity n-text="fontSize:1pt;width:1.8;height:0.1;text:NEVER lag - requestAnimationFrame seconds since the app started:" position="0 0.2 0"></a-entity>
-                <a-entity id="rafCount" n-text="fontSize:1pt;width:3;height:0.1;text:0" position="0 -0.05 0"></a-entity>
-                <a-entity n-text="fontSize:1pt;width:1.8;height:0.1;text:Beeps are 1 second long. Count (from 0) to tell if the timers above are out" position="0 -0.35 0"></a-entity>
-            </a-entity>
-        </a-circle>
+        <!--
+                <a-circle onclick="toggleTest()" altspace-cursor-collider color="#000" position="0 2.2 0" side="double" scale="0.5 0.5 0.5">
+                    <a-entity position="0 0 0.1">
+                        <a-entity n-text="fontSize:1pt;width:1.8;height:0.1;text:SHOULD lag- setInterval:" position="0 0.6 0"></a-entity>
+                        <a-entity id="intervalCount" n-text="fontSize:1pt;width:1;height:0.1;text:0" position="0 0.45 0"></a-entity>
+                        <a-entity n-text="fontSize:1pt;width:1.8;height:0.1;text:NEVER lag - requestAnimationFrame seconds since the app started:" position="0 0.2 0"></a-entity>
+                        <a-entity id="rafCount" n-text="fontSize:1pt;width:3;height:0.1;text:0" position="0 -0.05 0"></a-entity>
+                        <a-entity n-text="fontSize:1pt;width:1.8;height:0.1;text:Beeps are 1 second long. Count (from 0) to tell if the timers above are out" position="0 -0.35 0"></a-entity>
+                    </a-entity>
+                </a-circle>-->
 
         <a-cylinder material="src:#galv-texture;" height="0.9" position="0 0.5 0" color="#556" radius="0.3">
             <a-sphere id="beater" playable position="0 0.3 0.3" radius="0.1" material="src:#play-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
