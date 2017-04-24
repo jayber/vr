@@ -30,12 +30,12 @@ window.addEventListener('error', function (e) {
     serverLog("userAgent: " + navigator.userAgent + "; isGear: " + isGearVR());
 
     var soundSettings = new SoundSettings();
-    var scoreLoader = new ScoreLoader(soundSettings);
-    var scheduler = new AudioAndAnimationScheduler(soundSettings.audioCtx);
-    var events = new EventDispatcher(scoreLoader.loaded);
-    var markers = new Markers(soundSettings, events);
+    var scheduler = new AudioAndAnimationScheduler(soundSettings);
+    var scoreLoader = new ScoreLoader(soundSettings, scheduler);
+    var eventDispatcher = new EventDispatcher(scoreLoader.loaded);
+    var markers = new Markers(soundSettings, eventDispatcher);
     var instruments = new Instruments(scoreLoader.score, soundSettings, markers, scheduler);
-    events.init(new LocalTarget(scheduler, soundSettings, instruments.instruments));
+    eventDispatcher.init(new LocalEventTarget(scheduler, soundSettings, instruments.instruments));
     Cockpit(soundSettings);
-    Pedestal(events, scheduler, soundSettings, markers);
+    Pedestal(eventDispatcher, scheduler, soundSettings, markers);
 })();

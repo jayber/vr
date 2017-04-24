@@ -16,7 +16,7 @@
 <script src="script/score.js"></script>
 <script src="script/markers.js"></script>
 <script src="script/utils.js"></script>
-<script src="script/eventhandler.js"></script>
+<script src="script/eventdispatcher.js"></script>
 <script src="script/cockpit.js"></script>
 <script src="script/instruments.js"></script>
 <script src="script/pedestal.js"></script>
@@ -39,6 +39,7 @@
         <img id="rock-texture" src="img/rock.jpg">
         <img id="cloud-texture" src="img/cloud.jpg">
         <img id="play-texture" src="img/play.png">
+        <img id="reset-texture" src="img/reset.png">
         <img id="cable-texture" src="img/cable_stripe.png">
         <img id="up-arrow" src="img/up_arrow.png">
         <img id="down-arrow" src="img/down_arrow.png">
@@ -87,7 +88,8 @@
     <a-entity id="root">
 
         <a-cylinder material="src:#galv-texture;" height="0.9" position="0 0.5 0" color="#556" radius="0.3">
-            <a-sphere id="beater" playable position="0 0.3 0.3" radius="0.1" material="src:#play-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
+            <a-sphere reset position="-0.15 0.37 0.27" radius="0.03" material="src:#reset-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
+            <a-sphere playable position="0 0.3 0.3" radius="0.1" material="src:#play-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
         </a-cylinder>
 
         <a-cylinder timer altspace-cursor-collider id="clock-face" material="src:#studded-texture;repeat: 10 1" segments-radial="16" height="0.05" rotation="0 90 40" position="0 1.3 0" radius="0.405" n-mesh-collider="convex:false">

@@ -32,7 +32,7 @@ function EventDispatcher(loaded) {
     }
 }
 
-function LocalTarget(scheduler, soundSettings, instruments) {
+function LocalEventTarget(scheduler, soundSettings, instruments) {
     var self = this;
     self.start = function () {
         scheduler.start(soundSettings);
@@ -59,7 +59,7 @@ function LocalTarget(scheduler, soundSettings, instruments) {
     }
 }
 
-function WebSocketHandler(dispatcher, target, loaded) {
+function WebSocketHandler(dispatcher, target, scoreLoaded) {
     var self = this;
     var host = window.location.host;
     var spaceId = altspace.getSpace().then(function (space) {
@@ -68,7 +68,6 @@ function WebSocketHandler(dispatcher, target, loaded) {
     var userId = altspace.getUser().then(function (user) {
         return user.userId
     });
-    //var host = "vr.beatlab.co";
     var ws;
     var tries = 1;
     init();
@@ -78,7 +77,7 @@ function WebSocketHandler(dispatcher, target, loaded) {
             ws.close();
         }
 
-        Promise.all([spaceId, userId]).then(function (values) {
+        Promise.all([spaceId, userId, scoreLoaded]).then(function (values) {
             ws = new WebSocket("ws://" + host + "/ws/" + values[0] + "/" + values[1]);
 
             ws.onclose = function () {
@@ -102,14 +101,10 @@ function WebSocketHandler(dispatcher, target, loaded) {
                 console.log("ws opened");
                 var sceneEl = document.querySelector("a-scene");
                 if (sceneEl.hasLoaded) {
-                    loaded.then(function () {
-                        self.emit(JSON.stringify({event: "unroll"}));
-                    });
+                    self.emit({event: "unroll"});
                 } else {
                     sceneEl.addEventListener("loaded", function () {
-                        loaded.then(function () {
-                            self.emit(JSON.stringify({event: "unroll"}));
-                        });
+                        self.emit({event: "unroll"});
                     });
                 }
             };
@@ -156,28 +151,28 @@ function WebSocketHandler(dispatcher, target, loaded) {
     }
 
     self.start = function () {
-        self.emit(JSON.stringify({event: "start"}));
+        self.emit({event: "start"});
     };
     self.stop = function () {
-        self.emit(JSON.stringify({event: "stop"}));
+        self.emit({event: "stop"});
     };
     self.incrementBpm = function () {
-        self.emit(JSON.stringify({event: "incrementBpm"}));
+        self.emit({event: "incrementBpm"});
     };
     self.decrementBpm = function () {
-        self.emit(JSON.stringify({event: "decrementBpm"}));
+        self.emit({event: "decrementBpm"});
     };
     self.addPlayTrigger = function (data) {
-        self.emit(JSON.stringify({event: "addPlayTrigger", data: data}));
+        self.emit({event: "addPlayTrigger", data: data});
     };
     self.removePlayTrigger = function (instrumentIndex, count, elementId) {
-        self.emit(JSON.stringify({
+        self.emit({
             event: "removePlayTrigger",
             data: {instrumentIndex: instrumentIndex, count: count, elementId: elementId}
-        }));
+        });
     };
 
     self.emit = function (message) {
-        ws.send(message);
+        ws.send(JSON.stringify(message));
     };
 }

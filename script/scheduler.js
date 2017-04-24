@@ -1,4 +1,5 @@
-function AudioAndAnimationScheduler(audioCtx) {
+function AudioAndAnimationScheduler(soundSettings) {
+    var audioCtx = soundSettings.audioCtx;
     //ALL time is in SECONDS (not millis)
     const self = this;
     const timeOnLength = 0.1;
@@ -23,10 +24,33 @@ function AudioAndAnimationScheduler(audioCtx) {
 
     var isRunning = false;
     var startTime;
-    var soundSettings;
 
     var segmentOffTime;
     var sourcesToCancel;
+
+    self.registerInstrument = function (instrumentPart) {
+        if (self.soundList == undefined) {
+            self.soundList = [soundSettings.totalSegments];
+            for (var i = 0; i < soundSettings.totalSegments; i++) {
+                self.soundList[i] = [];
+            }
+        }
+        instrumentPart.parsedTimes.forEach(function (time) {
+            self.addTriggerTime(time.count, instrumentPart.src);
+        });
+    };
+
+    self.removeTriggerTime = function (count, src) {
+        var index = self.soundList[count].indexOf(src);
+        self.soundList[count].splice(index, 1);
+    };
+
+    self.addTriggerTime = function (count, src) {
+        var index = self.soundList[count].indexOf(src);
+        if (index < 0) {
+            self.soundList[count].push(src);
+        }
+    };
 
     self.addCountListener = function (time, listener) {
         if (countListeners[time] == undefined) {
@@ -53,9 +77,8 @@ function AudioAndAnimationScheduler(audioCtx) {
         listeners[type].push(listener);
     };
 
-    self.start = function (soundSettingsP) {
+    self.start = function () {
         console.log("Scheduler.start");
-        soundSettings = soundSettingsP;
 
         count = 0;
         segmentOffCount = 0;
@@ -70,18 +93,20 @@ function AudioAndAnimationScheduler(audioCtx) {
     };
 
     self.stop = function () {
-        isRunning = false;
-        if (sourcesToCancel) {
-            for (var i = 0; i < sourcesToCancel.length; i++) {
-                var source = sourcesToCancel[i];
-                if (source) {
-                    //console.log("Cancelling " + source);
-                    source.stop();
+        if (isRunning) {
+            isRunning = false;
+            if (sourcesToCancel) {
+                for (var i = 0; i < sourcesToCancel.length; i++) {
+                    var source = sourcesToCancel[i];
+                    if (source) {
+                        //console.log("Cancelling " + source);
+                        source.stop();
+                    }
                 }
             }
+            dispatch("stop");
+            dispatch("timeoff", count % soundSettings.totalSegments);
         }
-        dispatch("stop");
-        dispatch("timeoff", count % soundSettings.totalSegments);
     };
 
     function dispatch(type, param) {
@@ -158,7 +183,7 @@ function AudioAndAnimationScheduler(audioCtx) {
     function scheduleFromStartTime(from, to, offset) {
         sourcesToCancel = [];
         for (var i = from; i < to; i++) {
-            var sounds = soundSettings.soundList[i];
+            var sounds = self.soundList[i];
             if (sounds != undefined && sounds.length > 0) {
                 sounds.forEach(function (soundName) {
                     var when = startTime + offset + (i * soundSettings.getSegmentDuration() );

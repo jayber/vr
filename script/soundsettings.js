@@ -59,31 +59,6 @@ function SoundSettings() {
         });
     };
 
-    self.removeTriggerTime = function (count, src) {
-        var index = self.soundList[count].indexOf(src);
-        self.soundList[count].splice(index, 1);
-    };
-
-    self.addTriggerTime = function (count, src) {
-        var index = self.soundList[count].indexOf(src);
-        if (index < 0) {
-            self.soundList[count].push(src);
-        }
-    };
-
-    self.registerSound = function (src, times) {
-        if (self.soundList == undefined) {
-            self.soundList = [self.totalSegments];
-            for (var i = 0; i < self.totalSegments; i++) {
-                self.soundList[i] = [];
-            }
-        }
-
-        times.forEach(function (time) {
-            self.soundList[time.count].push(src);
-        });
-    };
-
     self.convertTimeToCount = function (beat, seg) {
         return Math.round((self.segmentsPerBeat * beat) + seg);
     };

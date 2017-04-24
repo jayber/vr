@@ -8,7 +8,6 @@ function Instruments(score, soundSettings, markers, scheduler) {
             self.instruments.push(this);
             var el = this.el;
             el.instrument = this;
-            soundSettings.registerSound(score[this.data].src, score[this.data].parsedTimes);
             this.listenToSchedule(score[this.data].parsedTimes, el, this);
             this.color = el.getAttribute("material").color;
             this.generateMarkers(score[this.data].parsedTimes);
@@ -19,7 +18,7 @@ function Instruments(score, soundSettings, markers, scheduler) {
         addTrigger: function (data) {
             markers.marker(data.count, this);
             scheduler.addCountListener(data.count, this.countListener);
-            soundSettings.addTriggerTime(data.count, score[this.data].src);
+            scheduler.addTriggerTime(data.count, score[this.data].src);
         },
 
         makeClickable: function (self, el) {
@@ -34,7 +33,7 @@ function Instruments(score, soundSettings, markers, scheduler) {
         },
 
         removeTime: function (count) {
-            soundSettings.removeTriggerTime(count, score[this.data].src);
+            scheduler.removeTriggerTime(count, score[this.data].src);
             scheduler.removeCountListener(count, this.countListener);
         },
 
