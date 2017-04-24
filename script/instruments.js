@@ -8,8 +8,8 @@ function Instruments(score, soundSettings, markers, scheduler) {
             self.instruments.push(this);
             var el = this.el;
             el.instrument = this;
-            this.listenToSchedule(score[this.data].parsedTimes, el, this);
             this.color = el.getAttribute("material").color;
+            this.listenToSchedule(this.color, el, this);
             this.generateMarkers(score[this.data].parsedTimes);
             this.createCable(el);
             this.makeClickable(this, el);
@@ -17,8 +17,7 @@ function Instruments(score, soundSettings, markers, scheduler) {
 
         addTrigger: function (data) {
             markers.marker(data.count, this);
-            scheduler.addCountListener(data.count, this.countListener);
-            scheduler.addTriggerTime(data.count, score[this.data].src);
+            scheduler.addInstrumentTrigger(data.count, this.data);
         },
 
         makeClickable: function (self, el) {
@@ -33,8 +32,7 @@ function Instruments(score, soundSettings, markers, scheduler) {
         },
 
         removeTime: function (count) {
-            scheduler.removeTriggerTime(count, score[this.data].src);
-            scheduler.removeCountListener(count, this.countListener);
+            scheduler.removeInstrumentTrigger(count, this.data);
         },
 
         generateMarkers: function (times) {
@@ -45,27 +43,28 @@ function Instruments(score, soundSettings, markers, scheduler) {
             });
         },
 
-        listenToSchedule: function (times, el, self) {
+        listenToSchedule: function (color, el, self) {
             self.flasherElements = [el];
             self.flash = function (target) {
                 self.flasherElements.push(target);
             };
-            self.countListener = function (time) {
-                self.dispatchFlash();
-            };
-            self.dispatchFlash = function () {
-                self.flasherElements.forEach(function (target) {
-                    target.setAttribute('material', 'color', "#fff");
-                });
-            };
-            self.dispatchUnflash = function () {
-                self.flasherElements.forEach(function (target) {
-                    target.setAttribute('material', 'color', self.color);
-                });
-            };
-            scheduler.addCountsListener(times, self.countListener);
-            scheduler.addEventListener("timeoff", function (count) {
-                self.dispatchUnflash();
+
+            scheduler.addInstrumentListener(self.data, function () {
+                self.dispatchFlash(self)
+            }, function () {
+                self.dispatchUnflash(self, color)
+            });
+        },
+
+        dispatchFlash: function (self) {
+            self.flasherElements.forEach(function (target) {
+                target.setAttribute('material', 'color', "#fff");
+            });
+        },
+
+        dispatchUnflash: function (self, color) {
+            self.flasherElements.forEach(function (target) {
+                target.setAttribute('material', 'color', color);
             });
         },
 

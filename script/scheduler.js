@@ -2,7 +2,7 @@ function AudioAndAnimationScheduler(soundSettings) {
     var audioCtx = soundSettings.audioCtx;
     //ALL time is in SECONDS (not millis)
     const self = this;
-    const timeOnLength = 0.1;
+    const timeOnLength = 0.05;
     const segmentsPerBatch = 32;
 
     function getGrain() {
@@ -13,61 +13,52 @@ function AudioAndAnimationScheduler(soundSettings) {
         }
     }
 
+    var instrumentList = [soundSettings.totalSegments];
+    for (var i = 0; i < soundSettings.totalSegments; i++) {
+        instrumentList[i] = [];
+    }
+
     const timeEventGranularity = getGrain();
     const listeners = {};
-    const countListeners = [];
 
     var count = 0;
-    var segmentOffCount = 0;
     var playedCount = 0;
     var scheduleTime = 0;
 
     var isRunning = false;
     var startTime;
 
-    var segmentOffTime;
+    var segmentOffTime = 0;
     var sourcesToCancel;
+    var instrumentListeners = {};
+    var offStack = [];
+    var instruments = {};
 
     self.registerInstrument = function (instrumentPart) {
-        if (self.soundList == undefined) {
-            self.soundList = [soundSettings.totalSegments];
-            for (var i = 0; i < soundSettings.totalSegments; i++) {
-                self.soundList[i] = [];
-            }
-        }
+        instruments[instrumentPart.name] = instrumentPart;
         instrumentPart.parsedTimes.forEach(function (time) {
-            self.addTriggerTime(time.count, instrumentPart.src);
+            self.addInstrumentTrigger(time.count, instrumentPart.name);
         });
     };
 
-    self.removeTriggerTime = function (count, src) {
-        var index = self.soundList[count].indexOf(src);
-        self.soundList[count].splice(index, 1);
+    self.addInstrumentListener = function (name, onListener, offListener) {
+        if (!(name in instrumentListeners)) {
+            instrumentListeners[name] = {on: [], off: []};
+        }
+        instrumentListeners[name].on.push(onListener);
+        instrumentListeners[name].off.push(offListener);
     };
 
-    self.addTriggerTime = function (count, src) {
-        var index = self.soundList[count].indexOf(src);
+    self.removeInstrumentTrigger = function (count, instrument) {
+        var index = instrumentList[count].indexOf(instrument);
+        instrumentList[count].splice(index, 1);
+    };
+
+    self.addInstrumentTrigger = function (count, instrumentName) {
+        var index = instrumentList[count].indexOf(instrumentName);
         if (index < 0) {
-            self.soundList[count].push(src);
+            instrumentList[count].push(instrumentName);
         }
-    };
-
-    self.addCountListener = function (time, listener) {
-        if (countListeners[time] == undefined) {
-            countListeners[time] = [];
-        }
-        countListeners[time].push(listener);
-    };
-
-    self.addCountsListener = function (times, listener) {
-        times.forEach(function (time) {
-            self.addCountListener(time.count, listener);
-        })
-    };
-
-    self.removeCountListener = function (time, listener) {
-        var index = countListeners[time].indexOf(listener);
-        countListeners[time].splice(index, 1);
     };
 
     self.addEventListener = function (type, listener) {
@@ -81,7 +72,6 @@ function AudioAndAnimationScheduler(soundSettings) {
         console.log("Scheduler.start");
 
         count = 0;
-        segmentOffCount = 0;
         playedCount = 0;
         scheduleTime = 0;
 
@@ -99,13 +89,12 @@ function AudioAndAnimationScheduler(soundSettings) {
                 for (var i = 0; i < sourcesToCancel.length; i++) {
                     var source = sourcesToCancel[i];
                     if (source) {
-                        //console.log("Cancelling " + source);
                         source.stop();
                     }
                 }
             }
             dispatch("stop");
-            dispatch("timeoff", count % soundSettings.totalSegments);
+            dispatchOff();
         }
     };
 
@@ -119,13 +108,24 @@ function AudioAndAnimationScheduler(soundSettings) {
         }
     }
 
-    function dispatchCount(count) {
-        if (countListeners[count] == undefined) {
+    function dispatchOn(count) {
+        if (instrumentList[count] == undefined) {
             return true;
         }
-        var stack = countListeners[count];
+        var stack = instrumentList[count];
         for (var i = 0, l = stack.length; i < l; i++) {
-            stack[i].call(self, count);
+            instrumentListeners[stack[i]].on.forEach(function (listener) {
+                listener.call(self, count);
+            });
+            instrumentListeners[stack[i]].off.forEach(function (listener) {
+                offStack.push(listener);
+            });
+        }
+    }
+
+    function dispatchOff() {
+        while (offStack.length > 0) {
+            offStack.pop().call(self);
         }
     }
 
@@ -159,40 +159,38 @@ function AudioAndAnimationScheduler(soundSettings) {
     function fireSegmentEvents(elapsedTime, offset) {
         var nextSegmentTime = calcNextSegmentTime(offset, count);
 
-        if (segmentOffCount < count && (nextSegmentTime < elapsedTime || (elapsedTime - segmentOffTime) > timeOnLength)) {
-            //console.log("fireSegmentOff - count: " + count + "; elapsedTime: " + elapsedTime);
-            dispatch("timeoff", count % soundSettings.totalSegments);
-            segmentOffCount = count;
+        if (offStack.length > 0 && ((elapsedTime - segmentOffTime) > timeOnLength)) {
+            dispatchOff();
             segmentOffTime = elapsedTime;
         }
 
         if (nextSegmentTime < elapsedTime) {
             var pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             while (pendingNextSegmentTime < elapsedTime) {
-                dispatchCount(count % soundSettings.totalSegments);
+                dispatchOn(count % soundSettings.totalSegments);
                 count++;
                 pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             }
             if (count % timeEventGranularity == 0) {
                 dispatch("time", count % soundSettings.totalSegments);
             }
-            dispatchCount(count % soundSettings.totalSegments);
+            dispatchOn(count % soundSettings.totalSegments);
         }
     }
 
     function scheduleFromStartTime(from, to, offset) {
         sourcesToCancel = [];
         for (var i = from; i < to; i++) {
-            var sounds = self.soundList[i];
-            if (sounds != undefined && sounds.length > 0) {
-                sounds.forEach(function (soundName) {
+            var instrumentNames = instrumentList[i];
+            if (instrumentNames != undefined && instrumentNames.length > 0) {
+                instrumentNames.forEach(function (instrumentName) {
+                    var instrument = instruments[instrumentName];
                     var when = startTime + offset + (i * soundSettings.getSegmentDuration() );
                     if (when > audioCtx.currentTime) {
                         if (!soundSettings.mute) {
                             var source = audioCtx.createBufferSource();
-                            source.buffer = soundSettings.soundBuffersMap[soundName];
+                            source.buffer = soundSettings.soundBuffersMap[instrument.src];
                             source.connect(soundSettings.output);
-                            //console.log("scheduling " + soundName + " for " + when + " with " + offset);
                             source.start(when);
                             sourcesToCancel.push(source);
                         }

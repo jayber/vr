@@ -29,6 +29,7 @@ function ScoreLoader(settings, scheduler) {
     var sources = [];
     Object.keys(score).forEach(function (key, index) {
         var instrumentPart = score[key];
+        instrumentPart.name = key;
         instrumentPart.parsedTimes = parseTimes(instrumentPart.times);
         scheduler.registerInstrument(instrumentPart);
         sources.push(instrumentPart.src);
