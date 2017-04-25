@@ -27,17 +27,17 @@ function Instruments(scoreLoader) {
     };
 }
 
-function InstrumentComponents(self, scoreLoader, markers, soundSettings, scheduler) {
+function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler) {
 
     AFRAME.registerComponent('instrument', {
         schema: {type: 'string'},
         init: function () {
-            self.instruments.push(this);
+            instruments.instruments.push(this);
             var el = this.el;
             el.instrument = this;
             this.color = el.getAttribute("material").color;
             this.listenToSchedule(this.color, el, this);
-            this.instrumentIndex = self.instruments.length - 1;
+            this.instrumentIndex = instruments.instruments.length - 1;
             this.generateMarkers(scoreLoader.score.instruments[this.data].times);
             this.createCable(el);
             this.makeClickable(this, el, this.color);
