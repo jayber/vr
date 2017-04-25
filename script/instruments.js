@@ -37,7 +37,7 @@ function Instruments(scoreLoader, soundSettings, markers, scheduler) {
             this.instrumentIndex = self.instruments.length - 1;
             this.generateMarkers(scoreLoader.score.instruments[this.data].times);
             this.createCable(el);
-            this.makeClickable(this, el);
+            this.makeClickable(this, el, this.color);
         },
 
         addTrigger: function (data) {
@@ -45,13 +45,13 @@ function Instruments(scoreLoader, soundSettings, markers, scheduler) {
             scoreLoader.score.addInstrumentTrigger(data.count, this.data);
         },
 
-        makeClickable: function (self, el) {
+        makeClickable: function (self, el, color) {
             el.setAttribute("altspace-cursor-collider");
             el.addEventListener("click", function () {
                 soundSettings.play(scoreLoader.score.instruments[self.data].src);
-                self.dispatchFlash();
+                self.dispatchFlash(self);
                 setTimeout(function () {
-                    self.dispatchUnflash();
+                    self.dispatchUnflash(self, color);
                 }, 150);
             });
         },
