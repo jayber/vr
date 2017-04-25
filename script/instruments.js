@@ -1,4 +1,4 @@
-function Instruments(scoreLoader, soundSettings, markers, scheduler) {
+function Instruments(scoreLoader) {
     var self = this;
     self.instruments = [];
 
@@ -25,6 +25,9 @@ function Instruments(scoreLoader, soundSettings, markers, scheduler) {
             instrument.generateMarkers(scoreLoader.score.instruments[instrument.data].times);
         });
     };
+}
+
+function InstrumentComponents(self, scoreLoader, markers, soundSettings, scheduler) {
 
     AFRAME.registerComponent('instrument', {
         schema: {type: 'string'},

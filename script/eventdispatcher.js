@@ -1,41 +1,41 @@
-function EventDispatcher(loaded) {
+function EventDispatcher(scheduler, instruments, scoreLoader) {
     var self = this;
+    var loaded = scoreLoader.loaded;
 
-    self.init = function (localTarget) {
-        self.target = localTarget;
+    self.target = new LocalEventTarget(scheduler, instruments, scoreLoader);
 
-        try {
-            new WebSocketHandler(self, localTarget, loaded);
-        } catch (e) {
-            reportException(e);
-            console.log("continuing in single player mode");
-        }
-
-        self.reload = function () {
-            self.target.reload();
-        };
-        self.start = function () {
-            self.target.start();
-        };
-        self.stop = function () {
-            self.target.stop();
-        };
-        self.incrementBpm = function () {
-            self.target.incrementBpm();
-        };
-        self.decrementBpm = function () {
-            self.target.decrementBpm();
-        };
-        self.addPlayTrigger = function (data) {
-            self.target.addPlayTrigger(data);
-        };
-        self.removePlayTrigger = function (instrumentIndex, count, elementId) {
-            self.target.removePlayTrigger(instrumentIndex, count, elementId);
-        }
+    try {
+        new WebSocketHandler(self, localTarget, loaded);
+    } catch (e) {
+        reportException(e);
+        console.log("continuing in single player mode");
     }
+
+    self.reload = function () {
+        self.target.reload();
+    };
+    self.start = function () {
+        self.target.start();
+    };
+    self.stop = function () {
+        self.target.stop();
+    };
+    self.incrementBpm = function () {
+        self.target.incrementBpm();
+    };
+    self.decrementBpm = function () {
+        self.target.decrementBpm();
+    };
+    self.addPlayTrigger = function (data) {
+        self.target.addPlayTrigger(data);
+    };
+    self.removePlayTrigger = function (instrumentIndex, count, elementId) {
+        self.target.removePlayTrigger(instrumentIndex, count, elementId);
+    }
+
 }
 
-function LocalEventTarget(scheduler, soundSettings, instruments, scoreLoader) {
+function LocalEventTarget(scheduler, instruments, scoreLoader) {
     var self = this;
     self.start = function () {
         scheduler.start(scoreLoader.score);
@@ -49,12 +49,12 @@ function LocalEventTarget(scheduler, soundSettings, instruments, scoreLoader) {
         scheduler.stop();
     };
     self.incrementBpm = function () {
-        soundSettings.setBpm(soundSettings.bpm + 1);
         scheduler.stop();
+        scoreLoader.score.setBpm(scoreLoader.score.bpm + 1);
     };
     self.decrementBpm = function () {
-        soundSettings.setBpm(soundSettings.bpm - 1);
         scheduler.stop();
+        scoreLoader.score.setBpm(scoreLoader.score.bpm - 1);
     };
     self.addPlayTrigger = function (data) {
         instruments.add(data);

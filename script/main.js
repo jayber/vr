@@ -32,10 +32,10 @@ window.addEventListener('error', function (e) {
     var soundSettings = new SoundSettings();
     var scoreLoader = new ScoreLoader(soundSettings);
     var scheduler = new AudioAndAnimationScheduler(soundSettings);
-    var eventDispatcher = new EventDispatcher(scoreLoader.loaded);
-    var markers = new Markers(soundSettings, eventDispatcher);
-    var instruments = new Instruments(scoreLoader, soundSettings, markers, scheduler);
-    eventDispatcher.init(new LocalEventTarget(scheduler, soundSettings, instruments, scoreLoader));
-    Cockpit(soundSettings);
-    Pedestal(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, instruments);
+    var instruments = new Instruments(scoreLoader);
+    var eventDispatcher = new EventDispatcher(scheduler, instruments, scoreLoader);
+    var markers = new Markers(eventDispatcher, scoreLoader);
+    InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler);
+    CockpitComponents(soundSettings);
+    PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader);
 })();

@@ -1,9 +1,6 @@
 function SoundSettings() {
     var self = this;
-    self.bpm = 130;
-    self.beats = 4;
     self.segmentsPerBeat = 32;
-    self.totalSegments = self.segmentsPerBeat * self.beats;
 
     self.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     var gain = self.audioCtx.createGain();
@@ -11,34 +8,6 @@ function SoundSettings() {
     self.output = gain;
     self.soundBuffersMap = {};
     self.mute = false;
-
-    var listeners = {};
-
-    self.addEventListener = function (type, listener) {
-        if (!(type in listeners)) {
-            listeners[type] = [];
-        }
-        listeners[type].push(listener);
-    };
-
-    self.setBpm = function (bpm) {
-        self.bpm = bpm;
-        dispatch("bpm-change", bpm);
-    };
-
-    function dispatch(type, param) {
-        if (!(type in listeners)) {
-            return true;
-        }
-        var stack = listeners[type];
-        for (var i = 0, l = stack.length; i < l; i++) {
-            stack[i].call(self, param);
-        }
-    }
-
-    self.getSegmentDuration = function () {
-        return 60 / self.bpm / self.segmentsPerBeat;
-    };
 
     self.load = function (sources) {
         return new Promise(function (resolve, reject) {

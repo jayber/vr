@@ -1,4 +1,4 @@
-function Pedestal(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, instruments) {
+function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader) {
 
     AFRAME.registerComponent('reset', {
         init: function () {
@@ -90,8 +90,8 @@ function Pedestal(eventDispatcher, scheduler, soundSettings, markers, scoreLoade
     AFRAME.registerComponent('bpm-label', {
         init: function () {
             var el = this.el;
-            el.setAttribute("n-text", {text: soundSettings.bpm + " BPM", fontSize: "1pt"});
-            soundSettings.addEventListener("bpm-change", function (event) {
+            el.setAttribute("n-text", {text: scoreLoader.score.bpm + " BPM", fontSize: "1pt"});
+            scoreLoader.score.addEventListener("bpm-change", function (event) {
                 el.setAttribute("n-text", {text: event + " BPM", fontSize: "1pt"});
             })
         }
@@ -101,7 +101,7 @@ function Pedestal(eventDispatcher, scheduler, soundSettings, markers, scoreLoade
         init: function () {
             var self = this;
             var el = this.el;
-            self.degreesPerBeat = (360 / soundSettings.beats);
+            self.degreesPerBeat = (360 / scoreLoader.score.beats);
             self.degreesPerSeg = self.degreesPerBeat / soundSettings.segmentsPerBeat;
             scheduler.addEventListener("time", function (count) {
                 var currentDegrees = count * self.degreesPerSeg;

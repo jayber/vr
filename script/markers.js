@@ -1,4 +1,4 @@
-function Markers(soundSettings, events) {
+function Markers(events, scoreLoader) {
     var startRadius = 0.175;
     var radiusStep = 0.05;
 
@@ -12,7 +12,7 @@ function Markers(soundSettings, events) {
             angle = (2 * Math.PI) + angle;
         }
 
-        var count = (angle / (2 * Math.PI / (soundSettings.totalSegments - 1)) % soundSettings.totalSegments);
+        var count = (angle / (2 * Math.PI / (scoreLoader.score.totalSegments - 1)) % scoreLoader.score.totalSegments);
 
         var result = {instrumentNumber: Math.round(instCount), count: Math.round(count)};
         //console.log(result);
@@ -20,7 +20,7 @@ function Markers(soundSettings, events) {
     };
 
     this.marker = function (count, instrument) {
-        var angle = count * (2 * Math.PI / soundSettings.totalSegments);
+        var angle = count * (2 * Math.PI / scoreLoader.score.totalSegments);
         var radius = startRadius + (instrument.instrumentIndex * radiusStep);
         var newX = Math.cos(angle) * radius;
         var newY = Math.sin(angle) * radius;

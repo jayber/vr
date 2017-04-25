@@ -3,11 +3,15 @@ function ScoreLoader(settings) {
     var self = this;
 
     var readableScore = {
-        "kick": {src: "audio/kick2.wav", times: ["0:0/4", "0:2/4", "2:7/16", "2:7/8"]},
-        "hat": {src: "audio/hat2.wav", times: ["0:2/4", "1:2/4", "2:2/4", "3:2/4"]},
-        "snare": {src: "audio/snare2.wav", times: ["1:0/4", "2:1/4", "3:0/4"]},
-        "bork": {src: "audio/guitar.wav", times: []},
-        "beep": {src: "audio/siren.wav", times: []}
+        "bpm": 130,
+        "beats": 4,
+        instrumentParts: {
+            "kick": {src: "audio/kick2.wav", times: ["0:0/4", "0:2/4", "2:7/16", "2:7/8"]},
+            "hat": {src: "audio/hat2.wav", times: ["0:2/4", "1:2/4", "2:2/4", "3:2/4"]},
+            "snare": {src: "audio/snare2.wav", times: ["1:0/4", "2:1/4", "3:0/4"]},
+            "bork": {src: "audio/guitar.wav", times: []},
+            "beep": {src: "audio/siren.wav", times: []}
+        }
     };
 
     var beatExp = /(\d*):(\d*)\/(\d*)/;
@@ -27,10 +31,10 @@ function ScoreLoader(settings) {
     }
 
     self.reload = function () {
-        var playableScore = new PlayableScore(settings);
+        var playableScore = new PlayableScore(settings, readableScore.bpm, readableScore.beats);
         var sources = [];
-        Object.keys(readableScore).forEach(function (key, index) {
-            var instrumentPart = readableScore[key];
+        Object.keys(readableScore.instrumentParts).forEach(function (key, index) {
+            var instrumentPart = readableScore.instrumentParts[key];
             instrumentPart.name = key;
             instrumentPart.parsedTimes = parseTimes(instrumentPart.times);
             playableScore.registerInstrument(key, instrumentPart.parsedTimes, instrumentPart.src);
@@ -45,14 +49,46 @@ function ScoreLoader(settings) {
     self.loaded = settings.load(sources);
 }
 
-function PlayableScore(settings) {
+function PlayableScore(settings, bpm, beats) {
 
     var self = this;
 
+    self.bpm = bpm;
+    self.beats = beats;
+    self.totalSegments = settings.segmentsPerBeat * self.beats;
+
     self.instruments = {};
-    self.instrumentList = [settings.totalSegments];
-    for (var i = 0; i < settings.totalSegments; i++) {
+    self.instrumentList = [self.totalSegments];
+    for (var i = 0; i < self.totalSegments; i++) {
         self.instrumentList[i] = [];
+    }
+
+    self.getSegmentDuration = function () {
+        return 60 / self.bpm / settings.segmentsPerBeat;
+    };
+
+    var listeners = {};
+
+    self.addEventListener = function (type, listener) {
+        if (!(type in listeners)) {
+            listeners[type] = [];
+        }
+        listeners[type].push(listener);
+    };
+
+    self.setBpm = function (bpm) {
+        self.bpm = bpm;
+        dispatch("bpm-change", bpm);
+    };
+
+    function dispatch(type, param) {
+        if (!(type in listeners)) {
+            return true;
+        }
+        var stack = listeners[type];
+        for (var i = 0, l = stack.length; i < l; i++) {
+            stack[i].call(self, param);
+        }
     }
 
     self.registerInstrument = function (name, times, src) {

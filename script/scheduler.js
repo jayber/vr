@@ -107,7 +107,7 @@ function AudioAndAnimationScheduler(soundSettings) {
     }
 
     function playAndSchedule() {
-        const offset = segmentsPerBatch * soundSettings.getSegmentDuration();
+        const offset = segmentsPerBatch * self.score.getSegmentDuration();
         const elapsedTime = audioCtx.currentTime - startTime;
         scheduleSounds(elapsedTime, offset);
         fireSegmentEvents(elapsedTime, offset);
@@ -118,9 +118,9 @@ function AudioAndAnimationScheduler(soundSettings) {
 
     function scheduleSounds(elapsedTime, offset) {
         while (scheduleTime < elapsedTime) {
-            const nextIndex = playedCount % soundSettings.totalSegments;
+            const nextIndex = playedCount % self.score.totalSegments;
             const toIndex = nextIndex + segmentsPerBatch;
-            const accumulatedOffset = offset + (soundSettings.getSegmentDuration() * soundSettings.totalSegments * Math.floor(playedCount / soundSettings.totalSegments));
+            const accumulatedOffset = offset + (self.score.getSegmentDuration() * self.score.totalSegments * Math.floor(playedCount / self.score.totalSegments));
 
             scheduleTriggerBatch(nextIndex, toIndex, accumulatedOffset);
 
@@ -130,7 +130,7 @@ function AudioAndAnimationScheduler(soundSettings) {
     }
 
     function calcNextSegmentTime(offset, count) {
-        return (count * soundSettings.getSegmentDuration()) + offset;
+        return (count * self.score.getSegmentDuration()) + offset;
     }
 
     function fireSegmentEvents(elapsedTime, offset) {
@@ -143,14 +143,14 @@ function AudioAndAnimationScheduler(soundSettings) {
         if (nextSegmentTime < elapsedTime) {
             var pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             while (pendingNextSegmentTime < elapsedTime) {
-                dispatchInstrumentOn(count % soundSettings.totalSegments);
+                dispatchInstrumentOn(count % self.score.totalSegments);
                 count++;
                 pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             }
             if (count % timeEventGranularity == 0) {
-                dispatch("time", count % soundSettings.totalSegments);
+                dispatch("time", count % self.score.totalSegments);
             }
-            dispatchInstrumentOn(count % soundSettings.totalSegments);
+            dispatchInstrumentOn(count % self.score.totalSegments);
         }
     }
 
@@ -161,7 +161,7 @@ function AudioAndAnimationScheduler(soundSettings) {
             if (instrumentNames != undefined && instrumentNames.length > 0) {
                 instrumentNames.forEach(function (instrumentName) {
                     var instrument = self.score.instruments[instrumentName];
-                    var when = startTime + offset + (i * soundSettings.getSegmentDuration() );
+                    var when = startTime + offset + (i * self.score.getSegmentDuration() );
                     if (when > audioCtx.currentTime) {
                         if (!soundSettings.mute) {
                             var source = audioCtx.createBufferSource();

@@ -1,4 +1,4 @@
-function Cockpit(soundSettings) {
+function CockpitComponents(soundSettings) {
 
     AFRAME.registerComponent('mute', {
         init: function () {
