@@ -41,9 +41,9 @@ function LocalEventTarget(scheduler, soundSettings, instruments, scoreLoader) {
         scheduler.start(scoreLoader.score);
     };
     self.reload = function () {
+        scheduler.stop();
         scoreLoader.reload();
         instruments.reload();
-        scheduler.stop();
     };
     self.stop = function () {
         scheduler.stop();
