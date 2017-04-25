@@ -5,7 +5,7 @@ function EventDispatcher(scheduler, instruments, scoreLoader) {
     self.target = new LocalEventTarget(scheduler, instruments, scoreLoader);
 
     try {
-        new WebSocketHandler(self, localTarget, loaded);
+        new WebSocketHandler(self, self.target, loaded);
     } catch (e) {
         reportException(e);
         console.log("continuing in single player mode");
