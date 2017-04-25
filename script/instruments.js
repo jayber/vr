@@ -10,20 +10,20 @@ function Instruments(score, soundSettings, markers, scheduler) {
             el.instrument = this;
             this.color = el.getAttribute("material").color;
             this.listenToSchedule(this.color, el, this);
-            this.generateMarkers(score[this.data].parsedTimes);
+            this.generateMarkers(score.instruments[this.data].times);
             this.createCable(el);
             this.makeClickable(this, el);
         },
 
         addTrigger: function (data) {
             markers.marker(data.count, this);
-            scheduler.addInstrumentTrigger(data.count, this.data);
+            score.addInstrumentTrigger(data.count, this.data);
         },
 
         makeClickable: function (self, el) {
             el.setAttribute("altspace-cursor-collider");
             el.addEventListener("click", function () {
-                soundSettings.play(score[self.data].src);
+                soundSettings.play(score.instruments[self.data].src);
                 self.dispatchFlash();
                 setTimeout(function () {
                     self.dispatchUnflash();
@@ -32,7 +32,7 @@ function Instruments(score, soundSettings, markers, scheduler) {
         },
 
         removeTime: function (count) {
-            scheduler.removeInstrumentTrigger(count, this.data);
+            score.removeInstrumentTrigger(count, this.data);
         },
 
         generateMarkers: function (times) {

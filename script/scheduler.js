@@ -17,12 +17,6 @@ function AudioAndAnimationScheduler(soundSettings) {
     const listeners = {};
     var instrumentListeners = {};
     var offStack = [];
-    var instruments = {};
-
-    var instrumentList = [soundSettings.totalSegments];
-    for (var i = 0; i < soundSettings.totalSegments; i++) {
-        instrumentList[i] = [];
-    }
 
     function getGrain() {
         if (isGearVR()) {
@@ -34,31 +28,12 @@ function AudioAndAnimationScheduler(soundSettings) {
 
     const timeEventGranularity = getGrain();
 
-    self.registerInstrument = function (instrumentPart) {
-        instruments[instrumentPart.name] = instrumentPart;
-        instrumentPart.parsedTimes.forEach(function (time) {
-            self.addInstrumentTrigger(time.count, instrumentPart.name);
-        });
-    };
-
     self.addInstrumentListener = function (name, onListener, offListener) {
         if (!(name in instrumentListeners)) {
             instrumentListeners[name] = {on: [], off: []};
         }
         instrumentListeners[name].on.push(onListener);
         instrumentListeners[name].off.push(offListener);
-    };
-
-    self.removeInstrumentTrigger = function (count, instrument) {
-        var index = instrumentList[count].indexOf(instrument);
-        instrumentList[count].splice(index, 1);
-    };
-
-    self.addInstrumentTrigger = function (count, instrumentName) {
-        var index = instrumentList[count].indexOf(instrumentName);
-        if (index < 0) {
-            instrumentList[count].push(instrumentName);
-        }
     };
 
     self.addEventListener = function (type, listener) {
@@ -68,8 +43,9 @@ function AudioAndAnimationScheduler(soundSettings) {
         listeners[type].push(listener);
     };
 
-    self.start = function () {
+    self.start = function (score) {
         console.log("Scheduler.start");
+        self.score = score;
 
         count = 0;
         playedCount = 0;
@@ -78,7 +54,7 @@ function AudioAndAnimationScheduler(soundSettings) {
         startTime = audioCtx.currentTime;
         isRunning = true;
 
-        window.requestAnimationFrame(playAndSchedule);
+        playAndSchedule();
         dispatch("start");
     };
 
@@ -109,10 +85,10 @@ function AudioAndAnimationScheduler(soundSettings) {
     }
 
     function dispatchOn(count) {
-        if (instrumentList[count] == undefined) {
+        if (self.score.instrumentList[count] == undefined) {
             return true;
         }
-        var stack = instrumentList[count];
+        var stack = self.score.instrumentList[count];
         for (var i = 0, l = stack.length; i < l; i++) {
             instrumentListeners[stack[i]].on.forEach(function (listener) {
                 listener.call(self, count);
@@ -153,7 +129,7 @@ function AudioAndAnimationScheduler(soundSettings) {
     }
 
     function calcNextSegmentTime(offset, count) {
-        return ( count * soundSettings.getSegmentDuration()) + offset;
+        return (count * soundSettings.getSegmentDuration()) + offset;
     }
 
     function fireSegmentEvents(elapsedTime, offset) {
@@ -180,10 +156,10 @@ function AudioAndAnimationScheduler(soundSettings) {
     function scheduleFromStartTime(from, to, offset) {
         sourcesToCancel = [];
         for (var i = from; i < to; i++) {
-            var instrumentNames = instrumentList[i];
+            var instrumentNames = self.score.instrumentList[i];
             if (instrumentNames != undefined && instrumentNames.length > 0) {
                 instrumentNames.forEach(function (instrumentName) {
-                    var instrument = instruments[instrumentName];
+                    var instrument = self.score.instruments[instrumentName];
                     var when = startTime + offset + (i * soundSettings.getSegmentDuration() );
                     if (when > audioCtx.currentTime) {
                         if (!soundSettings.mute) {

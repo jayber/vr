@@ -32,10 +32,10 @@ function EventDispatcher(loaded) {
     }
 }
 
-function LocalEventTarget(scheduler, soundSettings, instruments) {
+function LocalEventTarget(scheduler, soundSettings, instruments, score) {
     var self = this;
     self.start = function () {
-        scheduler.start(soundSettings);
+        scheduler.start(score);
     };
     self.stop = function () {
         scheduler.stop();

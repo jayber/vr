@@ -1,8 +1,8 @@
-function ScoreLoader(settings, scheduler) {
+function ScoreLoader(settings) {
 
     var self = this;
 
-    var score = {
+    var readableScore = {
         "kick": {src: "audio/kick2.wav", times: ["0:0/4", "0:2/4", "2:7/16", "2:7/8"]},
         "hat": {src: "audio/hat2.wav", times: ["0:2/4", "1:2/4", "2:2/4", "3:2/4"]},
         "snare": {src: "audio/snare2.wav", times: ["1:0/4", "2:1/4", "3:0/4"]},
@@ -26,15 +26,46 @@ function ScoreLoader(settings, scheduler) {
         return parsedTimes;
     }
 
+    var playableScore = new PlayableScore(settings);
     var sources = [];
-    Object.keys(score).forEach(function (key, index) {
-        var instrumentPart = score[key];
+    Object.keys(readableScore).forEach(function (key, index) {
+        var instrumentPart = readableScore[key];
         instrumentPart.name = key;
         instrumentPart.parsedTimes = parseTimes(instrumentPart.times);
-        scheduler.registerInstrument(instrumentPart);
+        playableScore.registerInstrument(key, instrumentPart.parsedTimes, instrumentPart.src);
         sources.push(instrumentPart.src);
     });
 
-    self.score = JSON.parse(JSON.stringify(score));
+    self.score = playableScore;
     self.loaded = settings.load(sources);
+}
+
+function PlayableScore(settings) {
+
+    var self = this;
+
+    self.instruments = {};
+    self.instrumentList = [settings.totalSegments];
+    for (var i = 0; i < settings.totalSegments; i++) {
+        self.instrumentList[i] = [];
+    }
+
+    self.registerInstrument = function (name, times, src) {
+        self.instruments[name] = {name: name, times: times, src: src};
+        times.forEach(function (time) {
+            self.addInstrumentTrigger(time.count, name);
+        });
+    };
+
+    self.removeInstrumentTrigger = function (count, instrument) {
+        var index = self.instrumentList[count].indexOf(instrument);
+        self.instrumentList[count].splice(index, 1);
+    };
+
+    self.addInstrumentTrigger = function (count, instrumentName) {
+        var index = self.instrumentList[count].indexOf(instrumentName);
+        if (index < 0) {
+            self.instrumentList[count].push(instrumentName);
+        }
+    };
 }
