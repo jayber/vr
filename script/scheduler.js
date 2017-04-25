@@ -5,6 +5,25 @@ function AudioAndAnimationScheduler(soundSettings) {
     const timeOnLength = 0.05;
     const segmentsPerBatch = 32;
 
+    var count = 0;
+    var playedCount = 0;
+    var scheduleTime = 0;
+
+    var segmentOffTime = 0;
+    var sourcesToCancel;
+    var isRunning = false;
+    var startTime;
+
+    const listeners = {};
+    var instrumentListeners = {};
+    var offStack = [];
+    var instruments = {};
+
+    var instrumentList = [soundSettings.totalSegments];
+    for (var i = 0; i < soundSettings.totalSegments; i++) {
+        instrumentList[i] = [];
+    }
+
     function getGrain() {
         if (isGearVR()) {
             return 4;
@@ -13,26 +32,7 @@ function AudioAndAnimationScheduler(soundSettings) {
         }
     }
 
-    var instrumentList = [soundSettings.totalSegments];
-    for (var i = 0; i < soundSettings.totalSegments; i++) {
-        instrumentList[i] = [];
-    }
-
     const timeEventGranularity = getGrain();
-    const listeners = {};
-
-    var count = 0;
-    var playedCount = 0;
-    var scheduleTime = 0;
-
-    var isRunning = false;
-    var startTime;
-
-    var segmentOffTime = 0;
-    var sourcesToCancel;
-    var instrumentListeners = {};
-    var offStack = [];
-    var instruments = {};
 
     self.registerInstrument = function (instrumentPart) {
         instruments[instrumentPart.name] = instrumentPart;
@@ -157,13 +157,12 @@ function AudioAndAnimationScheduler(soundSettings) {
     }
 
     function fireSegmentEvents(elapsedTime, offset) {
-        var nextSegmentTime = calcNextSegmentTime(offset, count);
-
         if (offStack.length > 0 && ((elapsedTime - segmentOffTime) > timeOnLength)) {
             dispatchOff();
             segmentOffTime = elapsedTime;
         }
 
+        var nextSegmentTime = calcNextSegmentTime(offset, count);
         if (nextSegmentTime < elapsedTime) {
             var pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             while (pendingNextSegmentTime < elapsedTime) {
