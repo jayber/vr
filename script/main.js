@@ -34,8 +34,8 @@ window.addEventListener('error', function (e) {
     var scheduler = new AudioAndAnimationScheduler(soundSettings);
     var eventDispatcher = new EventDispatcher(scoreLoader.loaded);
     var markers = new Markers(soundSettings, eventDispatcher);
-    var instruments = new Instruments(scoreLoader.score, soundSettings, markers, scheduler);
-    eventDispatcher.init(new LocalEventTarget(scheduler, soundSettings, instruments.instruments, scoreLoader.score));
+    var instruments = new Instruments(scoreLoader, soundSettings, markers, scheduler);
+    eventDispatcher.init(new LocalEventTarget(scheduler, soundSettings, instruments, scoreLoader));
     Cockpit(soundSettings);
-    Pedestal(eventDispatcher, scheduler, soundSettings, markers);
+    Pedestal(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, instruments);
 })();

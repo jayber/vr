@@ -44,5 +44,6 @@ function Markers(soundSettings, events) {
             events.removePlayTrigger(instrument.instrumentIndex, count, subElementId);
             event.handled = true;
         });
+        return subElement
     }
 }

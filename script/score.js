@@ -26,17 +26,22 @@ function ScoreLoader(settings) {
         return parsedTimes;
     }
 
-    var playableScore = new PlayableScore(settings);
-    var sources = [];
-    Object.keys(readableScore).forEach(function (key, index) {
-        var instrumentPart = readableScore[key];
-        instrumentPart.name = key;
-        instrumentPart.parsedTimes = parseTimes(instrumentPart.times);
-        playableScore.registerInstrument(key, instrumentPart.parsedTimes, instrumentPart.src);
-        sources.push(instrumentPart.src);
-    });
+    self.reload = function () {
+        var playableScore = new PlayableScore(settings);
+        var sources = [];
+        Object.keys(readableScore).forEach(function (key, index) {
+            var instrumentPart = readableScore[key];
+            instrumentPart.name = key;
+            instrumentPart.parsedTimes = parseTimes(instrumentPart.times);
+            playableScore.registerInstrument(key, instrumentPart.parsedTimes, instrumentPart.src);
+            sources.push(instrumentPart.src);
+        });
 
-    self.score = playableScore;
+        self.score = playableScore;
+        return sources;
+    };
+
+    var sources = self.reload();
     self.loaded = settings.load(sources);
 }
 

@@ -50,6 +50,7 @@ function AudioAndAnimationScheduler(soundSettings) {
         count = 0;
         playedCount = 0;
         scheduleTime = 0;
+        segmentOffTime = 0;
 
         startTime = audioCtx.currentTime;
         isRunning = true;
@@ -70,7 +71,7 @@ function AudioAndAnimationScheduler(soundSettings) {
                 }
             }
             dispatch("stop");
-            dispatchOff();
+            dispatchInstrumentOff();
         }
     };
 
@@ -84,7 +85,7 @@ function AudioAndAnimationScheduler(soundSettings) {
         }
     }
 
-    function dispatchOn(count) {
+    function dispatchInstrumentOn(count) {
         if (self.score.instrumentList[count] == undefined) {
             return true;
         }
@@ -99,7 +100,7 @@ function AudioAndAnimationScheduler(soundSettings) {
         }
     }
 
-    function dispatchOff() {
+    function dispatchInstrumentOff() {
         while (offStack.length > 0) {
             offStack.pop().call(self);
         }
@@ -108,23 +109,23 @@ function AudioAndAnimationScheduler(soundSettings) {
     function playAndSchedule() {
         const offset = segmentsPerBatch * soundSettings.getSegmentDuration();
         const elapsedTime = audioCtx.currentTime - startTime;
-        scheduleSamples(elapsedTime, offset);
+        scheduleSounds(elapsedTime, offset);
         fireSegmentEvents(elapsedTime, offset);
         if (isRunning) {
             window.requestAnimationFrame(playAndSchedule);
         }
     }
 
-    function scheduleSamples(elapsedTime, offset) {
+    function scheduleSounds(elapsedTime, offset) {
         while (scheduleTime < elapsedTime) {
             const nextIndex = playedCount % soundSettings.totalSegments;
             const toIndex = nextIndex + segmentsPerBatch;
-            const scheduleOffset = offset + (soundSettings.getSegmentDuration() * soundSettings.totalSegments * Math.floor(playedCount / soundSettings.totalSegments));
+            const accumulatedOffset = offset + (soundSettings.getSegmentDuration() * soundSettings.totalSegments * Math.floor(playedCount / soundSettings.totalSegments));
 
-            scheduleFromStartTime(nextIndex, toIndex, scheduleOffset);
+            scheduleTriggerBatch(nextIndex, toIndex, accumulatedOffset);
 
             playedCount += segmentsPerBatch;
-            scheduleTime = scheduleTime + offset;
+            scheduleTime += offset;
         }
     }
 
@@ -134,7 +135,7 @@ function AudioAndAnimationScheduler(soundSettings) {
 
     function fireSegmentEvents(elapsedTime, offset) {
         if (offStack.length > 0 && ((elapsedTime - segmentOffTime) > timeOnLength)) {
-            dispatchOff();
+            dispatchInstrumentOff();
             segmentOffTime = elapsedTime;
         }
 
@@ -142,18 +143,18 @@ function AudioAndAnimationScheduler(soundSettings) {
         if (nextSegmentTime < elapsedTime) {
             var pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             while (pendingNextSegmentTime < elapsedTime) {
-                dispatchOn(count % soundSettings.totalSegments);
+                dispatchInstrumentOn(count % soundSettings.totalSegments);
                 count++;
                 pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             }
             if (count % timeEventGranularity == 0) {
                 dispatch("time", count % soundSettings.totalSegments);
             }
-            dispatchOn(count % soundSettings.totalSegments);
+            dispatchInstrumentOn(count % soundSettings.totalSegments);
         }
     }
 
-    function scheduleFromStartTime(from, to, offset) {
+    function scheduleTriggerBatch(from, to, offset) {
         sourcesToCancel = [];
         for (var i = from; i < to; i++) {
             var instrumentNames = self.score.instrumentList[i];

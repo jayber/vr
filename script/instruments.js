@@ -1,6 +1,30 @@
-function Instruments(score, soundSettings, markers, scheduler) {
+function Instruments(scoreLoader, soundSettings, markers, scheduler) {
     var self = this;
     self.instruments = [];
+
+    self.remove = function (instrumentIndex, count, elementId) {
+        var subElement = document.querySelector("#" + elementId);
+        document.querySelector("#clock-face").removeChild(subElement);
+        self.instruments[instrumentIndex].removeTime(count);
+        var index = self.instruments[instrumentIndex].markers.indexOf(subElement);
+        self.instruments[instrumentIndex].markers.splice(index, 1);
+    };
+
+    self.add = function (data) {
+        var instrument = self.instruments[data.instrumentNumber];
+        instrument.addTrigger(data);
+    };
+
+    self.reload = function () {
+        var dial = document.querySelector("#clock-face");
+        self.instruments.forEach(function (instrument) {
+            instrument.markers.forEach(function (marker) {
+                dial.removeChild(marker);
+            });
+
+            instrument.generateMarkers(scoreLoader.score.instruments[instrument.data].times);
+        });
+    };
 
     AFRAME.registerComponent('instrument', {
         schema: {type: 'string'},
@@ -10,20 +34,21 @@ function Instruments(score, soundSettings, markers, scheduler) {
             el.instrument = this;
             this.color = el.getAttribute("material").color;
             this.listenToSchedule(this.color, el, this);
-            this.generateMarkers(score.instruments[this.data].times);
+            this.instrumentIndex = self.instruments.length - 1;
+            this.generateMarkers(scoreLoader.score.instruments[this.data].times);
             this.createCable(el);
             this.makeClickable(this, el);
         },
 
         addTrigger: function (data) {
-            markers.marker(data.count, this);
-            score.addInstrumentTrigger(data.count, this.data);
+            this.markers.push(markers.marker(data.count, this));
+            scoreLoader.score.addInstrumentTrigger(data.count, this.data);
         },
 
         makeClickable: function (self, el) {
             el.setAttribute("altspace-cursor-collider");
             el.addEventListener("click", function () {
-                soundSettings.play(score.instruments[self.data].src);
+                soundSettings.play(scoreLoader.score.instruments[self.data].src);
                 self.dispatchFlash();
                 setTimeout(function () {
                     self.dispatchUnflash();
@@ -32,14 +57,14 @@ function Instruments(score, soundSettings, markers, scheduler) {
         },
 
         removeTime: function (count) {
-            score.removeInstrumentTrigger(count, this.data);
+            scoreLoader.score.removeInstrumentTrigger(count, this.data);
         },
 
         generateMarkers: function (times) {
             var sself = this;
-            sself.instrumentIndex = self.instruments.length - 1;
+            sself.markers = [];
             times.forEach(function (time) {
-                markers.marker(time.count, sself, sself.instrumentIndex);
+                sself.markers.push(markers.marker(time.count, sself));
             });
         },
 

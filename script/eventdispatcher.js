@@ -11,6 +11,9 @@ function EventDispatcher(loaded) {
             console.log("continuing in single player mode");
         }
 
+        self.reload = function () {
+            self.target.reload();
+        };
         self.start = function () {
             self.target.start();
         };
@@ -32,10 +35,15 @@ function EventDispatcher(loaded) {
     }
 }
 
-function LocalEventTarget(scheduler, soundSettings, instruments, score) {
+function LocalEventTarget(scheduler, soundSettings, instruments, scoreLoader) {
     var self = this;
     self.start = function () {
-        scheduler.start(score);
+        scheduler.start(scoreLoader.score);
+    };
+    self.reload = function () {
+        scoreLoader.reload();
+        instruments.reload();
+        scheduler.stop();
     };
     self.stop = function () {
         scheduler.stop();
@@ -49,13 +57,10 @@ function LocalEventTarget(scheduler, soundSettings, instruments, score) {
         scheduler.stop();
     };
     self.addPlayTrigger = function (data) {
-        var instrument = instruments[data.instrumentNumber];
-        instrument.addTrigger(data);
+        instruments.add(data);
     };
     self.removePlayTrigger = function (instrumentIndex, count, elementId) {
-        var subElement = document.querySelector("#" + elementId);
-        document.querySelector("#clock-face").removeChild(subElement);
-        instruments[instrumentIndex].removeTime(count);
+        instruments.remove(instrumentIndex, count, elementId);
     }
 }
 
@@ -142,6 +147,10 @@ function WebSocketHandler(dispatcher, target, scoreLoaded) {
                         console.log("ws received:stop");
                         target.stop();
                         break;
+                    case "reload":
+                        console.log("ws received:reload");
+                        target.reload();
+                        break;
                     case "message":
                         console.log(msg.data);
                         break;
@@ -150,6 +159,9 @@ function WebSocketHandler(dispatcher, target, scoreLoaded) {
         });
     }
 
+    self.reload = function () {
+        self.emit({event: "reload"});
+    };
     self.start = function () {
         self.emit({event: "start"});
     };

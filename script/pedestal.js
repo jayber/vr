@@ -1,4 +1,12 @@
-function Pedestal(eventDispatcher, scheduler, soundSettings, markers) {
+function Pedestal(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, instruments) {
+
+    AFRAME.registerComponent('reset', {
+        init: function () {
+            this.el.addEventListener("click", function () {
+                eventDispatcher.reload();
+            });
+        }
+    });
 
     AFRAME.registerComponent('bpm-change', {
         schema: {type: 'string'},
