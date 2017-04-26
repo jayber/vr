@@ -1,7 +1,5 @@
 function ScoreLoader(settings) {
-
     var self = this;
-
     var readableScore = {
         "bpm": 130,
         "beats": 4,
@@ -16,6 +14,10 @@ function ScoreLoader(settings) {
 
     var beatExp = /(\d*):(\d*)\/(\d*)/;
 
+    function convertTimeToCount(beat, seg) {
+        return Math.round((settings.segmentsPerBeat * beat) + seg);
+    }
+
     function parseTimes(times) {
         var parsedTimes = [];
         times.forEach(function (time) {
@@ -24,7 +26,7 @@ function ScoreLoader(settings) {
             var nom = capture[2];
             var denom = capture[3];
             var seg = (settings.segmentsPerBeat / denom) * nom;
-            var element = {beat: beat, seg: seg, count: settings.convertTimeToCount(beat, seg)};
+            var element = {beat: beat, seg: seg, count: convertTimeToCount(beat, seg)};
             parsedTimes.push(element);
         });
         return parsedTimes;
@@ -35,9 +37,7 @@ function ScoreLoader(settings) {
         var sources = [];
         Object.keys(readableScore.instrumentParts).forEach(function (key, index) {
             var instrumentPart = readableScore.instrumentParts[key];
-            instrumentPart.name = key;
-            instrumentPart.parsedTimes = parseTimes(instrumentPart.times);
-            playableScore.registerInstrument(key, instrumentPart.parsedTimes, instrumentPart.src);
+            playableScore.registerInstrument(key, parseTimes(instrumentPart.times), instrumentPart.src);
             sources.push(instrumentPart.src);
         });
 
@@ -50,9 +50,7 @@ function ScoreLoader(settings) {
 }
 
 function PlayableScore(settings, bpm, beats) {
-
     var self = this;
-
     self.bpm = bpm;
     self.beats = beats;
     self.totalSegments = settings.segmentsPerBeat * self.beats;

@@ -32,7 +32,6 @@ function EventDispatcher(scheduler, instruments, scoreLoader) {
     self.removePlayTrigger = function (instrumentIndex, count, elementId) {
         self.target.removePlayTrigger(instrumentIndex, count, elementId);
     }
-
 }
 
 function LocalEventTarget(scheduler, instruments, scoreLoader) {
@@ -68,10 +67,10 @@ function WebSocketHandler(dispatcher, target, scoreLoaded) {
     var self = this;
     var host = window.location.host;
     var spaceId = altspace.getSpace().then(function (space) {
-        return space.sid
+        return space.sid;
     });
     var userId = altspace.getUser().then(function (user) {
-        return user.userId
+        return user.userId + ":" + user.displayName;
     });
     var ws;
     var tries = 1;

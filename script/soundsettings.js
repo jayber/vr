@@ -28,10 +28,6 @@ function SoundSettings() {
         });
     };
 
-    self.convertTimeToCount = function (beat, seg) {
-        return Math.round((self.segmentsPerBeat * beat) + seg);
-    };
-
     self.play = function (src) {
         var source = self.audioCtx.createBufferSource();
         source.buffer = self.soundBuffersMap[src];

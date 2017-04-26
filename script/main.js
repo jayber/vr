@@ -3,11 +3,11 @@ function reportException(e) {
     altspace.getUser().then(function (user) {
         try {
             if (e.error) {
-                data = {userId: user.userId, message: e.error.message, stack: e.error.stack};
+                data = {userId: user.userId + ":" + user.displayName, message: e.error.message, stack: e.error.stack};
             } else if (e.message) {
-                data = {userId: user.userId, message: e.message, stack: ""};
+                data = {userId: user.userId + ":" + user.displayName, message: e.message, stack: ""};
             } else {
-                e.userId = user.userId;
+                e.userId = user.userId + "-" + user.displayName;
                 data = JSON.stringify(e);
             }
             $.get("error", data);
