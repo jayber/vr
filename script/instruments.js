@@ -24,7 +24,7 @@ function Instruments(scoreLoader) {
     };
 }
 
-function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler) {
+function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler, animations) {
 
     AFRAME.registerComponent('instrument', {
         schema: {type: 'string'},
@@ -73,28 +73,17 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
         },
 
         listenToSchedule: function (color, el, self) {
-            self.flasherElements = [el];
-            self.flash = function (target) {
-                self.flasherElements.push(target);
-            };
+            animations.registerMasterFlasher(self.data, color, el);
 
             scheduler.addInstrumentListener(self.data, function () {
-                self.dispatchFlash(self)
+                animations.flash(self.data);
             }, function () {
-                self.dispatchUnflash(self, color)
+                animations.unflash(self.data);
             });
         },
 
-        dispatchFlash: function (self) {
-            self.flasherElements.forEach(function (target) {
-                target.setAttribute('material', 'color', "#fff");
-            });
-        },
-
-        dispatchUnflash: function (self, color) {
-            self.flasherElements.forEach(function (target) {
-                target.setAttribute('material', 'color', color);
-            });
+        flash: function (target) {
+            animations.registerSlaveFlasher(this.data, target);
         },
 
         createCable: function (el) {

@@ -17,6 +17,7 @@ function AudioAndAnimationScheduler(soundSettings) {
     const listeners = {};
     var instrumentListeners = {};
     var offStack = [];
+    const lastInstrumentSources = {};
 
     function getGrain() {
         if (isGearVR()) {
@@ -75,6 +76,16 @@ function AudioAndAnimationScheduler(soundSettings) {
         }
     };
 
+    function playAndSchedule() {
+        const offset = segmentsPerBatch * self.score.getSegmentDuration();
+        const elapsedTime = audioCtx.currentTime - startTime;
+        scheduleSounds(elapsedTime, offset);
+        fireSegmentEvents(elapsedTime, offset);
+        if (isRunning) {
+            window.requestAnimationFrame(playAndSchedule);
+        }
+    }
+
     function dispatch(type, param) {
         if (!(type in listeners)) {
             return true;
@@ -106,16 +117,6 @@ function AudioAndAnimationScheduler(soundSettings) {
         }
     }
 
-    function playAndSchedule() {
-        const offset = segmentsPerBatch * self.score.getSegmentDuration();
-        const elapsedTime = audioCtx.currentTime - startTime;
-        scheduleSounds(elapsedTime, offset);
-        fireSegmentEvents(elapsedTime, offset);
-        if (isRunning) {
-            window.requestAnimationFrame(playAndSchedule);
-        }
-    }
-
     function scheduleSounds(elapsedTime, offset) {
         while (scheduleTime < elapsedTime) {
             const nextIndex = playedCount % self.score.totalSegments;
@@ -144,6 +145,9 @@ function AudioAndAnimationScheduler(soundSettings) {
             var pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             while (pendingNextSegmentTime < elapsedTime) {
                 dispatchInstrumentOn(count % self.score.totalSegments);
+                if (count % soundSettings.segmentsPerBeat == 0) {
+                    dispatch("beat", count);
+                }
                 count++;
                 pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
             }
@@ -164,11 +168,16 @@ function AudioAndAnimationScheduler(soundSettings) {
                     var when = startTime + offset + (i * self.score.getSegmentDuration() );
                     if (when > audioCtx.currentTime) {
                         if (!soundSettings.mute) {
+                            var oldSource = lastInstrumentSources[instrumentName];
+                            if (oldSource) {
+                                oldSource.stop(when);
+                            }
                             var source = audioCtx.createBufferSource();
                             source.buffer = soundSettings.soundBuffersMap[instrument.src];
                             source.connect(soundSettings.output);
                             source.start(when);
                             sourcesToCancel.push(source);
+                            lastInstrumentSources[instrumentName] = source;
                         }
                     }
                 });

@@ -1,8 +1,8 @@
-function EventDispatcher(scheduler, instruments, scoreLoader) {
+function EventDispatcher(scheduler, instruments, scoreLoader, animations) {
     var self = this;
     var loaded = scoreLoader.loaded;
 
-    self.target = new LocalEventTarget(scheduler, instruments, scoreLoader);
+    self.target = new LocalEventTarget(scheduler, instruments, scoreLoader, animations);
 
     try {
         new WebSocketHandler(self, self.target, loaded);
@@ -11,6 +11,9 @@ function EventDispatcher(scheduler, instruments, scoreLoader) {
         console.log("continuing in single player mode");
     }
 
+    self.toggleDiscoMode = function () {
+        self.target.toggleDiscoMode();
+    };
     self.reload = function () {
         self.target.reload();
     };
@@ -34,10 +37,13 @@ function EventDispatcher(scheduler, instruments, scoreLoader) {
     }
 }
 
-function LocalEventTarget(scheduler, instruments, scoreLoader) {
+function LocalEventTarget(scheduler, instruments, scoreLoader, animations) {
     var self = this;
     self.start = function () {
         scheduler.start(scoreLoader.score);
+    };
+    self.toggleDiscoMode = function () {
+        animations.discoMode = !animations.discoMode;
     };
     self.reload = function () {
         scheduler.stop();
@@ -150,6 +156,10 @@ function WebSocketHandler(dispatcher, target, scoreLoaded) {
                         console.log("ws received:reload");
                         target.reload();
                         break;
+                    case "toggleDiscoMode":
+                        console.log("ws received:toggleDiscoMode");
+                        target.toggleDiscoMode();
+                        break;
                     case "message":
                         console.log(msg.data);
                         break;
@@ -158,6 +168,9 @@ function WebSocketHandler(dispatcher, target, scoreLoaded) {
         });
     }
 
+    self.toggleDiscoMode = function () {
+        self.emit({event: "toggleDiscoMode"});
+    };
     self.reload = function () {
         self.emit({event: "reload"});
     };
