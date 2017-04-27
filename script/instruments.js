@@ -3,11 +3,8 @@ function Instruments(scoreLoader) {
     self.instruments = [];
 
     self.remove = function (instrumentIndex, count, elementId) {
-        var subElement = document.querySelector("#" + elementId);
-        document.querySelector("#clock-face").removeChild(subElement);
-        self.instruments[instrumentIndex].removeTime(count);
-        var index = self.instruments[instrumentIndex].markers.indexOf(subElement);
-        self.instruments[instrumentIndex].markers.splice(index, 1);
+        var instrument = self.instruments[instrumentIndex];
+        instrument.removeTrigger(elementId, count);
     };
 
     self.add = function (data) {
@@ -48,6 +45,14 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
             scoreLoader.score.addInstrumentTrigger(data.count, this.data);
         },
 
+        removeTrigger: function (elementId, count) {
+            var subElement = document.querySelector("#" + elementId);
+            document.querySelector("#clock-face").removeChild(subElement);
+            scoreLoader.score.removeInstrumentTrigger(count, this.data);
+            var index = this.markers.indexOf(subElement);
+            this.markers.splice(index, 1);
+        },
+
         makeClickable: function (self, el, color) {
             el.setAttribute("altspace-cursor-collider");
             el.addEventListener("click", function () {
@@ -57,10 +62,6 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
                     self.dispatchUnflash(self, color);
                 }, 150);
             });
-        },
-
-        removeTime: function (count) {
-            scoreLoader.score.removeInstrumentTrigger(count, this.data);
         },
 
         generateMarkers: function (times) {

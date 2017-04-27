@@ -36,6 +36,6 @@ window.addEventListener('error', function (e) {
     var eventDispatcher = new EventDispatcher(scheduler, instruments, scoreLoader);
     var markers = new Markers(eventDispatcher, scoreLoader);
     InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler);
-    CockpitComponents(soundSettings);
     PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader);
+    CockpitComponents(soundSettings);
 })();
