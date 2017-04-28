@@ -7,8 +7,8 @@ function ScoreLoader(settings) {
             "kick": {src: "audio/kick2.wav", times: ["0:0/4", "0:2/4", "2:7/16", "2:7/8"]},
             "hat": {src: "audio/hat2.wav", times: ["0:2/4", "1:2/4", "2:2/4", "3:2/4"]},
             "snare": {src: "audio/snare2.wav", times: ["1:0/4", "2:1/4", "3:0/4"]},
-            "bork": {src: "audio/guitar.wav", times: []},
-            "beep": {src: "audio/siren.wav", times: []}
+            "bork": {src: "audio/yo.wav", times: []},
+            "beep": {src: "audio/truck.wav", times: []}
         }
     };
 
