@@ -139,19 +139,21 @@ function AnimationManager(scheduler, settings) {
     var discoColors;
 
     scheduler.addEventListener("beat", function (count) {
-        if (isDisco) {
-            if (count != 0 && Math.floor((count / settings.segmentsPerBeat) % 8) == 0) {
-                mode2 = !mode2;
-            }
-            if (mode2) {
-                currentColor = (currentColor + 1) % colors.length;
-                var i = colors.length - 1;
-                discoColors = {};
-                Object.keys(flashers).forEach(function (key) {
-                    discoColors[key] = (i + currentColor) % colors.length;
-                    changeColor(colors[discoColors[key]], flashers[key].elements);
-                    i--;
-                })
+        if (!isGearVR()) {
+            if (isDisco) {
+                if (count != 0 && Math.floor((count / settings.segmentsPerBeat) % 8) == 0) {
+                    mode2 = !mode2;
+                }
+                if (mode2) {
+                    currentColor = (currentColor + 1) % colors.length;
+                    var i = colors.length - 1;
+                    discoColors = {};
+                    Object.keys(flashers).forEach(function (key) {
+                        discoColors[key] = (i + currentColor) % colors.length;
+                        changeColor(colors[discoColors[key]], flashers[key].elements);
+                        i--;
+                    })
+                }
             }
         }
     });
@@ -159,13 +161,15 @@ function AnimationManager(scheduler, settings) {
     Object.defineProperty(self, 'discoMode', {
         set: function (value) {
             isDisco = value;
-            if (!isDisco) {
-                Object.keys(flashers).forEach(function (key) {
-                    changeColor(flashers[key].color, flashers[key].elements);
-                });
-                self.discoButton.setAttribute('material', 'color', '#fff');
-            } else {
-                self.discoButton.setAttribute('material', 'color', '#0f0');
+            if (!isGearVR()) {
+                if (!isDisco) {
+                    Object.keys(flashers).forEach(function (key) {
+                        changeColor(flashers[key].color, flashers[key].elements);
+                    });
+                    self.discoButton.setAttribute('material', 'color', '#fff');
+                } else {
+                    self.discoButton.setAttribute('material', 'color', '#0f0');
+                }
             }
         }, get: function () {
             return isDisco;
@@ -192,27 +196,31 @@ function AnimationManager(scheduler, settings) {
     };
 
     self.flash = function (name) {
-        var namedFlashers = flashers[name];
-        changeColor("#fff", namedFlashers.elements);
+        if (!isGearVR()) {
+            var namedFlashers = flashers[name];
+            changeColor("#fff", namedFlashers.elements);
+        }
     };
 
     self.unflash = function (name) {
-        var namedFlashers = flashers[name];
-        if (self.discoMode) {
-            Object.keys(flashers).forEach(function (key) {
-                var color;
-                if (mode2) {
-                    color = colors[discoColors[key]];
-                } else {
-                    color = namedFlashers.color
-                }
-                changeColor(color, flashers[key].elements);
-                if (self.discoButton) {
-                    self.discoButton.setAttribute('material', 'color', color);
-                }
-            })
-        } else {
-            changeColor(namedFlashers.color, namedFlashers.elements);
+        if (!isGearVR()) {
+            var namedFlashers = flashers[name];
+            if (self.discoMode) {
+                Object.keys(flashers).forEach(function (key) {
+                    var color;
+                    if (mode2) {
+                        color = colors[discoColors[key]];
+                    } else {
+                        color = namedFlashers.color
+                    }
+                    changeColor(color, flashers[key].elements);
+                    if (self.discoButton) {
+                        self.discoButton.setAttribute('material', 'color', color);
+                    }
+                })
+            } else {
+                changeColor(namedFlashers.color, namedFlashers.elements);
+            }
         }
     };
 
