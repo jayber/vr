@@ -6,7 +6,7 @@ function CockpitComponents(soundSettings, animations) {
             var self = this;
             if (!animations.animations) {
                 el.setAttribute("material", "src", "#animationsOn");
-                el.setAttribute("color", "#aaa");
+                el.setAttribute("color", "#999");
             }
             el.addEventListener("click", function (event) {
                 animations.toggleAnimations();
@@ -15,7 +15,7 @@ function CockpitComponents(soundSettings, animations) {
                     el.setAttribute("color", "#fff");
                 } else {
                     el.setAttribute("material", "src", "#animationsOn");
-                    el.setAttribute("color", "#aaa");
+                    el.setAttribute("color", "#999");
                 }
             });
         }
@@ -30,7 +30,7 @@ function CockpitComponents(soundSettings, animations) {
                 soundSettings.mute = !soundSettings.mute;
                 if (soundSettings.mute) {
                     el.setAttribute("material", "src", "#unmute");
-                    el.setAttribute("color", "#aaa");
+                    el.setAttribute("color", "#999");
 
                 } else {
                     el.setAttribute("material", "src", "#mute");
