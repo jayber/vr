@@ -1,4 +1,4 @@
-function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader) {
+function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations) {
 
     AFRAME.registerComponent('reset', {
         init: function () {
@@ -8,8 +8,17 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
         }
     });
 
+    AFRAME.registerComponent('double-up', {
+        init: function () {
+            this.el.addEventListener("click", function () {
+                eventDispatcher.doubleUp();
+            });
+        }
+    });
+
     AFRAME.registerComponent('disco-mode', {
         init: function () {
+            animations.discoButton = this.el;
             this.el.addEventListener("click", function () {
                 eventDispatcher.toggleDiscoMode();
             });
@@ -109,10 +118,9 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
         init: function () {
             var self = this;
             var el = this.el;
-            self.degreesPerBeat = (360 / scoreLoader.score.beats);
-            self.degreesPerSeg = self.degreesPerBeat / soundSettings.segmentsPerBeat;
             scheduler.addEventListener("time", function (count) {
-                var currentDegrees = count * self.degreesPerSeg;
+                var degreesPerSeg = ((360 / scoreLoader.score.beats)) / soundSettings.segmentsPerBeat;
+                var currentDegrees = count * degreesPerSeg;
                 el.setAttribute("theta-start", currentDegrees + 0.05);    //OMFG i have no idea why i have to add this little number, but if i don't, it doesn't work!!
                 //console.log(el.getAttribute("theta-length") + "; current="+currentDegrees+" - beat="+event.detail.beatCount + "; seg="+event.detail.seg);
             });
@@ -121,7 +129,7 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
 }
 
 
-function AnimationManager(scheduler, scoreLoader, settings) {
+function AnimationManager(scheduler, settings) {
     var flashers = {};
     var self = this;
     var isDisco;
@@ -132,17 +140,17 @@ function AnimationManager(scheduler, scoreLoader, settings) {
 
     scheduler.addEventListener("beat", function (count) {
         if (isDisco) {
-            if (count != 0 && Math.floor((count / settings.segmentsPerBeat) % (2 * scoreLoader.score.beats)) == 0) {
+            if (count != 0 && Math.floor((count / settings.segmentsPerBeat) % 8) == 0) {
                 mode2 = !mode2;
             }
             if (mode2) {
                 currentColor = (currentColor + 1) % colors.length;
-                var i = 0;
+                var i = colors.length - 1;
                 discoColors = {};
                 Object.keys(flashers).forEach(function (key) {
                     discoColors[key] = (i + currentColor) % colors.length;
                     changeColor(colors[discoColors[key]], flashers[key].elements);
-                    i++;
+                    i--;
                 })
             }
         }
@@ -154,7 +162,10 @@ function AnimationManager(scheduler, scoreLoader, settings) {
             if (!isDisco) {
                 Object.keys(flashers).forEach(function (key) {
                     changeColor(flashers[key].color, flashers[key].elements);
-                })
+                });
+                self.discoButton.setAttribute('material', 'color', '#fff');
+            } else {
+                self.discoButton.setAttribute('material', 'color', '#0f0');
             }
         }, get: function () {
             return isDisco;
@@ -196,6 +207,9 @@ function AnimationManager(scheduler, scoreLoader, settings) {
                     color = namedFlashers.color
                 }
                 changeColor(color, flashers[key].elements);
+                if (self.discoButton) {
+                    self.discoButton.setAttribute('material', 'color', color);
+                }
             })
         } else {
             changeColor(namedFlashers.color, namedFlashers.elements);

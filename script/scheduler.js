@@ -46,7 +46,6 @@ function AudioAndAnimationScheduler(soundSettings) {
 
     self.start = function (score) {
         console.log("Scheduler.start");
-        self.score = score;
 
         count = 0;
         playedCount = 0;
@@ -56,7 +55,7 @@ function AudioAndAnimationScheduler(soundSettings) {
         startTime = audioCtx.currentTime;
         isRunning = true;
 
-        playAndSchedule();
+        playAndSchedule(score);
         dispatch("start");
     };
 
@@ -76,13 +75,15 @@ function AudioAndAnimationScheduler(soundSettings) {
         }
     };
 
-    function playAndSchedule() {
-        const offset = segmentsPerBatch * self.score.getSegmentDuration();
+    function playAndSchedule(score) {
+        const offset = segmentsPerBatch * score.getSegmentDuration();
         const elapsedTime = audioCtx.currentTime - startTime;
-        scheduleSounds(elapsedTime, offset);
-        fireSegmentEvents(elapsedTime, offset);
+        scheduleSounds(elapsedTime, offset, score);
+        fireSegmentEvents(elapsedTime, offset, score);
         if (isRunning) {
-            window.requestAnimationFrame(playAndSchedule);
+            window.requestAnimationFrame(function () {
+                playAndSchedule(score)
+            });
         }
     }
 
@@ -96,11 +97,11 @@ function AudioAndAnimationScheduler(soundSettings) {
         }
     }
 
-    function dispatchInstrumentOn(count) {
-        if (self.score.instrumentList[count] == undefined) {
+    function dispatchInstrumentOn(count, score) {
+        if (score.triggersByTime[count] == undefined) {
             return true;
         }
-        var stack = self.score.instrumentList[count];
+        var stack = score.triggersByTime[count];
         for (var i = 0, l = stack.length; i < l; i++) {
             instrumentListeners[stack[i]].on.forEach(function (listener) {
                 listener.call(self, count);
@@ -117,55 +118,55 @@ function AudioAndAnimationScheduler(soundSettings) {
         }
     }
 
-    function scheduleSounds(elapsedTime, offset) {
+    function scheduleSounds(elapsedTime, offset, score) {
         while (scheduleTime < elapsedTime) {
-            const nextIndex = playedCount % self.score.totalSegments;
+            const nextIndex = playedCount % score.totalSegments;
             const toIndex = nextIndex + segmentsPerBatch;
-            const accumulatedOffset = offset + (self.score.getSegmentDuration() * self.score.totalSegments * Math.floor(playedCount / self.score.totalSegments));
+            const accumulatedOffset = offset + (score.getSegmentDuration() * score.totalSegments * Math.floor(playedCount / score.totalSegments));
 
-            scheduleTriggerBatch(nextIndex, toIndex, accumulatedOffset);
+            scheduleTriggerBatch(nextIndex, toIndex, accumulatedOffset, score);
 
             playedCount += segmentsPerBatch;
             scheduleTime += offset;
         }
     }
 
-    function calcNextSegmentTime(offset, count) {
-        return (count * self.score.getSegmentDuration()) + offset;
+    function calcNextSegmentTime(offset, count, score) {
+        return (count * score.getSegmentDuration()) + offset;
     }
 
-    function fireSegmentEvents(elapsedTime, offset) {
+    function fireSegmentEvents(elapsedTime, offset, score) {
         if (offStack.length > 0 && ((elapsedTime - segmentOffTime) > timeOnLength)) {
             dispatchInstrumentOff();
             segmentOffTime = elapsedTime;
         }
 
-        var nextSegmentTime = calcNextSegmentTime(offset, count);
+        var nextSegmentTime = calcNextSegmentTime(offset, count, score);
         if (nextSegmentTime < elapsedTime) {
-            var pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
+            var pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1, score);
             while (pendingNextSegmentTime < elapsedTime) {
-                dispatchInstrumentOn(count % self.score.totalSegments);
+                dispatchInstrumentOn(count % score.totalSegments, score);
                 if (count % soundSettings.segmentsPerBeat == 0) {
                     dispatch("beat", count);
                 }
                 count++;
-                pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1);
+                pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1, score);
             }
             if (count % timeEventGranularity == 0) {
-                dispatch("time", count % self.score.totalSegments);
+                dispatch("time", count % score.totalSegments);
             }
-            dispatchInstrumentOn(count % self.score.totalSegments);
+            dispatchInstrumentOn(count % score.totalSegments, score);
         }
     }
 
-    function scheduleTriggerBatch(from, to, offset) {
+    function scheduleTriggerBatch(from, to, offset, score) {
         sourcesToCancel = [];
         for (var i = from; i < to; i++) {
-            var instrumentNames = self.score.instrumentList[i];
+            var instrumentNames = score.triggersByTime[i];
             if (instrumentNames != undefined && instrumentNames.length > 0) {
                 instrumentNames.forEach(function (instrumentName) {
-                    var instrument = self.score.instruments[instrumentName];
-                    var when = startTime + offset + (i * self.score.getSegmentDuration() );
+                    var instrument = score.instruments[instrumentName];
+                    var when = startTime + offset + (i * score.getSegmentDuration() );
                     if (when > audioCtx.currentTime) {
                         if (!soundSettings.mute) {
                             var oldSource = lastInstrumentSources[instrumentName];

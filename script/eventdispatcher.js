@@ -11,6 +11,9 @@ function EventDispatcher(scheduler, instruments, scoreLoader, animations) {
         console.log("continuing in single player mode");
     }
 
+    self.doubleUp = function () {
+        self.target.doubleUp();
+    };
     self.toggleDiscoMode = function () {
         self.target.toggleDiscoMode();
     };
@@ -41,6 +44,10 @@ function LocalEventTarget(scheduler, instruments, scoreLoader, animations) {
     var self = this;
     self.start = function () {
         scheduler.start(scoreLoader.score);
+    };
+    self.doubleUp = function () {
+        scoreLoader.score.doubleUp();
+        instruments.reload();
     };
     self.toggleDiscoMode = function () {
         animations.discoMode = !animations.discoMode;
@@ -160,6 +167,10 @@ function WebSocketHandler(dispatcher, target, scoreLoaded) {
                         console.log("ws received:toggleDiscoMode");
                         target.toggleDiscoMode();
                         break;
+                    case "doubleUp":
+                        console.log("ws received:doubleUp");
+                        target.doubleUp();
+                        break;
                     case "message":
                         console.log(msg.data);
                         break;
@@ -168,6 +179,9 @@ function WebSocketHandler(dispatcher, target, scoreLoaded) {
         });
     }
 
+    self.doubleUp = function () {
+        self.emit({event: "doubleUp"});
+    };
     self.toggleDiscoMode = function () {
         self.emit({event: "toggleDiscoMode"});
     };

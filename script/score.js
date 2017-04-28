@@ -53,13 +53,36 @@ function PlayableScore(settings, bpm, beats) {
     var self = this;
     self.bpm = bpm;
     self.beats = beats;
-    self.totalSegments = settings.segmentsPerBeat * self.beats;
+
+    Object.defineProperty(self, 'totalSegments', {
+        get: function () {
+            return settings.segmentsPerBeat * self.beats;
+        }
+    });
 
     self.instruments = {};
-    self.instrumentList = [self.totalSegments];
+    self.triggersByTime = [self.totalSegments];
     for (var i = 0; i < self.totalSegments; i++) {
-        self.instrumentList[i] = [];
+        self.triggersByTime[i] = [];
     }
+
+    self.doubleUp = function () {
+        var j = 0;
+        for (var i = self.triggersByTime.length; i < self.totalSegments * 2; i++) {
+            var elements = self.triggersByTime[j++];
+            self.triggersByTime[i] = [];
+            elements.forEach(function (element) {
+                self.triggersByTime[i].push(element);
+            });
+        }
+        Object.keys(self.instruments).forEach(function (key) {
+            var totalTimes = self.instruments[key].times.length;
+            for (var i = 0; i < totalTimes; i++) {
+                self.instruments[key].times[i + totalTimes] = {count: self.instruments[key].times[i].count + self.totalSegments};
+            }
+        });
+        self.beats = self.beats * 2;
+    };
 
     self.getSegmentDuration = function () {
         return 60 / self.bpm / settings.segmentsPerBeat;
@@ -92,19 +115,29 @@ function PlayableScore(settings, bpm, beats) {
     self.registerInstrument = function (name, times, src) {
         self.instruments[name] = {name: name, times: times, src: src};
         times.forEach(function (time) {
-            self.addInstrumentTrigger(time.count, name);
+            addTriggerTime(time.count, name);
         });
     };
 
-    self.removeInstrumentTrigger = function (count, instrument) {
-        var index = self.instrumentList[count].indexOf(instrument);
-        self.instrumentList[count].splice(index, 1);
+    self.removeInstrumentTrigger = function (count, instrumentName) {
+        var index = self.triggersByTime[count].indexOf(instrumentName);
+        self.triggersByTime[count].splice(index, 1);
+
+        var indexToo = self.instruments[instrumentName].times.findIndex(function (element) {
+            return element.count == count;
+        });
+        self.instruments[instrumentName].times.splice(indexToo, 1);
     };
 
-    self.addInstrumentTrigger = function (count, instrumentName) {
-        var index = self.instrumentList[count].indexOf(instrumentName);
+    function addTriggerTime(count, instrumentName) {
+        var index = self.triggersByTime[count].indexOf(instrumentName);
         if (index < 0) {
-            self.instrumentList[count].push(instrumentName);
+            self.triggersByTime[count].push(instrumentName);
         }
+    }
+
+    self.addInstrumentTrigger = function (count, instrumentName) {
+        addTriggerTime(count, instrumentName);
+        self.instruments[instrumentName].times.push({count: count})
     };
 }

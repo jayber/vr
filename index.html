@@ -40,6 +40,7 @@
         <img id="cloud-texture" src="img/cloud.jpg">
         <img id="play-texture" src="img/play.png">
         <img id="reset-texture" src="img/reset.png">
+        <img id="double-up-texture" src="img/double-up.png">
         <img id="disco-texture" src="img/disco.png">
         <img id="cable-texture" src="img/cable_stripe.png">
         <img id="up-arrow" src="img/up_arrow.png">
@@ -88,8 +89,9 @@
     <!--<a-entity id="root" position="3.5 0 -7">-->
     <a-entity id="root">
 
-        <a-cylinder material="src:#galv-texture;" height="0.9" position="0 0.5 0" color="#556" radius="0.3">
+        <a-cylinder material="src:#galv-texture;" height="1" position="0 0.5 0" color="#556" radius="0.3">
             <a-sphere reset position="-0.15 0.37 0.26" radius="0.03" material="src:#reset-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
+            <a-sphere double-up position="0 0.475 0.3" radius="0.03" material="src:#double-up-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
             <a-sphere playable position="0 0.3 0.3" radius="0.1" material="src:#play-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
             <a-sphere disco-mode position="0.15 0.37 0.26" radius="0.03" material="src:#disco-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
         </a-cylinder>
