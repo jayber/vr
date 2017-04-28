@@ -18,7 +18,7 @@ function reportException(e) {
 
 function serverLog(message) {
     altspace.getUser().then(function (user) {
-        $.get("log", {userId: user.userId, message: message});
+        $.get("log", {userId: user.userId + ":" + user.displayName, message: message});
     });
 }
 
@@ -37,6 +37,6 @@ window.addEventListener('error', function (e) {
     var eventDispatcher = new EventDispatcher(scheduler, instruments, scoreLoader, animations);
     var markers = new Markers(eventDispatcher, scoreLoader);
     InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler, animations);
-    PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations);
+    PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader);
     CockpitComponents(soundSettings);
 })();

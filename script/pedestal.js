@@ -1,4 +1,4 @@
-function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations) {
+function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader) {
 
     AFRAME.registerComponent('reset', {
         init: function () {
