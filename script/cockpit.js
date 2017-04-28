@@ -1,4 +1,25 @@
-function CockpitComponents(soundSettings) {
+function CockpitComponents(soundSettings, animations) {
+
+    AFRAME.registerComponent('animations-toggle', {
+        init: function () {
+            var el = this.el;
+            var self = this;
+            if (!animations.animations) {
+                el.setAttribute("material", "src", "#animationsOn");
+                el.setAttribute("color", "#aaa");
+            }
+            el.addEventListener("click", function (event) {
+                animations.toggleAnimations();
+                if (animations.animations) {
+                    el.setAttribute("material", "src", "#animationsOff");
+                    el.setAttribute("color", "#fff");
+                } else {
+                    el.setAttribute("material", "src", "#animationsOn");
+                    el.setAttribute("color", "#aaa");
+                }
+            });
+        }
+    });
 
     AFRAME.registerComponent('mute', {
         init: function () {

@@ -138,8 +138,10 @@ function AnimationManager(scheduler, settings) {
     var mode2 = false;
     var discoColors;
 
+    var animationsOn = !isGearVR();
+
     scheduler.addEventListener("beat", function (count) {
-        if (!isGearVR()) {
+        if (animationsOn) {
             if (isDisco) {
                 if (count != 0 && Math.floor((count / settings.segmentsPerBeat) % 8) == 0) {
                     mode2 = !mode2;
@@ -158,15 +160,19 @@ function AnimationManager(scheduler, settings) {
         }
     });
 
+    function resetColors() {
+        Object.keys(flashers).forEach(function (key) {
+            changeColor(flashers[key].color, flashers[key].elements);
+        });
+        self.discoButton.setAttribute('material', 'color', '#fff');
+    }
+
     Object.defineProperty(self, 'discoMode', {
         set: function (value) {
             isDisco = value;
-            if (!isGearVR()) {
+            if (animationsOn) {
                 if (!isDisco) {
-                    Object.keys(flashers).forEach(function (key) {
-                        changeColor(flashers[key].color, flashers[key].elements);
-                    });
-                    self.discoButton.setAttribute('material', 'color', '#fff');
+                    resetColors();
                 } else {
                     self.discoButton.setAttribute('material', 'color', '#0f0');
                 }
@@ -175,6 +181,19 @@ function AnimationManager(scheduler, settings) {
             return isDisco;
         }
     });
+
+    Object.defineProperty(self, 'animations', {
+        get: function () {
+            return animationsOn;
+        }
+    });
+
+    self.toggleAnimations = function () {
+        animationsOn = !animationsOn;
+        if (!animationsOn) {
+            resetColors();
+        }
+    };
 
     self.registerSlaveFlasher = function (name, element) {
         var namedFlashers = flashers[name];
@@ -196,14 +215,14 @@ function AnimationManager(scheduler, settings) {
     };
 
     self.flash = function (name) {
-        if (!isGearVR()) {
+        if (animationsOn) {
             var namedFlashers = flashers[name];
             changeColor("#fff", namedFlashers.elements);
         }
     };
 
     self.unflash = function (name) {
-        if (!isGearVR()) {
+        if (animationsOn) {
             var namedFlashers = flashers[name];
             if (self.discoMode) {
                 Object.keys(flashers).forEach(function (key) {
