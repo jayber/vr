@@ -27,10 +27,10 @@ function makeSceneLoadedPromise() {
         $(function () {
             var sceneEl = document.querySelector("a-scene");
             if (sceneEl.hasLoaded) {
-                resolve("success");
+                resolve(sceneEl);
             } else {
                 sceneEl.addEventListener("loaded", function () {
-                    resolve("success");
+                    resolve(sceneEl);
                 });
             }
         });

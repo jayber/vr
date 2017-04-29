@@ -87,15 +87,22 @@ function WebSocketHandler(dispatcher, target, scoreLoaded, sceneLoaded) {
     });
     var ws;
     var tries = 1;
-    init();
+    var demoId = getUrlParameter("demo");
 
-    function init() {
-        if (ws != undefined) {
-            ws.close();
-        }
+    function emitUnguarded(message) {
+        ws.send(JSON.stringify(message));
+    }
 
-        Promise.all([spaceId, userId, scoreLoaded, sceneLoaded]).then(function (values) {
-            ws = new WebSocket("ws://" + host + "/ws/" + values[0] + "/" + values[1]);
+    Promise.all([spaceId, userId, scoreLoaded, sceneLoaded]).then(function (values) {
+        init();
+        function init() {
+            var spaceId = values[0];
+            var userId = values[1];
+            if (ws != undefined) {
+                ws.close();
+            }
+
+            ws = new WebSocket("ws://" + host + "/ws/" + spaceId + "/" + userId);
 
             ws.onclose = function () {
                 if (tries < 500) {
@@ -116,7 +123,7 @@ function WebSocketHandler(dispatcher, target, scoreLoaded, sceneLoaded) {
             ws.onopen = function () {
                 dispatcher.target = self;
                 console.log("ws opened");
-                self.emit({event: "unroll"});
+                emitUnguarded({event: "unroll"});
             };
 
             ws.onerror = function (error) {
@@ -169,41 +176,43 @@ function WebSocketHandler(dispatcher, target, scoreLoaded, sceneLoaded) {
                         break;
                 }
             };
-        });
-    }
 
-    self.doubleUp = function () {
-        self.emit({event: "doubleUp"});
-    };
-    self.toggleDiscoMode = function () {
-        self.emit({event: "toggleDiscoMode"});
-    };
-    self.reload = function () {
-        self.emit({event: "reload"});
-    };
-    self.start = function () {
-        self.emit({event: "start"});
-    };
-    self.stop = function () {
-        self.emit({event: "stop"});
-    };
-    self.incrementBpm = function () {
-        self.emit({event: "incrementBpm"});
-    };
-    self.decrementBpm = function () {
-        self.emit({event: "decrementBpm"});
-    };
-    self.addPlayTrigger = function (data) {
-        self.emit({event: "addPlayTrigger", data: data});
-    };
-    self.removePlayTrigger = function (instrumentIndex, count, elementId) {
-        self.emit({
-            event: "removePlayTrigger",
-            data: {instrumentIndex: instrumentIndex, count: count, elementId: elementId}
-        });
-    };
+            self.doubleUp = function () {
+                self.emit({event: "doubleUp"});
+            };
+            self.toggleDiscoMode = function () {
+                self.emit({event: "toggleDiscoMode"});
+            };
+            self.reload = function () {
+                self.emit({event: "reload"});
+            };
+            self.start = function () {
+                self.emit({event: "start"});
+            };
+            self.stop = function () {
+                self.emit({event: "stop"});
+            };
+            self.incrementBpm = function () {
+                self.emit({event: "incrementBpm"});
+            };
+            self.decrementBpm = function () {
+                self.emit({event: "decrementBpm"});
+            };
+            self.addPlayTrigger = function (data) {
+                self.emit({event: "addPlayTrigger", data: data});
+            };
+            self.removePlayTrigger = function (instrumentIndex, count, elementId) {
+                self.emit({
+                    event: "removePlayTrigger",
+                    data: {instrumentIndex: instrumentIndex, count: count, elementId: elementId}
+                });
+            };
 
-    self.emit = function (message) {
-        ws.send(JSON.stringify(message));
-    };
+            self.emit = function (message) {
+                if (!demoId || demoId == userId) {
+                    emitUnguarded(message);
+                }
+            };
+        }
+    });
 }
