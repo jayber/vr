@@ -24,7 +24,7 @@ function Instruments(scoreLoader) {
     };
 }
 
-function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler, animations) {
+function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler, animations, sceneLoaded) {
 
     AFRAME.registerComponent('instrument', {
         schema: {type: 'string'},
@@ -105,17 +105,25 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
         }
     });
 
-    AFRAME.registerComponent('ring', {
-        schema: {type: 'string'},
+    AFRAME.registerComponent('rings', {
         init: function () {
             var el = this.el;
             var self = this;
+            sceneLoaded.then(function () {
+                self.addRings(el)
+            });
+        },
 
-            var target = document.querySelector("[instrument^=\"" + this.data + "\"]");
-
-            target.addEventListener("loaded", function (event) {
-                el.setAttribute("color", target.instrument.color);
-                target.instrument.flash(el);
+        addRings: function (rings) {
+            var current = 0.180;
+            instruments.instruments.forEach(function (instrument) {
+                var ring = document.createElement("a-ring");
+                ring.setAttribute("radius-outer", current);
+                ring.setAttribute("radius-inner", current - 0.002);
+                ring.setAttribute("color", instrument.color);
+                instrument.flash(ring);
+                rings.appendChild(ring);
+                current += 0.05;
             });
         }
     });

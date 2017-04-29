@@ -1,11 +1,11 @@
-function EventDispatcher(scheduler, instruments, scoreLoader, animations) {
+function EventDispatcher(scheduler, instruments, scoreLoader, animations, sceneLoaded) {
     var self = this;
     var loaded = scoreLoader.loaded;
 
     self.target = new LocalEventTarget(scheduler, instruments, scoreLoader, animations);
 
     try {
-        new WebSocketHandler(self, self.target, loaded);
+        new WebSocketHandler(self, self.target, loaded, sceneLoaded);
     } catch (e) {
         reportException(e);
         console.log("continuing in single player mode");
@@ -76,7 +76,7 @@ function LocalEventTarget(scheduler, instruments, scoreLoader, animations) {
     }
 }
 
-function WebSocketHandler(dispatcher, target, scoreLoaded) {
+function WebSocketHandler(dispatcher, target, scoreLoaded, sceneLoaded) {
     var self = this;
     var host = window.location.host;
     var spaceId = altspace.getSpace().then(function (space) {
@@ -94,7 +94,7 @@ function WebSocketHandler(dispatcher, target, scoreLoaded) {
             ws.close();
         }
 
-        Promise.all([spaceId, userId, scoreLoaded]).then(function (values) {
+        Promise.all([spaceId, userId, scoreLoaded, sceneLoaded]).then(function (values) {
             ws = new WebSocket("ws://" + host + "/ws/" + values[0] + "/" + values[1]);
 
             ws.onclose = function () {
@@ -116,14 +116,7 @@ function WebSocketHandler(dispatcher, target, scoreLoaded) {
             ws.onopen = function () {
                 dispatcher.target = self;
                 console.log("ws opened");
-                var sceneEl = document.querySelector("a-scene");
-                if (sceneEl.hasLoaded) {
-                    self.emit({event: "unroll"});
-                } else {
-                    sceneEl.addEventListener("loaded", function () {
-                        self.emit({event: "unroll"});
-                    });
-                }
+                self.emit({event: "unroll"});
             };
 
             ws.onerror = function (error) {

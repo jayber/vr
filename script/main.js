@@ -22,6 +22,21 @@ function serverLog(message) {
     });
 }
 
+function makeSceneLoadedPromise() {
+    return new Promise(function (resolve, reject) {
+        $(function () {
+            var sceneEl = document.querySelector("a-scene");
+            if (sceneEl.hasLoaded) {
+                resolve("success");
+            } else {
+                sceneEl.addEventListener("loaded", function () {
+                    resolve("success");
+                });
+            }
+        });
+    });
+}
+
 window.addEventListener('error', function (e) {
     reportException(e);
 });
@@ -29,6 +44,7 @@ window.addEventListener('error', function (e) {
 (function () {
     serverLog("userAgent: " + navigator.userAgent + "; isGear: " + isGearVR());
 
+    var sceneLoaded = makeSceneLoadedPromise();
     var soundSettings = new SoundSettings();
     var scoreLoader = new ScoreLoader(soundSettings);
     var scheduler = new AudioAndAnimationScheduler(soundSettings);
@@ -36,7 +52,7 @@ window.addEventListener('error', function (e) {
     var animations = new AnimationManager(scheduler, soundSettings);
     var eventDispatcher = new EventDispatcher(scheduler, instruments, scoreLoader, animations);
     var markers = new Markers(eventDispatcher, scoreLoader);
-    InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler, animations);
+    InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler, animations, sceneLoaded);
     PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations);
     CockpitComponents(soundSettings, animations);
 })();
