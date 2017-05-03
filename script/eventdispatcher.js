@@ -83,30 +83,34 @@ function WebSocketHandler(dispatcher, target, scoreLoaded, sceneLoaded) {
         return space.sid;
     });
     var userId = altspace.getUser().then(function (user) {
-        return user.userId + ":" + user.displayName;
+        return user.userId;
+    });
+    var displayName = altspace.getUser().then(function (user) {
+        return user.displayName;
     });
     var ws;
-    var tries = 1;
     var demoId = getUrlParameter("demo");
 
     function emitUnguarded(message) {
         ws.send(JSON.stringify(message));
     }
 
-    Promise.all([spaceId, userId, scoreLoaded, sceneLoaded]).then(function (values) {
+    Promise.all([spaceId, userId, displayName, scoreLoaded, sceneLoaded]).then(function (values) {
         init();
         function init() {
             var spaceId = values[0];
             var userId = values[1];
+            var displayName = values[2];
             if (ws != undefined) {
                 ws.close();
             }
 
-            ws = new WebSocket("ws://" + host + "/ws/" + spaceId + "/" + userId);
+            ws = new WebSocket("ws://" + host + "/ws/" + spaceId + "/" + userId + ":" + displayName);
 
+            var tries = 1;
             ws.onclose = function () {
-                if (tries < 500) {
-                    tries = tries * 5;
+                if (tries < 100) {
+                    tries = tries * 2;
                     console.log("ws closed! - trying to reopen in " + tries + " seconds");
                     setTimeout(function () {
                         try {
