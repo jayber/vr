@@ -103,10 +103,11 @@ function AudioAndAnimationScheduler(soundSettings) {
         }
         var stack = score.triggersByTime[count];
         for (var i = 0, l = stack.length; i < l; i++) {
-            instrumentListeners[stack[i]].on.forEach(function (listener) {
+            var name = stack[i].name;
+            instrumentListeners[name].on.forEach(function (listener) {
                 listener.call(self, count);
             });
-            instrumentListeners[stack[i]].off.forEach(function (listener) {
+            instrumentListeners[name].off.forEach(function (listener) {
                 offStack.push(listener);
             });
         }
@@ -162,27 +163,25 @@ function AudioAndAnimationScheduler(soundSettings) {
     function scheduleTriggerBatch(from, to, offset, score) {
         sourcesToCancel = [];
         for (var i = from; i < to; i++) {
-            var instrumentNames = score.triggersByTime[i];
-            if (instrumentNames != undefined && instrumentNames.length > 0) {
-                instrumentNames.forEach(function (instrumentName) {
-                    var instrument = score.instruments[instrumentName];
-                    var when = startTime + offset + (i * score.getSegmentDuration() );
-                    if (when > audioCtx.currentTime) {
-                        if (!soundSettings.mute) {
-                            var oldSource = lastInstrumentSources[instrumentName];
-                            if (oldSource) {
-                                oldSource.stop(when);
-                            }
-                            var source = audioCtx.createBufferSource();
-                            source.buffer = soundSettings.soundBuffersMap[instrument.src];
-                            source.connect(soundSettings.output);
-                            source.start(when);
-                            sourcesToCancel.push(source);
-                            lastInstrumentSources[instrumentName] = source;
+            var instrumentTriggers = score.triggersByTime[i];
+            instrumentTriggers.forEach(function (trigger) {
+                var instrument = score.instruments[trigger.name];
+                var when = startTime + offset + (i * score.getSegmentDuration() );
+                if (when > audioCtx.currentTime) {
+                    if (!soundSettings.mute) {
+                        var oldSource = lastInstrumentSources[trigger.name];
+                        if (oldSource) {
+                            oldSource.stop(when);
                         }
+                        var source = audioCtx.createBufferSource();
+                        source.buffer = soundSettings.soundBuffersMap[instrument.src];
+                        source.connect(soundSettings.output);
+                        source.start(when);
+                        sourcesToCancel.push(source);
+                        lastInstrumentSources[trigger.name] = source;
                     }
-                });
-            }
+                }
+            });
         }
     }
 }

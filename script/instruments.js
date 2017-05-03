@@ -33,11 +33,11 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
             var el = this.el;
             el.instrument = this;
             this.color = el.getAttribute("material").color;
-            this.listenToSchedule(this.color, el, this);
+            this.listenToSchedule(this.color, el, this.data);
             this.instrumentIndex = instruments.instruments.length - 1;
             this.generateMarkers(scoreLoader.score.instruments[this.data].times);
             this.createCable(el);
-            this.makeClickable(this, el, this.color);
+            this.makeClickable(this, el);
         },
 
         addTrigger: function (data) {
@@ -53,13 +53,13 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
             this.markers.splice(index, 1);
         },
 
-        makeClickable: function (self, el, color) {
+        makeClickable: function (self, el) {
             el.setAttribute("altspace-cursor-collider");
             el.addEventListener("click", function () {
                 soundSettings.play(scoreLoader.score.instruments[self.data].src);
-                self.dispatchFlash(self);
+                animations.flash(self.data);
                 setTimeout(function () {
-                    self.dispatchUnflash(self, color);
+                    animations.unflash(self.data);
                 }, 150);
             });
         },
@@ -72,13 +72,13 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
             });
         },
 
-        listenToSchedule: function (color, el, self) {
-            animations.registerMasterFlasher(self.data, color, el);
+        listenToSchedule: function (color, el, name) {
+            animations.registerMasterFlasher(name, color, el);
 
-            scheduler.addInstrumentListener(self.data, function () {
-                animations.flash(self.data);
+            scheduler.addInstrumentListener(name, function () {
+                animations.flash(name);
             }, function () {
-                animations.unflash(self.data);
+                animations.unflash(name);
             });
         },
 

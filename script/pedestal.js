@@ -11,7 +11,9 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
     AFRAME.registerComponent('double-up', {
         init: function () {
             this.el.addEventListener("click", function () {
-                eventDispatcher.doubleUp();
+                if (scoreLoader.score.beats < 16) {
+                    eventDispatcher.doubleUp();
+                }
             });
         }
     });

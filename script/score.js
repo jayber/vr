@@ -72,7 +72,7 @@ function PlayableScore(settings, bpm, beats) {
             var elements = self.triggersByTime[j++];
             self.triggersByTime[i] = [];
             elements.forEach(function (element) {
-                self.triggersByTime[i].push(element);
+                self.triggersByTime[i].push(element.copy());
             });
         }
         Object.keys(self.instruments).forEach(function (key) {
@@ -129,15 +129,26 @@ function PlayableScore(settings, bpm, beats) {
         self.instruments[instrumentName].times.splice(indexToo, 1);
     };
 
-    function addTriggerTime(count, instrumentName) {
-        var index = self.triggersByTime[count].indexOf(instrumentName);
-        if (index < 0) {
-            self.triggersByTime[count].push(instrumentName);
-        }
-    }
-
     self.addInstrumentTrigger = function (count, instrumentName) {
         addTriggerTime(count, instrumentName);
         self.instruments[instrumentName].times.push({count: count})
+    };
+
+    function addTriggerTime(count, instrumentName, rate) {
+        var trigger = new InstrumentTrigger(instrumentName, rate);
+        var index = self.triggersByTime[count].indexOf(trigger);
+        if (index < 0) {
+            self.triggersByTime[count].push(trigger);
+        }
+    }
+}
+
+function InstrumentTrigger(instrumentName, rate) {
+    var self = this;
+    self.name = instrumentName;
+    self.rate = rate;
+
+    self.copy = function () {
+        return new InstrumentTrigger(instrumentName, rate);
     };
 }
