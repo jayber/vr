@@ -14,6 +14,7 @@ if (!altspace.inClient) {
         addNativeComponent: function () {
         },
         updateNativeComponent: function () {
-        }
+        },
+        outside: true
     };
 }
