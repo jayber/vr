@@ -62,11 +62,11 @@ function LocalEventTarget(scheduler, instruments, scoreLoader, animations) {
     };
     self.incrementBpm = function () {
         scheduler.stop();
-        scoreLoader.score.setBpm(scoreLoader.score.bpm + 1);
+        scoreLoader.score.bpm = scoreLoader.score.bpm + 1;
     };
     self.decrementBpm = function () {
         scheduler.stop();
-        scoreLoader.score.setBpm(scoreLoader.score.bpm - 1);
+        scoreLoader.score.bpm = scoreLoader.score.bpm - 1;
     };
     self.addPlayTrigger = function (data) {
         instruments.add(data);

@@ -15,6 +15,8 @@ if (!altspace.inClient) {
         },
         updateNativeComponent: function () {
         },
-        outside: true
+        stubbed: true,
+        open: function () {
+        }
     };
 }

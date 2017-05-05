@@ -59,14 +59,14 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
                 if (!event.handled) {
                     var newPoint;
                     var point = self.intersectionPoint;
-                    if (!altspace.outside) {
+                    if (!altspace.stubbed) {
                         point = event.detail.point;
                     }
                     el.object3D.worldToLocal(point);
 
                     //this is utter craziness and just reflects that i don't understand rotation etc
                     //but it does work!
-                    if (!altspace.outside) {
+                    if (!altspace.stubbed) {
                         newPoint = {x: point.y, y: point.z};
                     } else {
                         newPoint = {x: point.x, y: point.z};

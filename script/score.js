@@ -32,27 +32,71 @@ function ScoreLoader(settings) {
         return parsedTimes;
     }
 
-    self.reload = function () {
-        var playableScore = new PlayableScore(settings, readableScore.bpm, readableScore.beats);
-        var sources = [];
+    function registerInstruments() {
         Object.keys(readableScore.instrumentParts).forEach(function (key, index) {
             var instrumentPart = readableScore.instrumentParts[key];
             playableScore.registerInstrument(key, parseTimes(instrumentPart.times), instrumentPart.src);
             sources.push(instrumentPart.src);
         });
+    }
 
-        self.score = playableScore;
-        return sources;
+    self.reload = function () {
+        self.score.unregisterAll();
+        self.score.beats = readableScore.beats;
+        registerInstruments();
+        self.score.bpm = readableScore.bpm;
     };
 
-    var sources = self.reload();
+    var playableScore = new PlayableScore(settings, readableScore.bpm, readableScore.beats);
+    var sources = [];
+    registerInstruments();
+
+    self.score = playableScore;
+
     self.loaded = settings.load(sources);
 }
 
 function PlayableScore(settings, bpm, beats) {
     var self = this;
-    self.bpm = bpm;
+    var bpm = bpm;
+
+    var listeners = {};
     self.beats = beats;
+
+    function addTriggerTime(count, instrumentName, rate) {
+        var trigger = new InstrumentTrigger(instrumentName, rate);
+        var index = self.triggersByTime[count].indexOf(trigger);
+        if (index < 0) {
+            self.triggersByTime[count].push(trigger);
+        }
+    }
+
+    function init() {
+        self.instruments = {};
+        self.triggersByTime = [self.totalSegments];
+        for (var i = 0; i < self.totalSegments; i++) {
+            self.triggersByTime[i] = [];
+        }
+    }
+
+    function dispatch(type, param) {
+        if (!(type in listeners)) {
+            return true;
+        }
+        var stack = listeners[type];
+        for (var i = 0, l = stack.length; i < l; i++) {
+            stack[i].call(self, param);
+        }
+    }
+
+    Object.defineProperty(self, 'bpm', {
+        set: function (bpmP) {
+            bpm = bpmP;
+            dispatch("bpm-change", bpm);
+        }, get: function () {
+            return bpm;
+        }
+    });
 
     Object.defineProperty(self, 'totalSegments', {
         get: function () {
@@ -60,11 +104,7 @@ function PlayableScore(settings, bpm, beats) {
         }
     });
 
-    self.instruments = {};
-    self.triggersByTime = [self.totalSegments];
-    for (var i = 0; i < self.totalSegments; i++) {
-        self.triggersByTime[i] = [];
-    }
+    init();
 
     self.doubleUp = function () {
         var j = 0;
@@ -88,8 +128,6 @@ function PlayableScore(settings, bpm, beats) {
         return 60 / self.bpm / settings.segmentsPerBeat;
     };
 
-    var listeners = {};
-
     self.addEventListener = function (type, listener) {
         if (!(type in listeners)) {
             listeners[type] = [];
@@ -97,20 +135,9 @@ function PlayableScore(settings, bpm, beats) {
         listeners[type].push(listener);
     };
 
-    self.setBpm = function (bpm) {
-        self.bpm = bpm;
-        dispatch("bpm-change", bpm);
+    self.unregisterAll = function () {
+        init();
     };
-
-    function dispatch(type, param) {
-        if (!(type in listeners)) {
-            return true;
-        }
-        var stack = listeners[type];
-        for (var i = 0, l = stack.length; i < l; i++) {
-            stack[i].call(self, param);
-        }
-    }
 
     self.registerInstrument = function (name, times, src) {
         self.instruments[name] = {name: name, times: times, src: src};
@@ -133,14 +160,6 @@ function PlayableScore(settings, bpm, beats) {
         addTriggerTime(count, instrumentName);
         self.instruments[instrumentName].times.push({count: count})
     };
-
-    function addTriggerTime(count, instrumentName, rate) {
-        var trigger = new InstrumentTrigger(instrumentName, rate);
-        var index = self.triggersByTime[count].indexOf(trigger);
-        if (index < 0) {
-            self.triggersByTime[count].push(trigger);
-        }
-    }
 }
 
 function InstrumentTrigger(instrumentName, rate) {
