@@ -43,6 +43,7 @@ function Markers(events, scoreLoader) {
 
         subElement.addEventListener("click", function (event) {
             events.removePlayTrigger(instrument.instrumentIndex, count, subElementId);
+
             event.handled = true;
         });
         return subElement

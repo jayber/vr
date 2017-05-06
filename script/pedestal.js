@@ -1,4 +1,33 @@
-function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations) {
+function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations, instruments) {
+
+    eventDispatcher.addEventListener("reload", function () {
+        scheduler.stop();
+        scoreLoader.reload();
+        instruments.reload();
+    });
+
+    eventDispatcher.addEventListener("doubleUp", function () {
+        scoreLoader.score.doubleUp();
+        instruments.reload();
+    });
+
+    eventDispatcher.addEventListener("incrementBpm", function () {
+        scheduler.stop();
+        scoreLoader.score.bpm = scoreLoader.score.bpm + 1;
+    });
+
+    eventDispatcher.addEventListener("decrementBpm", function () {
+        scheduler.stop();
+        scoreLoader.score.bpm = scoreLoader.score.bpm - 1;
+    });
+
+    eventDispatcher.addEventListener("stop", function () {
+        scheduler.stop();
+    });
+
+    eventDispatcher.addEventListener("start", function () {
+        scheduler.start(scoreLoader.score);
+    });
 
     AFRAME.registerComponent('reset', {
         init: function () {
@@ -74,7 +103,7 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
 
                     var data = markers.toInstrumentAndCount(newPoint.x, newPoint.y);
                     if (data.instrumentNumber > -1) {
-                        eventDispatcher.addPlayTrigger(data, eventDispatcher);
+                        eventDispatcher.addPlayTrigger(data);
                         event.handled = true;
                     }
                 }
@@ -131,7 +160,7 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
 }
 
 
-function AnimationManager(scheduler, settings) {
+function AnimationManager(scheduler, settings, eventDispatcher) {
     var flashers = {};
     var self = this;
     var isDisco;
@@ -160,6 +189,10 @@ function AnimationManager(scheduler, settings) {
                 }
             }
         }
+    });
+
+    eventDispatcher.addEventListener("toggleDiscoMode", function () {
+        self.discoMode = !self.discoMode;
     });
 
     function resetColors() {

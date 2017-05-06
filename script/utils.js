@@ -7,11 +7,11 @@ function reportException(e) {
             } else if (e.message) {
                 data = {userId: user.userId + ":" + user.displayName, message: e.message, stack: ""};
             } else {
-                e.userId = user.userId + "-" + user.displayName;
-                data = JSON.stringify(e);
+                data = {userId: user.userId + ":" + user.displayName, message: e, stack: ""};
             }
             $.get("error", data);
         } catch (e) {
+            console.error("could not report error to server", e);
         }
     });
 }
