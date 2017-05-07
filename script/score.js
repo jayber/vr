@@ -1,5 +1,8 @@
 function ScoreLoader(settings) {
     var self = this;
+
+    var beatExp = /(\d*):(\d*)\/(\d*)/;
+
     var readableScore = {
         "bpm": 130,
         "beats": 4,
@@ -11,8 +14,6 @@ function ScoreLoader(settings) {
             "beep": {src: "audio/truck.wav", times: []}
         }
     };
-
-    var beatExp = /(\d*):(\d*)\/(\d*)/;
 
     function convertTimeToCount(beat, seg) {
         return Math.round((settings.segmentsPerBeat * beat) + seg);
@@ -63,19 +64,19 @@ function PlayableScore(settings, bpm, beats) {
     var listeners = {};
     self.beats = beats;
 
-    function addTriggerTime(count, instrumentName, rate) {
-        var trigger = new InstrumentTrigger(instrumentName, rate);
-        var index = self.triggersByTime[count].indexOf(trigger);
-        if (index < 0) {
-            self.triggersByTime[count].push(trigger);
-        }
-    }
-
     function init() {
         self.instruments = {};
         self.triggersByTime = [self.totalSegments];
         for (var i = 0; i < self.totalSegments; i++) {
             self.triggersByTime[i] = [];
+        }
+    }
+
+    function addTriggerTime(count, instrumentName, rate) {
+        var trigger = new InstrumentTrigger(instrumentName, rate);
+        var index = self.triggersByTime[count].indexOf(trigger);
+        if (index < 0) {
+            self.triggersByTime[count].push(trigger);
         }
     }
 
@@ -103,8 +104,6 @@ function PlayableScore(settings, bpm, beats) {
             return settings.segmentsPerBeat * self.beats;
         }
     });
-
-    init();
 
     self.doubleUp = function () {
         var j = 0;
@@ -160,6 +159,8 @@ function PlayableScore(settings, bpm, beats) {
         addTriggerTime(count, instrumentName);
         self.instruments[instrumentName].times.push({count: count})
     };
+
+    init();
 }
 
 function InstrumentTrigger(instrumentName, rate) {

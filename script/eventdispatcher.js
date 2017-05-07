@@ -86,32 +86,38 @@ function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded) {
     });
     var ws;
     var demoId = getUrlParameter("demo");
+    var secondsTilRetry = 2; //don't move this
 
     function emitUnguarded(message) {
         ws.send(JSON.stringify(message));
     }
 
-    function init(spaceId, userId, displayName) {
-        if (ws != undefined) {
+    function emit(message) {
+        if (!demoId || demoId == userId) {
+            emitUnguarded(message);
+        }
+    }
+
+    function connect(spaceId, userId, displayName) {
+        if (ws) {
             ws.close();
         }
 
         ws = new WebSocket("ws://" + host + "/ws/" + spaceId + "/" + userId + ":" + displayName);
 
-        var tries = 1;
         ws.onclose = function () {
-            if (tries < 100) {
-                tries = tries * 2;
-                console.log("ws closed! - trying to reopen in " + tries + " seconds");
+            if (secondsTilRetry < 33) {
+                secondsTilRetry = secondsTilRetry * 2;
+                console.log("ws closed! - trying to reopen in " + secondsTilRetry + " seconds");
                 setTimeout(function () {
                     try {
-                        init(spaceId, userId, displayName);
+                        connect(spaceId, userId, displayName);
                     } catch (e) {
-                        reportException(e);
+                        console.error(e);
                     }
-                }, 1000 * tries);
+                }, 1000 * secondsTilRetry);
             } else {
-                reportException({message: "ws closed! - giving up"});
+                console.log("ws closed! - giving up");
             }
         };
 
@@ -122,32 +128,31 @@ function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded) {
         };
 
         ws.onerror = function (error) {
+            console.error(error);
             reportException({message: "ws errored! " + JSON.stringify(error)});
         };
 
         ws.onmessage = function (event) {
             try {
                 var msg = JSON.parse(event.data);
+                if (msg.event != "ping") {
+                    console.log("ws received: " + event.data);
+                }
                 target.dispatch(msg);
             } catch (e) {
+                console.error(e);
                 reportException(e);
-            }
-        };
-
-        self.dispatch = function (msg) {
-            var type = msg.event;
-            var param = msg.data;
-            self.emit({event: type, data: param});
-        };
-
-        self.emit = function (message) {
-            if (!demoId || demoId == userId) {
-                emitUnguarded(message);
             }
         };
     }
 
+    self.dispatch = function (msg) {
+        var type = msg.event;
+        var param = msg.data;
+        emit({event: type, data: param});
+    };
+
     Promise.all([spaceId, userId, displayName, scoreLoaded, sceneLoaded]).then(function (values) {
-        init(values[0], values[1], values[2]);
+        connect(values[0], values[1], values[2]);
     });
 }
