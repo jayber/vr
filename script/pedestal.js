@@ -1,34 +1,5 @@
 function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations, instruments) {
 
-    eventDispatcher.addEventListener("reload", function () {
-        scheduler.stop();
-        scoreLoader.reload();
-        instruments.reload();
-    });
-
-    eventDispatcher.addEventListener("doubleUp", function () {
-        scoreLoader.score.doubleUp();
-        instruments.reload();
-    });
-
-    eventDispatcher.addEventListener("incrementBpm", function () {
-        scheduler.stop();
-        scoreLoader.score.bpm = scoreLoader.score.bpm + 1;
-    });
-
-    eventDispatcher.addEventListener("decrementBpm", function () {
-        scheduler.stop();
-        scoreLoader.score.bpm = scoreLoader.score.bpm - 1;
-    });
-
-    eventDispatcher.addEventListener("stop", function () {
-        scheduler.stop();
-    });
-
-    eventDispatcher.addEventListener("start", function () {
-        scheduler.start(scoreLoader.score);
-    });
-
     AFRAME.registerComponent('reset', {
         init: function () {
             this.el.addEventListener("click", function () {
