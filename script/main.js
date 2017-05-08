@@ -9,39 +9,49 @@
     var eventDispatcher = new EventDispatcher(scoreLoader, sceneLoaded);
     var scheduler = new AudioAndAnimationScheduler(soundSettings);
     var instruments = new Instruments(scoreLoader, eventDispatcher);
-    var animations = new AnimationManager(scheduler, soundSettings, eventDispatcher);
+    var animations = new AnimationManager(scheduler, soundSettings, eventDispatcher, scoreLoader);
     var markers = new Markers(eventDispatcher, scoreLoader);
     InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler, animations, sceneLoaded);
-    PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations, instruments);
+    PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations);
     CockpitComponents(soundSettings, animations);
 
-    eventDispatcher.addEventListener("reload", function () {
+    eventDispatcher.addEventListener("reload", function (data, resolve) {
         scheduler.stop();
-        scoreLoader.reload();
+        scoreLoader.reload(data.score);
         instruments.reload();
+        scoreLoader.loaded.then(function () {
+            resolve("success");
+        })
     });
 
-    eventDispatcher.addEventListener("doubleUp", function () {
+    eventDispatcher.addEventListener("doubleUp", function (data, resolve) {
         scoreLoader.score.doubleUp();
         instruments.reload();
+        resolve();
     });
 
-    eventDispatcher.addEventListener("incrementBpm", function () {
+    eventDispatcher.addEventListener("incrementBpm", function (data, resolve) {
         scheduler.stop();
         scoreLoader.score.bpm = scoreLoader.score.bpm + 1;
+        resolve();
     });
 
-    eventDispatcher.addEventListener("decrementBpm", function () {
+    eventDispatcher.addEventListener("decrementBpm", function (data, resolve) {
         scheduler.stop();
         scoreLoader.score.bpm = scoreLoader.score.bpm - 1;
+        resolve();
     });
 
-    eventDispatcher.addEventListener("stop", function () {
+    eventDispatcher.addEventListener("stop", function (data, resolve) {
         scheduler.stop();
+        resolve();
     });
 
-    eventDispatcher.addEventListener("start", function () {
-        scheduler.start(scoreLoader.score);
+    eventDispatcher.addEventListener("start", function (data, resolve) {
+        scoreLoader.loaded.then(function () {
+            scheduler.start(scoreLoader.score);
+            resolve();
+        });
     });
 
 })();

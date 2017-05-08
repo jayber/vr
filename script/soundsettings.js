@@ -9,6 +9,8 @@ function SoundSettings() {
     self.soundBuffersMap = {};
     self.mute = false;
 
+    var eventSources = ["audio/satan.wav"];
+
     self.load = function (sources) {
         return new Promise(function (resolve, reject) {
             var completedCount = 0;
@@ -41,5 +43,7 @@ function SoundSettings() {
 
     self.decrementVol = function () {
         gain.gain.value = gain.gain.value - 0.1;
-    }
+    };
+
+    self.load(eventSources);
 }

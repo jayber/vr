@@ -3,7 +3,20 @@ function ScoreLoader(settings) {
 
     var beatExp = /(\d*):(\d*)\/(\d*)/;
 
-    var readableScore = {
+    var readableScores = [{
+        "bpm": 180,
+        "beats": 4,
+        instrumentParts: {
+            "kick": {src: "audio/kick2.wav", times: ["0:1/4", "2:3/4"]},
+            "hat": {
+                src: "audio/hat_011.wav",
+                times: ["0:1/4", "0:2/4", "0:3/4", "1:1/4", "1:2/4", "1:3/4", "2:1/4", "2:2/4", "2:3/4", "3:1/4", "3:2/4", "3:3/4"]
+            },
+            "snare": {src: "audio/snare2.wav", times: ["1:1/4", "3:1/4"]},
+            "bork": {src: "audio/yo.wav", times: []},
+            "beep": {src: "audio/bass.wav", times: []}
+        }
+    }, {
         "bpm": 130,
         "beats": 4,
         instrumentParts: {
@@ -13,7 +26,11 @@ function ScoreLoader(settings) {
             "bork": {src: "audio/yo.wav", times: []},
             "beep": {src: "audio/truck.wav", times: []}
         }
-    };
+    }];
+
+
+    var playableScore = new PlayableScore(settings);
+    self.score = playableScore;
 
     function convertTimeToCount(beat, seg) {
         return Math.round((settings.segmentsPerBeat * beat) + seg);
@@ -33,44 +50,45 @@ function ScoreLoader(settings) {
         return parsedTimes;
     }
 
-    function registerInstruments() {
-        Object.keys(readableScore.instrumentParts).forEach(function (key, index) {
-            var instrumentPart = readableScore.instrumentParts[key];
+    function registerInstruments(currentScore) {
+        var sources = [];
+        Object.keys(currentScore.instrumentParts).forEach(function (key) {
+            var instrumentPart = currentScore.instrumentParts[key];
             playableScore.registerInstrument(key, parseTimes(instrumentPart.times), instrumentPart.src);
             sources.push(instrumentPart.src);
         });
+        return sources;
     }
 
-    self.reload = function () {
-        self.score.unregisterAll();
-        self.score.beats = readableScore.beats;
-        registerInstruments();
-        self.score.bpm = readableScore.bpm;
+    self.reload = function (index) {
+        var currentScore = readableScores[index];
+        self.score.init(currentScore.bpm, currentScore.beats);
+        var sources = registerInstruments(currentScore);
+        self.score.bpm = currentScore.bpm;
+
+        self.loaded = settings.load(sources);
     };
 
-    var playableScore = new PlayableScore(settings, readableScore.bpm, readableScore.beats);
-    var sources = [];
-    registerInstruments();
 
-    self.score = playableScore;
-
-    self.loaded = settings.load(sources);
+    self.reload(0);
 }
 
-function PlayableScore(settings, bpm, beats) {
+function PlayableScore(settings) {
     var self = this;
-    var bpm = bpm;
+    var bpmVar;
 
     var listeners = {};
-    self.beats = beats;
+    self.beats;
 
-    function init() {
+    self.init = function (bpmP, beats) {
+        bpmVar = bpmP;
+        self.beats = beats;
         self.instruments = {};
         self.triggersByTime = [self.totalSegments];
         for (var i = 0; i < self.totalSegments; i++) {
             self.triggersByTime[i] = [];
         }
-    }
+    };
 
     function addTriggerTime(count, instrumentName, rate) {
         var trigger = new InstrumentTrigger(instrumentName, rate);
@@ -92,10 +110,10 @@ function PlayableScore(settings, bpm, beats) {
 
     Object.defineProperty(self, 'bpm', {
         set: function (bpmP) {
-            bpm = bpmP;
-            dispatch("bpm-change", bpm);
+            bpmVar = bpmP;
+            dispatch("bpm-change", bpmP);
         }, get: function () {
-            return bpm;
+            return bpmVar < 300 ? bpmVar : 300; //this is to prevent breaking, while still allowing 666 to be set
         }
     });
 
@@ -135,7 +153,7 @@ function PlayableScore(settings, bpm, beats) {
     };
 
     self.unregisterAll = function () {
-        init();
+        self.init(bpmVar, self.beats);
     };
 
     self.registerInstrument = function (name, times, src) {
@@ -146,21 +164,25 @@ function PlayableScore(settings, bpm, beats) {
     };
 
     self.removeInstrumentTrigger = function (count, instrumentName) {
-        var index = self.triggersByTime[count].indexOf(instrumentName);
-        self.triggersByTime[count].splice(index, 1);
+        var index = self.triggersByTime[count].findIndex(function (element) {
+            return element.name === instrumentName;
+        });
+        if (index > -1) {
+            self.triggersByTime[count].splice(index, 1);
+        }
 
         var indexToo = self.instruments[instrumentName].times.findIndex(function (element) {
             return element.count == count;
         });
-        self.instruments[instrumentName].times.splice(indexToo, 1);
+        if (indexToo > -1) {
+            self.instruments[instrumentName].times.splice(indexToo, 1);
+        }
     };
 
     self.addInstrumentTrigger = function (count, instrumentName) {
         addTriggerTime(count, instrumentName);
         self.instruments[instrumentName].times.push({count: count})
     };
-
-    init();
 }
 
 function InstrumentTrigger(instrumentName, rate) {
