@@ -31,8 +31,12 @@ function Markers(events, scoreLoader) {
         var subElementId = instrument.data + count;
 
         subElement.setAttribute("id", subElementId);
+        subElement.setAttribute("class", instrument.data);
         subElement.setAttribute("radius", "0.027");
         subElement.setAttribute("position", newX + " 0.025 " + newY);
+        subElement.setAttribute("buffer", false);
+        subElement.setAttribute("skipCache", true);
+        subElement.setAttribute("mergeTo", "." + instrument.data);
 
         instrument.flash(subElement);
 
@@ -43,7 +47,6 @@ function Markers(events, scoreLoader) {
 
         subElement.addEventListener("click", function (event) {
             events.removePlayTrigger(instrument.instrumentIndex, count, subElementId);
-
             event.handled = true;
         });
         return subElement
