@@ -17,7 +17,7 @@
 
     eventDispatcher.addEventListener("reload", function (data) {
         scheduler.stop();
-        scoreLoader.reload(data.score);
+        scoreLoader.reload(data.index);
         return scoreLoader.loaded.then(function () {
             instruments.reload();
         })

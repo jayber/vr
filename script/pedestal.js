@@ -3,7 +3,8 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
     AFRAME.registerComponent('reset', {
         init: function () {
             this.el.addEventListener("click", function () {
-                eventDispatcher.reload();
+                var index = (scoreLoader.scoreIndex + 1) % scoreLoader.readableScores.length;
+                eventDispatcher.reload(index);
             });
         }
     });

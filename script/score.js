@@ -3,13 +3,13 @@ function ScoreLoader(settings) {
 
     var beatExp = /(\d*):(\d*)\/(\d*)/;
 
-    var readableScores = [{
+    self.readableScores = [{
         "bpm": 180,
         "beats": 4,
         instrumentParts: {
             "kick": {src: "audio/kick2.wav", times: ["0:1/4", "2:3/4"]},
             "hat": {
-                src: "audio/hat_009.wav",
+                src: "audio/hat2.wav",
                 times: ["0:1/4", "0:2/4", "0:3/4", "1:1/4", "1:2/4", "1:3/4", "2:1/4", "2:2/4", "2:3/4", "3:1/4", "3:2/4", "3:3/4"]
             },
             "snare": {src: "audio/snare2.wav", times: ["1:1/4", "3:1/4"]},
@@ -71,14 +71,12 @@ function ScoreLoader(settings) {
     }
 
     self.reload = function (index) {
-        var currentScore = readableScores[index];
+        self.scoreIndex = index;
+        var currentScore = self.readableScores[index];
         self.score.init(currentScore.bpm, currentScore.beats);
         var sources = registerInstruments(currentScore);
-        self.score.bpm = currentScore.bpm;
-
         self.loaded = settings.load(sources);
     };
-
 
     self.reload(0);
 }
@@ -91,7 +89,7 @@ function PlayableScore(settings) {
     self.beats;
 
     self.init = function (bpmP, beats) {
-        bpmVar = bpmP;
+        self.bpm = bpmP;
         self.beats = beats;
         self.instruments = {};
         self.triggersByTime = [self.totalSegments];

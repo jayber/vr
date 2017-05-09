@@ -21,8 +21,8 @@ function EventDispatcher(scoreLoader, sceneLoaded) {
     self.toggleDiscoMode = function () {
         self.target.dispatch({event: "toggleDiscoMode"});
     };
-    self.reload = function () {
-        self.target.dispatch({event: "reload"});
+    self.reload = function (index) {
+        self.target.dispatch({event: "reload", data: {index: index}});
     };
     self.start = function () {
         self.target.dispatch({event: "start"});
