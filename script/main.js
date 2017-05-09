@@ -15,42 +15,36 @@
     PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations);
     CockpitComponents(soundSettings, animations);
 
-    eventDispatcher.addEventListener("reload", function (data, resolve) {
+    eventDispatcher.addEventListener("reload", function (data) {
         scheduler.stop();
         scoreLoader.reload(data.score);
-        instruments.reload();
-        scoreLoader.loaded.then(function () {
-            resolve("success");
+        return scoreLoader.loaded.then(function () {
+            instruments.reload();
         })
     });
 
-    eventDispatcher.addEventListener("doubleUp", function (data, resolve) {
+    eventDispatcher.addEventListener("doubleUp", function () {
         scoreLoader.score.doubleUp();
         instruments.reload();
-        resolve();
     });
 
-    eventDispatcher.addEventListener("incrementBpm", function (data, resolve) {
+    eventDispatcher.addEventListener("incrementBpm", function () {
         scheduler.stop();
         scoreLoader.score.bpm = scoreLoader.score.bpm + 1;
-        resolve();
     });
 
-    eventDispatcher.addEventListener("decrementBpm", function (data, resolve) {
+    eventDispatcher.addEventListener("decrementBpm", function () {
         scheduler.stop();
         scoreLoader.score.bpm = scoreLoader.score.bpm - 1;
-        resolve();
     });
 
-    eventDispatcher.addEventListener("stop", function (data, resolve) {
+    eventDispatcher.addEventListener("stop", function () {
         scheduler.stop();
-        resolve();
     });
 
-    eventDispatcher.addEventListener("start", function (data, resolve) {
-        scoreLoader.loaded.then(function () {
+    eventDispatcher.addEventListener("start", function () {
+        return scoreLoader.loaded.then(function () {
             scheduler.start(scoreLoader.score);
-            resolve();
         });
     });
 

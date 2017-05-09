@@ -5,7 +5,7 @@ function Markers(events, scoreLoader) {
     this.toInstrumentAndCount = function (x, y) {
         var radius = Math.sqrt((x * x) + (y * y));
         var instCount = (radius - startRadius) / radiusStep;
-        console.log("x: " + x + ";y: " + y);
+        //console.log("x: " + x + ";y: " + y);
 
         var angle = Math.atan2(y, x);
         //this fixes minus values produced over 180d
@@ -16,7 +16,7 @@ function Markers(events, scoreLoader) {
         var count = (angle / (2 * Math.PI / (scoreLoader.score.totalSegments - 1)) % scoreLoader.score.totalSegments);
 
         var result = {instrumentNumber: Math.round(instCount), count: Math.round(count)};
-        console.log(result);
+        //console.log(result);
         return result;
     };
 

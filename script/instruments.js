@@ -2,14 +2,12 @@ function Instruments(scoreLoader, eventDispatcher) {
     var self = this;
     self.instruments = [];
 
-    eventDispatcher.addEventListener("removePlayTrigger", function (data, resolve) {
+    eventDispatcher.addEventListener("removePlayTrigger", function (data) {
         self.remove(data.instrumentIndex, data.count, data.elementId);
-        resolve();
     });
 
-    eventDispatcher.addEventListener("addPlayTrigger", function (data, resolve) {
+    eventDispatcher.addEventListener("addPlayTrigger", function (data) {
         self.add(data);
-        resolve();
     });
 
     self.remove = function (instrumentIndex, count, elementId) {

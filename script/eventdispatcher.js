@@ -49,7 +49,7 @@ function EventDispatcher(scoreLoader, sceneLoaded) {
 
 function LocalEventTarget() {
     var self = this;
-    var promise;
+    var promise = Promise.resolve("start");
     var listeners = {};
 
     self.addEventListener = function (type, listener) {
@@ -59,14 +59,6 @@ function LocalEventTarget() {
         listeners[type].push(listener);
     };
 
-    function makePromise(stack, param) {
-        return new Promise(function (resolve, reject) {
-            for (var i = 0, l = stack.length; i < l; i++) {
-                stack[i].call(self, param, resolve, reject);
-            }
-        })
-    }
-
     self.dispatch = function (msg) {
         var type = msg.event;
         var param = msg.data;
@@ -75,12 +67,11 @@ function LocalEventTarget() {
         }
         var stack = listeners[type];
 
-        if (promise) {
+        for (var i = 0, l = stack.length; i < l; i++) {
+            const listener = stack[i];
             promise = promise.then(function () {
-                return makePromise(stack, param);
+                return Promise.resolve(listener.call(self, param))
             });
-        } else {
-            promise = makePromise(stack, param);
         }
     };
 }
