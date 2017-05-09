@@ -9,11 +9,11 @@ function ScoreLoader(settings) {
         instrumentParts: {
             "kick": {src: "audio/kick2.wav", times: ["0:1/4", "2:3/4"]},
             "hat": {
-                src: "audio/hat_011.wav",
+                src: "audio/hat_009.wav",
                 times: ["0:1/4", "0:2/4", "0:3/4", "1:1/4", "1:2/4", "1:3/4", "2:1/4", "2:2/4", "2:3/4", "3:1/4", "3:2/4", "3:3/4"]
             },
             "snare": {src: "audio/snare2.wav", times: ["1:1/4", "3:1/4"]},
-            "bork": {src: "audio/yo.wav", times: []},
+            "bork": {src: "audio/pling.wav", times: []},
             "beep": {src: "audio/bass.wav", times: []}
         }
     }, {
