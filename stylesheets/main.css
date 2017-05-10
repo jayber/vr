@@ -1,6 +1,6 @@
 html {
     font-family: "Helvetica Neue Light", arial, sans-serif;
-    font-size: 10pt;
+    font-size: 12pt;
     color: #fdfdfd;
     background-color: rgba(10, 10, 10, 0.8);
 }
@@ -9,7 +9,7 @@ h1 {
     font-size: 14pt;
     background: url("/img/beatlab.png") no-repeat;
     background-size: contain;
-    height: 70px;
+    height: 90px;
 }
 
 h2 {
@@ -35,6 +35,7 @@ textarea {
     background-color: #222;
     border: solid 1px #000;
     color: #fff;
+    font-size: inherit;
 }
 
 button.field {
