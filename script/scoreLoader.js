@@ -136,6 +136,10 @@ function PlayableScore(settings) {
         }
     });
 
+    self.getDisplayBpm = function () {
+        return bpmVar
+    };
+
     Object.defineProperty(self, 'totalSegments', {
         get: function () {
             return settings.segmentsPerBeat * self.beats;

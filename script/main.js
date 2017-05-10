@@ -57,12 +57,12 @@
 
     eventDispatcher.addEventListener("incrementBpm", function () {
         scheduler.stop();
-        scoreLoader.score.bpm = scoreLoader.score.bpm + 1;
+        scoreLoader.score.bpm = scoreLoader.score.getDisplayBpm() + 1;
     });
 
     eventDispatcher.addEventListener("decrementBpm", function () {
         scheduler.stop();
-        scoreLoader.score.bpm = scoreLoader.score.bpm - 1;
+        scoreLoader.score.bpm = scoreLoader.score.getDisplayBpm() - 1;
     });
 
     eventDispatcher.addEventListener("stop", function () {
