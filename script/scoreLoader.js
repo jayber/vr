@@ -33,7 +33,7 @@ function ScoreLoader(settings) {
             "kick": {src: "audio/kick2.wav", times: ["0:0/4", "1:0/4", "2:0/4", "3:0/4"]},
             "hat": {src: "audio/hat2.wav", times: ["0:2/4", "1:2/4", "2:2/4", "3:2/4"]},
             "snare": {src: "audio/clap27.wav", times: []},
-            "bork": {src: "audio/yeah.wav", times: []},
+            "bork": {src: "audio/chime.wav", times: []},
             "beep": {src: "audio/piano.wav", times: []}
         }
     }];

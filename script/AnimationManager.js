@@ -49,12 +49,10 @@ function AnimationManager(scheduler, settings, eventDispatcher, scoreLoader) {
     Object.defineProperty(self, 'discoMode', {
         set: function (value) {
             isDisco = value;
-            if (animationsOn) {
-                if (!isDisco) {
-                    resetColors();
-                } else {
-                    self.discoButton.setAttribute('material', 'color', '#0f0');
-                }
+            if (!isDisco) {
+                resetColors();
+            } else {
+                self.discoButton.setAttribute('material', 'color', '#0f0');
             }
         }, get: function () {
             return isDisco;
