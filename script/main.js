@@ -27,6 +27,12 @@
         })
     });
 
+    eventDispatcher.addEventListener("setFreeForAll", function (data) {
+        blUser.then(function (user) {
+            user.setFreeForAll(data.value)
+        });
+    });
+
     eventDispatcher.addEventListener("moderatorAbsent", function () {
         blUser.then(function (user) {
             user.setFreeForAll(true)

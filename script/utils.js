@@ -112,6 +112,10 @@ function BLUser(user) {
         }
     };
 
+    self.isFreeForAll = function () {
+        return ffa;
+    };
+
     function dispatchPermissionChanged() {
         listeners.forEach(function (listener) {
             listener.call(self, self.hasPermission());

@@ -62,6 +62,35 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
         }
     });
 
+    AFRAME.registerComponent('lock', {
+        init: function () {
+            var self = this;
+
+            blUser.then(function (blUser) {
+                if (blUser.user.isModerator) {
+                    self.el.setAttribute("material", "color", "#fff");
+                }
+            });
+
+            this.el.addEventListener("click", function () {
+                blUser.then(function (blUser) {
+                    if (blUser.user.isModerator) {
+                        eventDispatcher.setFreeForAll(!blUser.isFreeForAll());
+                    }
+                });
+                event.handled = true;
+            });
+
+            eventDispatcher.addEventListener("setFreeForAll", function (data) {
+                if (data.value) {
+                    self.el.setAttribute("material", "src", "#unlock-texture");
+                } else {
+                    self.el.setAttribute("material", "src", "#lock-texture");
+                }
+            });
+        }
+    });
+
     AFRAME.registerComponent('disco-mode', {
         init: function () {
             animations.discoButton = this.el;

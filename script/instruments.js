@@ -62,7 +62,6 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
         },
 
         makeClickable: function (self, el) {
-            el.setAttribute("altspace-cursor-collider");
             el.addEventListener("click", function () {
                 soundSettings.play(scoreLoader.score.instruments[self.data].src);
                 animations.flash(self.data);
@@ -109,6 +108,7 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
             document.querySelector("#root").appendChild(cableElement);
 
             cableElement.setAttribute('material', {color: self.color, src: "#cable-texture", repeat: '100 1'});
+            cableElement.setAttribute('material', "altspace-cursor-collider", "false");
             self.flash(cableElement);
         }
     });
