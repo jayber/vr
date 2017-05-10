@@ -3,16 +3,20 @@
 
     altspace.open(getFullUrl("comment.html"), "_experience", {icon: getFullUrl("img/bugform.png"), hidden: true});
 
+    var blUser = altspace.getUser().then(function (user) {
+        return new BLUser(user);
+    });
+
     var sceneLoaded = makeSceneLoadedPromise();
     var soundSettings = new SoundSettings();
     var scoreLoader = new ScoreLoader(soundSettings);
-    var eventDispatcher = new EventDispatcher(scoreLoader, sceneLoaded);
+    var eventDispatcher = new EventDispatcher(scoreLoader, sceneLoaded, blUser);
     var scheduler = new AudioAndAnimationScheduler(soundSettings);
     var instruments = new Instruments(scoreLoader, eventDispatcher);
     var animations = new AnimationManager(scheduler, soundSettings, eventDispatcher, scoreLoader);
     var markers = new Markers(eventDispatcher, scoreLoader);
     InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler, animations, sceneLoaded);
-    PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations);
+    PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations, blUser);
     CockpitComponents(soundSettings, animations);
 
     eventDispatcher.addEventListener("reload", function (data) {
@@ -21,6 +25,23 @@
         return scoreLoader.loaded.then(function () {
             instruments.reload();
         })
+    });
+
+    eventDispatcher.addEventListener("moderatorAbsent", function () {
+        blUser.then(function (user) {
+            user.setFreeForAll(true)
+        });
+    });
+
+    eventDispatcher.addEventListener("moderatorPresent", function () {
+        blUser.then(function (user) {
+            user.setFreeForAll(false)
+        });
+    });
+
+    eventDispatcher.addEventListener("clear", function () {
+        scoreLoader.score.clear();
+        instruments.reload();
     });
 
     eventDispatcher.addEventListener("doubleUp", function () {

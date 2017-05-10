@@ -90,3 +90,32 @@ function sendComment() {
     });
 }
 
+function BLUser(user) {
+    var self = this;
+    var listeners = [];
+    var ffa = true;
+
+    self.user = user;
+
+    self.hasPermission = function () {
+        return ffa || user.isModerator;
+    };
+
+    self.permissionChanged = function (listener) {
+        listeners.push(listener);
+    };
+
+    self.setFreeForAll = function (value) {
+        if (ffa != value) {
+            ffa = value;
+            dispatchPermissionChanged();
+        }
+    };
+
+    function dispatchPermissionChanged() {
+        listeners.forEach(function (listener) {
+            listener.call(self, self.hasPermission());
+        })
+    }
+}
+

@@ -1,21 +1,64 @@
-function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations) {
+function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations, blUser) {
+
+    function setPermissionColor(user, el) {
+        if (user.hasPermission()) {
+            el.setAttribute("material", "color", "#fff")
+        } else {
+            el.setAttribute("material", "color", "#999")
+        }
+    }
+
+    function handlePermission(el) {
+        blUser.then(function (user) {
+            setPermissionColor(user, el);
+            user.permissionChanged(function () {
+                setPermissionColor(user, el);
+            })
+        });
+    }
 
     AFRAME.registerComponent('reset', {
         init: function () {
-            this.el.addEventListener("click", function () {
-                var index = (scoreLoader.scoreIndex + 1) % scoreLoader.readableScores.length;
-                eventDispatcher.reload(index);
+            this.el.addEventListener("click", function (event) {
+                blUser.then(function (user) {
+                    if (user.hasPermission()) {
+                        var index = (scoreLoader.scoreIndex + 1) % scoreLoader.readableScores.length;
+                        eventDispatcher.reload(index);
+                    }
+                });
+                event.handled = true;
             });
+            handlePermission(this.el);
+        }
+    });
+
+    AFRAME.registerComponent('clear', {
+        init: function () {
+            this.el.addEventListener("click", function (event) {
+                blUser.then(function (user) {
+                    if (user.hasPermission()) {
+                        eventDispatcher.clear();
+                    }
+                });
+                event.handled = true;
+            });
+            handlePermission(this.el);
         }
     });
 
     AFRAME.registerComponent('double-up', {
         init: function () {
-            this.el.addEventListener("click", function () {
-                if (scoreLoader.score.beats < 16) {
-                    eventDispatcher.doubleUp();
-                }
+            this.el.addEventListener("click", function (event) {
+                blUser.then(function (user) {
+                    if (user.hasPermission()) {
+                        if (scoreLoader.score.beats < 16) {
+                            eventDispatcher.doubleUp();
+                        }
+                    }
+                });
+                event.handled = true;
             });
+            handlePermission(this.el);
         }
     });
 

@@ -1,11 +1,11 @@
-function EventDispatcher(scoreLoader, sceneLoaded) {
+function EventDispatcher(scoreLoader, sceneLoaded, blUser) {
     var self = this;
 
     var localEventTarget = new LocalEventTarget();
     self.target = localEventTarget;
 
     try {
-        new WebSocketHandler(self, self.target, scoreLoader.loaded, sceneLoaded);
+        new WebSocketHandler(self, self.target, scoreLoader.loaded, sceneLoaded, blUser);
     } catch (e) {
         reportException(e);
         console.log("continuing in single player mode");
@@ -15,6 +15,9 @@ function EventDispatcher(scoreLoader, sceneLoaded) {
         localEventTarget.addEventListener(type, listener);
     };
 
+    self.clear = function () {
+        self.target.dispatch({event: "clear"});
+    };
     self.doubleUp = function () {
         self.target.dispatch({event: "doubleUp"});
     };
@@ -76,14 +79,11 @@ function LocalEventTarget() {
     };
 }
 
-function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded) {
+function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded, blUser) {
     var self = this;
     var host = window.location.host;
     var spaceId = altspace.getSpace().then(function (space) {
         return space.sid;
-    });
-    var userId = altspace.getUser().then(function (user) {
-        return user.userId;
     });
     var displayName = altspace.getUser().then(function (user) {
         return user.displayName;
@@ -96,18 +96,12 @@ function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded) {
         ws.send(JSON.stringify(message));
     }
 
-    function emit(message) {
-        if (!demoId || demoId == userId) {
-            emitUnguarded(message);
-        }
-    }
-
-    function connect(spaceId, userId, displayName) {
+    function connect(spaceId, blUser, displayName) {
         if (ws) {
             ws.close();
         }
 
-        ws = new WebSocket("ws://" + host + "/ws/" + spaceId + "/" + userId + ":" + displayName);
+        ws = new WebSocket("ws://" + host + "/ws/" + spaceId + "/" + blUser.user.userId + ":" + displayName);
 
         ws.onclose = function () {
             if (secondsTilRetry < 33) {
@@ -115,7 +109,7 @@ function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded) {
                 console.log("ws closed! - trying to reopen in " + secondsTilRetry + " seconds");
                 setTimeout(function () {
                     try {
-                        connect(spaceId, userId, displayName);
+                        connect(spaceId, blUser, displayName);
                     } catch (e) {
                         console.error(e);
                     }
@@ -128,6 +122,9 @@ function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded) {
         ws.onopen = function () {
             eventDispatcher.target = self;
             console.log("ws opened");
+            if (blUser.user.isModerator) {
+                emit({event: "moderatorPresent"})
+            }
             emitUnguarded({event: "unroll"});
         };
 
@@ -150,13 +147,19 @@ function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded) {
         };
     }
 
+    function emit(message) {
+        if (!demoId || demoId == blUser.user.userId) {
+            emitUnguarded(message);
+        }
+    }
+
     self.dispatch = function (msg) {
         var type = msg.event;
         var param = msg.data;
         emit({event: type, data: param});
     };
 
-    Promise.all([spaceId, userId, displayName, scoreLoaded, sceneLoaded]).then(function (values) {
+    Promise.all([spaceId, blUser, displayName, scoreLoaded, sceneLoaded]).then(function (values) {
         connect(values[0], values[1], values[2]);
     });
 }

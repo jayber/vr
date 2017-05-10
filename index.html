@@ -15,7 +15,7 @@
 <script src="script/altspacepoly.js"></script>
 <script src="script/scheduler.js"></script>
 <script src="script/soundsettings.js"></script>
-<script src="script/score.js"></script>
+<script src="script/scoreLoader.js"></script>
 <script src="script/markers.js"></script>
 <script src="script/eventdispatcher.js"></script>
 <script src="script/cockpit.js"></script>
@@ -43,6 +43,8 @@
         <img id="play-texture" src="img/play.png">
         <img id="reset-texture" src="img/reset.png">
         <img id="double-up-texture" src="img/double-up.png">
+        <img id="clear-texture" src="img/clear.png">
+        <img id="lock-texture" src="img/lock.png">
         <img id="disco-texture" src="img/disco.png">
         <img id="cable-texture" src="img/cable_stripe.png">
         <img id="up-arrow" src="img/up_arrow.png">
@@ -105,8 +107,6 @@
     <a-entity id="root">
 
         <a-cylinder material="src:#galv-texture;" height="1" position="0 0.5 0" color="#556" radius="0.3">
-            <a-sphere reset position="-0.15 0.37 0.26" radius="0.03" material="src:#reset-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
-            <a-sphere double-up position="0 0.475 0.3" radius="0.03" material="src:#double-up-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
             <a-sphere playable position="0 0.3 0.3" radius="0.1" material="src:#play-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
             <a-sphere disco-mode position="0.15 0.37 0.26" radius="0.03" material="src:#disco-texture" rotation="0 -90 30" color="#ddd"></a-sphere>
         </a-cylinder>
@@ -122,6 +122,13 @@
                 <a-entity bpm-label position="0 0 0.01" rotation="0 0 -90" n-text="fontSize:1pt;width:0.5;height:0.1"></a-entity>
                 <a-circle altspace-cursor-collider bpm-change="down" radius="0.08" rotation="0 0 -90" material="src:#down-arrow" position="-0.15 0 0.01"></a-circle>
             </a-circle>
+
+            <a-box depth="0.2" height="0.05" width="0.35" position="0.025 -0.01 -0.4" material="src:#noise-texture; repeat:5 5;color: #333">
+                <a-circle lock altspace-cursor-collider position="0.115 0.04 -0.04" radius="0.03" material="src:#lock-texture" rotation="-90 0 -90" color="#fff"></a-circle>
+                <a-sphere reset position="0.035 0.03 -0.04" radius="0.03" material="src:#reset-texture" rotation="0 0 100" color="#999"></a-sphere>
+                <a-sphere clear position="-0.0525 0.03 -0.04" radius="0.03" material="src:#clear-texture" rotation="0 0 100" color="#999"></a-sphere>
+                <a-sphere double-up position="-0.13 0.03 -0.04" radius="0.03" material="src:#double-up-texture" rotation="0 0 100" color="#999"></a-sphere>
+            </a-box>
         </a-cylinder>
 
         <a-sphere instrument="kick" material="src:#noise-texture; repeat:5 5" color="#6688ff" position="1 1 1.5" radius="0.3"></a-sphere>

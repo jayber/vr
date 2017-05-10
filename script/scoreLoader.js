@@ -88,14 +88,25 @@ function PlayableScore(settings) {
     var listeners = {};
     self.beats;
 
-    self.init = function (bpmP, beats) {
-        self.bpm = bpmP;
-        self.beats = beats;
-        self.instruments = {};
+    self.clear = function () {
+        initTriggers();
+        Object.keys(self.instruments).forEach(function (key) {
+            self.instruments[key].times = [];
+        })
+    };
+
+    function initTriggers() {
         self.triggersByTime = [self.totalSegments];
         for (var i = 0; i < self.totalSegments; i++) {
             self.triggersByTime[i] = [];
         }
+    }
+
+    self.init = function (bpmP, beats) {
+        self.bpm = bpmP;
+        self.beats = beats;
+        self.instruments = {};
+        initTriggers();
     };
 
     function addTriggerTime(count, instrumentName, rate) {
