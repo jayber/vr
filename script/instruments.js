@@ -108,7 +108,7 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
             document.querySelector("#root").appendChild(cableElement);
 
             cableElement.setAttribute('material', {color: self.color, src: "#cable-texture", repeat: '100 1'});
-            cableElement.setAttribute('material', "altspace-cursor-collider", "false");
+            cableElement.setAttribute("altspace-cursor-collider", "enabled", "false");
             self.flash(cableElement);
         }
     });
