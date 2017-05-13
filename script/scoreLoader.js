@@ -33,7 +33,7 @@ function ScoreLoader(settings) {
             "kick": {src: "audio/kick2.wav", times: ["0:0/4", "1:0/4", "2:0/4", "3:0/4"]},
             "hat": {src: "audio/hat2.wav", times: ["0:2/4", "1:2/4", "2:2/4", "3:2/4"]},
             "snare": {src: "audio/clap27.wav", times: []},
-            "bork": {src: "audio/chime.wav", times: []},
+            "bork": {src: "audio/cmon.wav", times: []},
             "beep": {src: "audio/piano.wav", times: []}
         }
     }];
@@ -86,14 +86,6 @@ function PlayableScore(settings) {
     var bpmVar;
 
     var listeners = {};
-    self.beats;
-
-    self.clear = function () {
-        initTriggers();
-        Object.keys(self.instruments).forEach(function (key) {
-            self.instruments[key].times = [];
-        })
-    };
 
     function initTriggers() {
         self.triggersByTime = [self.totalSegments];
@@ -101,13 +93,6 @@ function PlayableScore(settings) {
             self.triggersByTime[i] = [];
         }
     }
-
-    self.init = function (bpmP, beats) {
-        self.bpm = bpmP;
-        self.beats = beats;
-        self.instruments = {};
-        initTriggers();
-    };
 
     function addTriggerTime(count, instrumentName, rate) {
         var trigger = new InstrumentTrigger(instrumentName, rate);
@@ -129,8 +114,8 @@ function PlayableScore(settings) {
 
     Object.defineProperty(self, 'bpm', {
         set: function (bpmP) {
-            bpmVar = bpmP;
-            dispatch("bpm-change", bpmP);
+            bpmVar = bpmP < 666 ? bpmP > 1 ? bpmP : 1 : 666;
+            dispatch("bpm-change", bpmVar);
         }, get: function () {
             return bpmVar < 300 ? bpmVar : 300; //this is to prevent breaking, while still allowing 666 to be set
         }
@@ -145,6 +130,20 @@ function PlayableScore(settings) {
             return settings.segmentsPerBeat * self.beats;
         }
     });
+
+    self.clear = function () {
+        initTriggers();
+        Object.keys(self.instruments).forEach(function (key) {
+            self.instruments[key].times = [];
+        })
+    };
+
+    self.init = function (bpmP, beats) {
+        self.bpm = bpmP;
+        self.beats = beats;
+        self.instruments = {};
+        initTriggers();
+    };
 
     self.doubleUp = function () {
         var j = 0;
