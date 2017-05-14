@@ -83,7 +83,12 @@ function LocalEventTarget() {
         for (var i = 0, l = stack.length; i < l; i++) {
             const listener = stack[i];
             promise = promise.then(function () {
-                return Promise.resolve(listener.call(self, param))
+                try {
+                    return Promise.resolve(listener.call(self, param))
+                } catch (e) {
+                    console.error(e);
+                    reportException(e);
+                }
             });
         }
     };
