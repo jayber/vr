@@ -3,7 +3,7 @@ function Instruments(scoreLoader, eventDispatcher) {
     self.instruments = [];
 
     eventDispatcher.addEventListener("removePlayTrigger", function (data) {
-        self.remove(data.instrumentIndex, data.count, data.elementId);
+        self.remove(data.instrumentNumber, data.count, data.elementId);
     });
 
     eventDispatcher.addEventListener("addPlayTrigger", function (data) {

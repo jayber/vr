@@ -95,7 +95,11 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
         init: function () {
             animations.discoButton = this.el;
             this.el.addEventListener("click", function () {
-                eventDispatcher.toggleDiscoMode();
+                if (animations.discoMode) {
+                    eventDispatcher.discoModeOff();
+                } else {
+                    eventDispatcher.discoModeOn();
+                }
             });
         }
     });

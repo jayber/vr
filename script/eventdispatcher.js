@@ -24,8 +24,11 @@ function EventDispatcher(scoreLoader, sceneLoaded, blUser) {
     self.doubleUp = function () {
         self.target.dispatch({event: "doubleUp"});
     };
-    self.toggleDiscoMode = function () {
-        self.target.dispatch({event: "toggleDiscoMode"});
+    self.discoModeOff = function () {
+        self.target.dispatch({event: "discoModeOff"});
+    };
+    self.discoModeOn = function () {
+        self.target.dispatch({event: "discoModeOn"});
     };
     self.reload = function (index) {
         self.target.dispatch({event: "reload", data: {index: index}});
@@ -48,7 +51,7 @@ function EventDispatcher(scoreLoader, sceneLoaded, blUser) {
     self.removePlayTrigger = function (instrumentIndex, count, elementId) {
         self.target.dispatch({
             event: "removePlayTrigger",
-            data: {instrumentIndex: instrumentIndex, count: count, elementId: elementId}
+            data: {instrumentNumber: instrumentIndex, count: count, elementId: elementId}
         });
     }
 }
