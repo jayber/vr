@@ -94,11 +94,12 @@ function BLUser(user) {
     var self = this;
     var listeners = [];
     var ffa = true;
+    var moderatorPresent = false;
 
     self.user = user;
 
     self.hasPermission = function () {
-        return ffa || user.isModerator;
+        return !moderatorPresent || (moderatorPresent && ffa) || user.isModerator;
     };
 
     self.permissionChanged = function (listener) {
@@ -111,6 +112,16 @@ function BLUser(user) {
             dispatchPermissionChanged();
         }
     };
+
+
+    Object.defineProperty(self, 'moderatorPresent', {
+        set: function (value) {
+            moderatorPresent = value;
+            dispatchPermissionChanged();
+        }, get: function () {
+            return moderatorPresent;
+        }
+    });
 
     self.isFreeForAll = function () {
         return ffa;

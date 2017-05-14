@@ -16,7 +16,11 @@ function EventDispatcher(scoreLoader, sceneLoaded, blUser) {
     };
 
     self.setFreeForAll = function (value) {
-        self.target.dispatch({event: "setFreeForAll", data: {value: value}});
+        if (value) {
+            self.target.dispatch({event: "freeForAllOn"});
+        } else {
+            self.target.dispatch({event: "freeForAllOff"});
+        }
     };
     self.clear = function () {
         self.target.dispatch({event: "clear"});

@@ -81,12 +81,12 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
                 event.handled = true;
             });
 
-            eventDispatcher.addEventListener("setFreeForAll", function (data) {
-                if (data.value) {
+            eventDispatcher.addEventListener("freeForAllOn", function () {
                     self.el.setAttribute("material", "src", "#unlock-texture");
-                } else {
-                    self.el.setAttribute("material", "src", "#lock-texture");
-                }
+            });
+
+            eventDispatcher.addEventListener("freeForAllOff", function () {
+                self.el.setAttribute("material", "src", "#lock-texture");
             });
         }
     });

@@ -27,21 +27,27 @@
         })
     });
 
-    eventDispatcher.addEventListener("setFreeForAll", function (data) {
+    eventDispatcher.addEventListener("freeForAllOn", function () {
         blUser.then(function (user) {
-            user.setFreeForAll(data.value)
+            user.setFreeForAll(true);
+        });
+    });
+
+    eventDispatcher.addEventListener("freeForAllOff", function () {
+        blUser.then(function (user) {
+            user.setFreeForAll(false);
         });
     });
 
     eventDispatcher.addEventListener("moderatorAbsent", function () {
         blUser.then(function (user) {
-            user.setFreeForAll(true)
+            user.moderatorPresent = false;
         });
     });
 
     eventDispatcher.addEventListener("moderatorPresent", function () {
         blUser.then(function (user) {
-            user.setFreeForAll(false)
+            user.moderatorPresent = true;
         });
     });
 
