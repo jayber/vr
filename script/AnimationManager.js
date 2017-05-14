@@ -35,8 +35,12 @@ function AnimationManager(scheduler, settings, eventDispatcher, scoreLoader) {
         }
     });
 
-    eventDispatcher.addEventListener("toggleDiscoMode", function () {
-        self.discoMode = !self.discoMode;
+    eventDispatcher.addEventListener("discoModeOn", function () {
+        self.discoMode = true;
+    });
+
+    eventDispatcher.addEventListener("discoModeOff", function () {
+        self.discoMode = false;
     });
 
     function resetColors() {
