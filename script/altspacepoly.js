@@ -3,7 +3,7 @@ if (!altspace.inClient) {
     altspace = {
         getUser: function () {
             return new Promise(function (resolve, reject) {
-                resolve({userId: new Date().getTime(), displayName: "web-user", isModerator: false});
+                resolve({userId: new Date().getTime(), displayName: "web-user", isModerator: true});
             });
         },
         getSpace: function () {
