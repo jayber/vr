@@ -11,9 +11,9 @@ function AnimationManager(scheduler, settings, eventDispatcher, scoreLoader) {
 
     scoreLoader.score.addEventListener("bpm-change", function (bpm) {
         if (bpm === 666) {
-            settings.play("audio/satan2.wav");
+            settings.play(settings.eventSources[0]);
         } else if (bpm === 1) {
-            settings.play("audio/groot.wav");
+            settings.play(settings.eventSources[1]);
         }
     });
 

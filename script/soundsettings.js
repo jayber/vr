@@ -9,7 +9,7 @@ function SoundSettings() {
     self.soundBuffersMap = {};
     self.mute = false;
 
-    var eventSources = ["audio/satan2.wav", "audio/groot.wav"];
+    self.eventSources = ["audio/satan2.wav", "audio/groot.wav"];
 
     self.load = function (sources) {
         return new Promise(function (resolve, reject) {
@@ -45,5 +45,5 @@ function SoundSettings() {
         gain.gain.value = gain.gain.value - 0.1;
     };
 
-    self.load(eventSources);
+    self.load(self.eventSources);
 }

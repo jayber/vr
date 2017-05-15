@@ -36,6 +36,32 @@ function ScoreLoader(settings) {
             "bork": {src: "audio/cmon.wav", times: []},
             "beep": {src: "audio/piano.wav", times: []}
         }
+    }, {
+        "bpm": 140,
+        "beats": 4,
+        instrumentParts: {
+            "kick": {src: "audio/dskick.wav", times: ["0:0/4", "1:0/4", "2:0/4", "2:3/4", "3:0/4", "3:1/4"]},
+            "hat": {
+                src: "audio/hat2.wav",
+                times: ["0:0/4", "0:2/4", "1:0/4", "1:2/4", "2:0/4", "2:2/4", "3:0/4", "3:2/4"]
+            },
+            "snare": {src: "audio/dssnare.wav", times: ["0:2/4", "1:2/4", "2:2/4", "3:2/4"]},
+            "bork": {src: "audio/wub.wav", times: []},
+            "beep": {src: "audio/zingk.wav", times: []}
+        }
+    }, {
+        "bpm": 160,
+        "beats": 4,
+        instrumentParts: {
+            "kick": {src: "audio/oddkick.wav", times: ["0:0/4", "0:2/4", "1:0/4", "1:2/4", "3:0/4"]},
+            "hat": {
+                src: "audio/hat2.wav",
+                times: ["0:0/4", "0:2/4", "1:0/4", "1:2/4", "2:0/4", "2:2/4", "3:0/4", "3:2/4"]
+            },
+            "snare": {src: "audio/odd1.wav", times: ["1:2/4", "2:0/4", "3:2/4"]},
+            "bork": {src: "audio/odd3.wav", times: []},
+            "beep": {src: "audio/odd4.wav", times: []}
+        }
     }];
 
 
