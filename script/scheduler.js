@@ -80,6 +80,7 @@ function AudioAndAnimationScheduler(soundSettings) {
         const elapsedTime = audioCtx.currentTime - startTime;
         scheduleSounds(elapsedTime, offset, score);
         fireSegmentEvents(elapsedTime, offset, score);
+        dispatch("frameFinished");
         if (isRunning) {
             window.requestAnimationFrame(function () {
                 playAndSchedule(score)
