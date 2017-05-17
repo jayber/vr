@@ -6,6 +6,7 @@ function AnimationManager(scheduler, settings, eventDispatcher, scoreLoader) {
     var currentColor = 0;
     var mode2 = false;
     var discoColors;
+    var alteredElements = [];
 
     var animationsOn = !isGearVR();
 
@@ -37,6 +38,16 @@ function AnimationManager(scheduler, settings, eventDispatcher, scoreLoader) {
         }
     });
 
+    scheduler.addEventListener("frameFinished", function () {
+        alteredElements.forEach(function (element) {
+            var target = element.target;
+            if (target.getAttribute("material").color != element.color) {
+                target.setAttribute('material', 'color', element.color);
+            }
+        });
+        alteredElements = [];
+    });
+
     eventDispatcher.addEventListener("discoModeOn", function () {
         self.discoMode = true;
     });
@@ -44,6 +55,21 @@ function AnimationManager(scheduler, settings, eventDispatcher, scoreLoader) {
     eventDispatcher.addEventListener("discoModeOff", function () {
         self.discoMode = false;
     });
+
+    function changeColor(color, elements) {
+        if (elements) {
+            elements.forEach(function (target) {
+                var index = alteredElements.find(function (element) {
+                    return element.target === target;
+                });
+                if (index > -1) {
+                    alteredElements[index].color = color;
+                } else {
+                    alteredElements.push({target: target, color: color});
+                }
+            });
+        }
+    }
 
     function resetColors() {
         Object.keys(flashers).forEach(function (key) {
@@ -125,12 +151,4 @@ function AnimationManager(scheduler, settings, eventDispatcher, scoreLoader) {
             }
         }
     };
-
-    function changeColor(color, elements) {
-        if (elements) {
-            elements.forEach(function (target) {
-                target.setAttribute('material', 'color', color);
-            });
-        }
-    }
 }
