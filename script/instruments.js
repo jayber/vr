@@ -64,9 +64,9 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
         makeClickable: function (self, el) {
             el.addEventListener("click", function () {
                 soundSettings.play(scoreLoader.score.instruments[self.data].src);
-                animations.flash(self.data);
+                animations.flash(self.data, true);
                 setTimeout(function () {
-                    animations.unflash(self.data);
+                    animations.unflash(self.data, true);
                 }, 150);
             });
         },

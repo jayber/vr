@@ -154,9 +154,9 @@ function AudioAndAnimationScheduler(soundSettings) {
                 count++;
                 pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1, score);
             }
-            if (count % timeEventGranularity == 0) {
+            //if (count % timeEventGranularity == 0) {
                 dispatch("time", count % score.totalSegments);
-            }
+            //}
             dispatchInstrumentOn(count % score.totalSegments, score);
         }
     }
