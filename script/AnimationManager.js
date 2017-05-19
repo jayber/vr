@@ -39,13 +39,7 @@ function AnimationManager(scheduler, settings, eventDispatcher, scoreLoader) {
     });
 
     scheduler.addEventListener("frameFinished", function () {
-        alteredElements.forEach(function (element) {
-            var target = element.target;
-            if (target.getAttribute("material").color != element.color) {
-                target.setAttribute('material', 'color', element.color);
-            }
-        });
-        alteredElements = [];
+        flushChanges();
     });
 
     eventDispatcher.addEventListener("discoModeOn", function () {
@@ -56,7 +50,17 @@ function AnimationManager(scheduler, settings, eventDispatcher, scoreLoader) {
         self.discoMode = false;
     });
 
-    function changeColor(color, elements) {
+    function flushChanges() {
+        alteredElements.forEach(function (element) {
+            var target = element.target;
+            if (target.getAttribute("material").color != element.color) {
+                target.setAttribute('material', 'color', element.color);
+            }
+        });
+        alteredElements = [];
+    }
+
+    function changeColor(color, elements, immediate) {
         if (elements) {
             elements.forEach(function (target) {
                 var index = alteredElements.find(function (element) {
@@ -68,6 +72,9 @@ function AnimationManager(scheduler, settings, eventDispatcher, scoreLoader) {
                     alteredElements.push({target: target, color: color});
                 }
             });
+            if (immediate) {
+                flushChanges();
+            }
         }
     }
 
@@ -123,14 +130,14 @@ function AnimationManager(scheduler, settings, eventDispatcher, scoreLoader) {
         namedFlashers.elements.push(element);
     };
 
-    self.flash = function (name) {
+    self.flash = function (name, immediate) {
         if (animationsOn) {
             var namedFlashers = flashers[name];
-            changeColor("#fff", namedFlashers.elements);
+            changeColor("#fff", namedFlashers.elements, immediate);
         }
     };
 
-    self.unflash = function (name) {
+    self.unflash = function (name, immediate) {
         if (animationsOn) {
             var namedFlashers = flashers[name];
             if (self.discoMode) {
@@ -141,13 +148,13 @@ function AnimationManager(scheduler, settings, eventDispatcher, scoreLoader) {
                     } else {
                         color = namedFlashers.color
                     }
-                    changeColor(color, flashers[key].elements);
+                    changeColor(color, flashers[key].elements, immediate);
                     if (self.discoButton) {
                         self.discoButton.setAttribute('material', 'color', color);
                     }
                 })
             } else {
-                changeColor(namedFlashers.color, namedFlashers.elements);
+                changeColor(namedFlashers.color, namedFlashers.elements, immediate);
             }
         }
     };
