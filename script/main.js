@@ -16,7 +16,7 @@
     var animations = new AnimationManager(scheduler, soundSettings, eventDispatcher, scoreLoader);
     var markers = new Markers(eventDispatcher, scoreLoader);
     InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler, animations, sceneLoaded);
-    PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations, blUser);
+    PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations, blUser, instruments);
     CockpitComponents(soundSettings, animations);
 
     eventDispatcher.addEventListener("reload", function (data) {

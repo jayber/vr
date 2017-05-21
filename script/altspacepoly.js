@@ -1,9 +1,10 @@
 if (!altspace.inClient) {
     console.log("polyfilling altspace");
+    var user = {userId: new Date().getTime(), displayName: "web-user", isModerator: true};
     altspace = {
         getUser: function () {
             return new Promise(function (resolve, reject) {
-                resolve({userId: new Date().getTime(), displayName: "web-user", isModerator: true});
+                resolve(user);
             });
         },
         getSpace: function () {
@@ -15,7 +16,6 @@ if (!altspace.inClient) {
         },
         updateNativeComponent: function () {
         },
-        stubbed: true,
         open: function () {
         }
     };

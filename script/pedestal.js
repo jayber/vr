@@ -1,4 +1,4 @@
-function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations, blUser) {
+function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations, blUser, instruments) {
 
     function setPermissionColor(user, el) {
         if (user.hasPermission()) {
@@ -136,21 +136,21 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
                 if (!event.handled) {
                     var newPoint;
                     var point = self.intersectionPoint;
-                    if (!altspace.stubbed) {
+                    if (altspace.inClient) {
                         point = event.detail.point;
                     }
                     el.object3D.worldToLocal(point);
 
                     //this is utter craziness and just reflects that i don't understand rotation etc
                     //but it does work!
-                    if (!altspace.stubbed) {
+                    if (altspace.inClient) {
                         newPoint = {x: point.y, y: point.z};
                     } else {
                         newPoint = {x: point.x, y: point.z};
                     }
 
                     var data = markers.toInstrumentAndCount(newPoint.x, newPoint.y);
-                    if (data.instrumentNumber > -1) {
+                    if (data.instrumentNumber > -1 && data.instrumentNumber < instruments.instruments.length) {
                         eventDispatcher.addPlayTrigger(data);
                         event.handled = true;
                     }
