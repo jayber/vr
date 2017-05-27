@@ -5,6 +5,7 @@ function SoundSettings() {
     self.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     var gain = self.audioCtx.createGain();
     gain.connect(self.audioCtx.destination);
+    gain.gain.value = 0.5;
     self.output = gain;
     self.soundBuffersMap = {};
     self.mute = false;
@@ -33,16 +34,22 @@ function SoundSettings() {
     self.play = function (src) {
         var source = self.audioCtx.createBufferSource();
         source.buffer = self.soundBuffersMap[src];
-        source.connect(self.audioCtx.destination);
+        source.connect(self.output);
         source.start();
     };
 
     self.incrementVol = function () {
-        gain.gain.value = gain.gain.value + 0.1;
+        var value = gain.gain.value + 0.1;
+        if (value <= 1) {
+            gain.gain.value = value;
+        }
     };
 
     self.decrementVol = function () {
-        gain.gain.value = gain.gain.value - 0.1;
+        var value = gain.gain.value - 0.1;
+        if (value >= 0) {
+            gain.gain.value = value;
+        }
     };
 
     self.load(self.eventSources);
