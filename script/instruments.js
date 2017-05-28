@@ -83,9 +83,9 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
             animations.registerMasterFlasher(name, color, el);
 
             scheduler.addInstrumentListener(name, function () {
-                animations.flash(name);
+                animations.flash(name, true);
             }, function () {
-                animations.unflash(name);
+                animations.unflash(name, true);
             });
         },
 
