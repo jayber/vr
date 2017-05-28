@@ -116,7 +116,7 @@ function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded, blU
             ws.close();
         }
 
-        ws = new WebSocket("ws://" + host + "/ws/" + spaceId + "/" + blUser.user.userId + ":" + displayName);
+        ws = new WebSocket("ws://" + host + "/ws/" + spaceId + "/" + blUser.user.userId + "?displayName=" + displayName);
 
         ws.onclose = function () {
             if (secondsTilRetry < 33) {

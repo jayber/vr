@@ -1,5 +1,5 @@
 (function () {
-    serverLog("userAgent: " + navigator.userAgent + "; isGear: " + isGearVR());
+    serverLog("referrer: " + document.referrer + "; userAgent: " + navigator.userAgent + "; isGear: " + isGearVR());
 
     altspace.open(getFullUrl("comment.html"), "_experience", {icon: getFullUrl("img/bugform.png"), hidden: true});
 
