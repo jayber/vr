@@ -2,7 +2,7 @@ function AudioAndAnimationScheduler(soundSettings) {
     var audioCtx = soundSettings.audioCtx;
     //ALL time is in SECONDS (not millis)
     const self = this;
-    const timeOnLength = 0.05;
+    const timeOnLength = 0.1;
     const segmentsPerBatch = 32;
 
     var count = 0;
@@ -19,15 +19,6 @@ function AudioAndAnimationScheduler(soundSettings) {
     var offStack = [];
     const lastInstrumentSources = {};
 
-    function getGrain() {
-        if (isGearVR()) {
-            return 4;
-        } else {
-            return 1;
-        }
-    }
-
-    const timeEventGranularity = getGrain();
 
     self.addInstrumentListener = function (name, onListener, offListener) {
         if (!(name in instrumentListeners)) {
@@ -154,9 +145,7 @@ function AudioAndAnimationScheduler(soundSettings) {
                 count++;
                 pendingNextSegmentTime = calcNextSegmentTime(offset, count + 1, score);
             }
-            //if (count % timeEventGranularity == 0) {
-                dispatch("time", count % score.totalSegments);
-            //}
+            dispatch("time", count % score.totalSegments);
             dispatchInstrumentOn(count % score.totalSegments, score);
         }
     }
