@@ -37,6 +37,8 @@ function Markers(events, scoreLoader) {
         subElement.setAttribute("buffer", false);
         subElement.setAttribute("skipCache", true);
         subElement.setAttribute("mergeTo", "." + instrument.data);
+        subElement.setAttribute("segments-height", "6");
+        subElement.setAttribute("segments-width", "10");
 
         instrument.flash(subElement);
 

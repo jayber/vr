@@ -21,6 +21,18 @@ function CockpitComponents(soundSettings, animations) {
         }
     });
 
+    AFRAME.registerComponent('highlight', {
+        init: function () {
+            var self = this;
+            this.el.addEventListener("mousedown", function (event) {
+                self.el.setAttribute("color", "#999");
+            });
+            this.el.addEventListener("mouseup", function (event) {
+                self.el.setAttribute("color", "#fff");
+            });
+        }
+    });
+
     AFRAME.registerComponent('mute', {
         init: function () {
             var el = this.el;
@@ -31,7 +43,6 @@ function CockpitComponents(soundSettings, animations) {
                 if (soundSettings.mute) {
                     el.setAttribute("material", "src", "#unmute");
                     el.setAttribute("color", "#999");
-
                 } else {
                     el.setAttribute("material", "src", "#mute");
                     el.setAttribute("color", "#fff");

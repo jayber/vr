@@ -107,7 +107,7 @@ function AudioAndAnimationScheduler(soundSettings) {
 
     function dispatchInstrumentOff(elapsedTime) {
         offStack = offStack.filter(function (off) {
-            console.log("off.time:" + off.time + "; elapsedTime:" + elapsedTime);
+            //console.log("off.time:" + off.time + "; elapsedTime:" + elapsedTime);
             var crit = off.time <= elapsedTime;
             if (crit) {
                 off.listener.call(self);

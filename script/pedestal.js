@@ -193,15 +193,15 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
         }
     });
 
-    AFRAME.registerComponent('animate-theta', {
+    AFRAME.registerComponent('animate-rotation', {
         init: function () {
             var self = this;
             var el = this.el;
             scheduler.addEventListener("time", function (count) {
                 var degreesPerSeg = ((360 / scoreLoader.score.beats)) / soundSettings.segmentsPerBeat;
                 var currentDegrees = count * degreesPerSeg;
-                el.setAttribute("theta-start", currentDegrees + 0.05);    //OMFG i have no idea why i have to add this little number, but if i don't, it doesn't work!!
-                //console.log(el.getAttribute("theta-length") + "; current="+currentDegrees+" - beat="+event.detail.beatCount + "; seg="+event.detail.seg);
+                el.setAttribute("rotation", "-90 -" + currentDegrees + " 0");
+                //console.log(el.getAttribute("rotation"));
             });
         }
     });
