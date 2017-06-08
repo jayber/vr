@@ -2,7 +2,7 @@ function AudioAndAnimationScheduler(soundSettings) {
     var audioCtx = soundSettings.audioCtx;
     //ALL time is in SECONDS (not millis)
     const self = this;
-    const timeOnLength = 0.1;
+    const timeOnLength = 0.05;
     const segmentsPerBatch = 32;
 
     var count = 0;

@@ -56,7 +56,9 @@
         <img id="minus" src="img/minus.png">
         <img id="animationsOff" src="img/animationsOff.png">
         <img id="animationsOn" src="img/animationsOn.png">
-        <!--<a-asset-item id="pedestal" src="models/simplepedestal.dae"></a-asset-item>-->
+        <img id="vinyl" src="img/vinyl.jpg">
+        <a-asset-item id="cube" src="models/cube.dae"></a-asset-item>
+        <a-asset-item id="pedestal" src="models/pedestal.dae"></a-asset-item>
     </a-assets>
 
     <a-entity position="0.6 -0.15 -1" rotation="-30 0 0">
@@ -105,21 +107,23 @@
     <!--<a-entity id="root" position="3.5 0 -7">-->
     <a-entity id="root">
 
-        <!--<a-entity collada-model="#pedestal" scale="1.5 1.5 1.5"></a-entity>-->
-        <a-cylinder segments-height="6" segments-radial="12" altspace-cursor-collider="enabled:false"
-                    material="src:#galv-texture;" height="0.9" visible="false"
-                    position="0 0.45 0" color="#556" radius="0.3">
-            <a-sphere segments-height="6" segments-width="12" playable position="0 0.3 0.3" radius="0.1"
+        <a-entity collada-model="#pedestal" position="0 0 0" altspace-cursor-collider="enabled:false">
+            <!--<a-cylinder segments-height="6" segments-radial="12" altspace-cursor-collider="enabled:false"
+                        material="src:#galv-texture;" height="0.9" visible="false"
+                        position="0 0.45 0" color="#556" radius="0.3">-->
+            <a-sphere playable segments-height="6" segments-width="12" position="0 0.75 0.3" radius="0.1"
                       material="src:#play-texture" rotation="0 -90 30" color="#ddd"
                       n-mesh-collider="convex:false"></a-sphere>
-            <a-sphere segments-height="6" segments-width="12" disco-mode position="0.17 0.39 0.25" radius="0.03"
+            <a-sphere disco-mode segments-height="6" segments-width="12" position="0.17 0.84 0.35" radius="0.03"
                       material="src:#disco-texture" rotation="0 -90 30" color="#ddd"
                       n-mesh-collider="convex:false"></a-sphere>
-        </a-cylinder>
+        </a-entity>
+        <!--</a-cylinder>-->
 
-        <a-cylinder segments-height="1" timer id="clock-face" material="src:#studded-texture;repeat: 10 1"
+        <a-box segments-height="1" timer id="clock-face" material="src:#vinyl;"
                     segments-radial="16"
-                    height="0.05" rotation="0 90 40" position="0 1.2 0" radius="0.405" n-mesh-collider="convex:false">
+                    height="0.025" rotation="0 90 45" position="0 1.17 -0.005" width="0.81" depth="0.825"
+                    n-mesh-collider="convex:false">
 
             <a-entity rings rotation="-90 0 0" position="0 0.038 0"></a-entity>
 
@@ -127,38 +131,51 @@
                       material="src:#noise-texture; repeat:5 5" rotation="-90 0 0" position="0 0.06 0.005"
                       geometry="radius: 0.405" theta-length="4" color="#f0eae0"></a-circle>
 
-            <a-circle altspace-cursor-collider="enabled:false" radius="0.3" scale="0.5 0.5 0.5" material="src:#noise-texture; repeat:5 5" color="#181818" position="-0.01 0.07 0" rotation="-90 0 0">
+            <a-circle altspace-cursor-collider="enabled:false" radius="0.3" scale="0.5 0.5 0.5"
+                      material="src:#noise-texture; repeat:5 5" color="#181818" position="0 0.07 0.003"
+                      rotation="-90 0 0">
                 <a-circle bpm-change="up" radius="0.08" rotation="0 0 -90" material="src:#up-arrow" position="0.15 0 0.01"></a-circle>
                 <a-entity bpm-label position="0 0 0.01" rotation="0 0 -90" n-text="fontSize:1pt;width:0.5;height:0.1"></a-entity>
                 <a-circle bpm-change="down" radius="0.08" rotation="0 0 -90" material="src:#down-arrow" position="-0.15 0 0.01"></a-circle>
             </a-circle>
 
-            <a-box altspace-cursor-collider="enabled:false" depth="0.2" height="0.05" width="0.35" position="0.025 -0.01 -0.4" material="src:#noise-texture; repeat:5 5;color: #333">
-                <a-circle lock position="0.115 0.028 -0.04" radius="0.03" material="src:#lock-texture" rotation="-90 0 -90" color="#999"></a-circle>
-                <a-sphere segments-height="6" segments-width="12" reset position="0.035 0.03 -0.04" radius="0.03"
+            <a-box altspace-cursor-collider="enabled:false" depth="0.1" height="0.05" width="0.35"
+                   position="0.025 -0.01 -0.49" color="#e8e4e4">
+                <a-circle lock position="0.115 0.028 0" radius="0.03" material="src:#lock-texture" rotation="-90 0 -90"
+                          color="#999"></a-circle>
+                <a-sphere segments-height="6" segments-width="12" reset position="0.035 0.03 0" radius="0.03"
                           material="src:#reset-texture" rotation="0 0 100" color="#999"></a-sphere>
-                <a-sphere segments-height="6" segments-width="12" clear position="-0.0525 0.03 -0.04" radius="0.03"
+                <a-sphere segments-height="6" segments-width="12" clear position="-0.0525 0.03 0" radius="0.03"
                           material="src:#clear-texture" rotation="0 0 100" color="#999"></a-sphere>
-                <a-sphere segments-height="6" segments-width="12" double-up position="-0.13 0.03 -0.04" radius="0.03"
+                <a-sphere segments-height="6" segments-width="12" double-up position="-0.13 0.03 0" radius="0.03"
                           material="src:#double-up-texture" rotation="0 0 100" color="#999"></a-sphere>
             </a-box>
-        </a-cylinder>
+        </a-box>
 
         <a-sphere segments-height="12" segments-width="24" instrument="kick" material="src:#noise-texture; repeat:5 5"
-                  color="#6688ff" position="1 1 1.5" radius="0.3"></a-sphere>
+                  color="#6688ff" position="1 1 1.5" radius="0.3">
+            <a-entity collada-model="#cube" position="0 -1 0"></a-entity>
+        </a-sphere>
 
-        <a-box instrument="hat" depth="0.5" height="0.5" width="0.5" material="src:#copper-texture;color: #ff6688" position="-1 1 1.5"></a-box>
+        <a-box instrument="hat" depth="0.5" height="0.5" width="0.5" material="src:#copper-texture;color: #ff6688"
+               position="-1 1 1.5">
+            <a-entity collada-model="#cube" position="0 -1 0"></a-entity>
+        </a-box>
 
         <a-tetrahedron instrument="snare" rotation="215 45 45" radius="0.6" material="src:#green-texture;color:#b0d8b0" position="-1.7 1 -0.8"></a-tetrahedron>
+        <a-entity collada-model="#cube" position="-1.7 0 -0.8"></a-entity>
 
         <a-cylinder segments-height="6" segments-radial="12" height="1" radius="0.08" position="0 1.2 -1.5"
-                    material="src:#stain-texture"></a-cylinder>
+                    material="src:#stain-texture">
+            <a-entity collada-model="#cube" position="0 -1.2 0"></a-entity>
+        </a-cylinder>
         <a-sphere segments-height="6" segments-width="12" instrument="bork" material="src:#tongue-texture;color:#aaf"
                   position="0 1 -1.5" radius="0.15"></a-sphere>
 
         <a-cone segments-height="6" segments-radial="12" instrument="beep" height="0.7" radius-top="0.2"
                 radius-bottom="0.38" open-ended="true" color="#ffc34e" material="src:#rock-texture;side:double"
                 position="1.7 1.1 -0.8">
+            <a-entity collada-model="#cube" position="0 -1.1 0"></a-entity>
 
         </a-cone>
     </a-entity>
