@@ -95,21 +95,31 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
 
         createCable: function (el) {
             var self = this;
-            var start = el.object3D.getWorldPosition();
-            var instrumentFloor = new THREE.Vector3(start.x, 0, start.z);
-            var path = new THREE.CurvePath();
-            path.add(new THREE.LineCurve3(start, instrumentFloor));
-            path.add(new THREE.LineCurve3(instrumentFloor, new THREE.Vector3(0, 0, 0)));
-            var geometry = new THREE.TubeGeometry(path, 16, 0.02, 4, false);
+            var sceneEl = el.sceneEl;
+            if (sceneEl.hasLoaded) {
+                resolve();
+            } else {
+                sceneEl.addEventListener("loaded", function () {
+                    resolve();
+                });
+            }
+            function resolve() {
+                var start = el.object3DMap.mesh.getWorldPosition();
+                var instrumentFloor = new THREE.Vector3(start.x, 0, start.z);
+                var path = new THREE.CurvePath();
+                path.add(new THREE.LineCurve3(start, instrumentFloor));
+                path.add(new THREE.LineCurve3(instrumentFloor, new THREE.Vector3(0, 0, 0)));
+                var geometry = new THREE.TubeGeometry(path, 16, 0.02, 4, false);
 
-            var tube = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({}));
-            var cableElement = document.createElement("a-entity");
-            cableElement.setObject3D("mesh", tube);
-            document.querySelector("#root").appendChild(cableElement);
+                var tube = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({}));
+                var cableElement = document.createElement("a-entity");
+                cableElement.setObject3D("mesh", tube);
+                document.querySelector("#root").appendChild(cableElement);
 
-            cableElement.setAttribute('material', {color: self.color, src: "#cable-texture", repeat: '100 1'});
-            cableElement.setAttribute("altspace-cursor-collider", "enabled", "false");
-            self.flash(cableElement);
+                cableElement.setAttribute('material', {color: self.color, src: "#cable-texture", repeat: '100 1'});
+                cableElement.setAttribute("altspace-cursor-collider", "enabled", "false");
+                self.flash(cableElement);
+            }
         }
     });
 
