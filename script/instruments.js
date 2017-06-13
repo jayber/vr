@@ -105,8 +105,16 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
                 path.add(new THREE.LineCurve3(cubeTop, edge));
                 var floor = new THREE.Vector3(edge.x, 0, edge.z);
                 path.add(new THREE.LineCurve3(edge, floor));
-                path.add(new THREE.LineCurve3(floor, new THREE.Vector3(0, 0, 0)));
-                var geometry = new THREE.TubeGeometry(path, 32, 0.02, 8, false);
+                var rndX = Math.random();
+                var rndZ = Math.random();
+                path.add(new THREE.CubicBezierCurve3(floor,
+                    new THREE.Vector3((floor.x / 3) + rndX, floor.y, (floor.z / 3) + rndZ),
+                    new THREE.Vector3(((floor.x / 3) * 2) + rndX, floor.y, ((floor.z / 3) * 2) + rndZ),
+                    new THREE.Vector3(0, 0, 0)
+                ));
+
+                //path.add(new THREE.LineCurve3(floor, new THREE.Vector3(0, 0, 0)));
+                var geometry = new THREE.TubeGeometry(path, 64, 0.02, 8, false);
 
                 var tube = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({}));
                 var cableElement = document.createElement("a-entity");
@@ -119,7 +127,7 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
             });
 
             function findEdge(start, position) {
-                var radius = 0.39;
+                var radius = 0.38;
                 if (Math.abs(start.x) < Math.abs(start.z)) {
                     var z = (start.z < 0 ? start.z + radius : start.z - radius) - position.z;
                     return new THREE.Vector3(start.x, height, z);
