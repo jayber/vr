@@ -34,7 +34,6 @@
         <img id="studded-texture" src="img/studded.jpg">
         <img id="noise-texture" src="img/noise.png">
         <img id="copper-texture" src="img/copper.jpg">
-        <img id="galv-texture" src="img/galvanised.jpg">
         <img id="green-texture" src="img/green.jpg">
         <img id="tongue-texture" src="img/tongue.jpg">
         <img id="stain-texture" src="img/stain.jpg">
@@ -56,8 +55,6 @@
         <img id="minus" src="img/minus.png">
         <img id="animationsOff" src="img/animationsOff.png">
         <img id="animationsOn" src="img/animationsOn.png">
-        <img id="vinyl" src="img/vinyl.jpg">
-        <img id="cross" src="img/cross.png">
         <a-asset-item id="cube" src="models/cube.dae"></a-asset-item>
         <a-asset-item id="pedestal" src="models/pedestal.dae"></a-asset-item>
     </a-assets>
@@ -105,14 +102,11 @@
         </a-circle>
     </a-entity>
 
-    <!--<a-entity id="root" position="3.5 0 -7">-->
+
     <a-entity id="root">
 
         <a-entity collada-model="#pedestal" position="0 0 0" altspace-cursor-collider="enabled:false"
                   altspace-capsule-collider="direction: z; type: object;">
-            <!--<a-cylinder segments-height="6" segments-radial="12" altspace-cursor-collider="enabled:false"
-                        material="src:#galv-texture;" height="0.9" visible="false"
-                        position="0 0.45 0" color="#556" radius="0.3">-->
             <a-sphere playable segments-height="6" segments-width="12" position="0 0.75 0.28" radius="0.1"
                       material="src:#play-texture" rotation="0 -90 30" color="#e4dcd4"
                       n-mesh-collider="convex:false"></a-sphere>
@@ -120,7 +114,6 @@
                       material="src:#disco-texture" rotation="0 -90 30" color="#e4dcd4"
                       n-mesh-collider="convex:false"></a-sphere>
         </a-entity>
-        <!--</a-cylinder>-->
 
         <a-box segments-height="1" timer id="clock-face"
                segments-radial="16"

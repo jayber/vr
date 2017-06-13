@@ -95,20 +95,17 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
 
         createCable: function (el) {
             var self = this;
-            var sceneEl = el.sceneEl;
-            if (sceneEl.hasLoaded) {
-                resolve();
-            } else {
-                sceneEl.addEventListener("loaded", function () {
-                    resolve();
-                });
-            }
-            function resolve() {
-                var start = el.object3DMap.mesh.getWorldPosition();
-                var instrumentFloor = new THREE.Vector3(start.x, 0, start.z);
+            var height = 0.72;
+            sceneLoaded.then(function () {
+                var start = el.object3D.getWorldPosition();
+                var cubeTop = new THREE.Vector3(start.x, height, start.z);
                 var path = new THREE.CurvePath();
-                path.add(new THREE.LineCurve3(start, instrumentFloor));
-                path.add(new THREE.LineCurve3(instrumentFloor, new THREE.Vector3(0, 0, 0)));
+                path.add(new THREE.LineCurve3(start, cubeTop));
+                var edge = findEdge(start, el.object3D.position);
+                path.add(new THREE.LineCurve3(cubeTop, edge));
+                var floor = new THREE.Vector3(edge.x, 0, edge.z);
+                path.add(new THREE.LineCurve3(edge, floor));
+                path.add(new THREE.LineCurve3(floor, new THREE.Vector3(0, 0, 0)));
                 var geometry = new THREE.TubeGeometry(path, 16, 0.02, 4, false);
 
                 var tube = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({}));
@@ -119,6 +116,17 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
                 cableElement.setAttribute('material', {color: self.color, src: "#cable-texture", repeat: '100 1'});
                 cableElement.setAttribute("altspace-cursor-collider", "enabled", "false");
                 self.flash(cableElement);
+            });
+
+            function findEdge(start, position) {
+                var radius = 0.39;
+                if (Math.abs(start.x) < Math.abs(start.z)) {
+                    var z = (start.z < 0 ? start.z + radius : start.z - radius) - position.z;
+                    return new THREE.Vector3(start.x, height, z);
+                } else {
+                    var x = (start.x < 0 ? start.x + radius : start.x - radius) - position.x;
+                    return new THREE.Vector3(x, height, start.z);
+                }
             }
         }
     });
