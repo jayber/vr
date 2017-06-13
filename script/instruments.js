@@ -106,7 +106,7 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
                 var floor = new THREE.Vector3(edge.x, 0, edge.z);
                 path.add(new THREE.LineCurve3(edge, floor));
                 path.add(new THREE.LineCurve3(floor, new THREE.Vector3(0, 0, 0)));
-                var geometry = new THREE.TubeGeometry(path, 16, 0.02, 4, false);
+                var geometry = new THREE.TubeGeometry(path, 32, 0.02, 8, false);
 
                 var tube = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({}));
                 var cableElement = document.createElement("a-entity");
