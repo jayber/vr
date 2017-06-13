@@ -108,7 +108,7 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
                 var rndX = Math.random();
                 var rndZ = Math.random();
                 path.add(new THREE.CubicBezierCurve3(floor,
-                    new THREE.Vector3((floor.x / 3) + rndX, floor.y, (floor.z / 3) + rndZ),
+                    new THREE.Vector3((floor.x / 3) + rndX, floor.y, Math.min((floor.z / 3) + rndZ, floor.z)),
                     new THREE.Vector3(((floor.x / 3) * 2) + rndX, floor.y, ((floor.z / 3) * 2) + rndZ),
                     new THREE.Vector3(0, 0, 0)
                 ));
