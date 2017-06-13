@@ -79,18 +79,17 @@ function LocalEventTarget() {
             return true;
         }
         var stack = listeners[type];
-
-        for (var i = 0, l = stack.length; i < l; i++) {
-            const listener = stack[i];
+        stack.forEach(function (element) {
             promise = promise.then(function () {
                 try {
-                    return Promise.resolve(listener.call(self, param))
+                    var call = element.call(self, param);
+                    return Promise.resolve(call);
                 } catch (e) {
                     console.error(e);
                     reportException(e);
                 }
             });
-        }
+        });
     };
 }
 

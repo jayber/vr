@@ -93,7 +93,7 @@ function sendComment() {
 function BLUser(user) {
     var self = this;
     var listeners = [];
-    var ffa = true;
+    var ffa = false;
     var moderatorPresent = false;
 
     self.user = user;
