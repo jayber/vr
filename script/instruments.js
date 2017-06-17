@@ -1,4 +1,4 @@
-function Instruments(scoreLoader, eventDispatcher) {
+function Instruments(scoreLoader, eventDispatcher, markers) {
     var self = this;
     self.instruments = [];
 
@@ -9,6 +9,24 @@ function Instruments(scoreLoader, eventDispatcher) {
     eventDispatcher.addEventListener("addPlayTrigger", function (data) {
         self.add(data);
     });
+
+    eventDispatcher.addEventListener("pitchUp", function (data) {
+        self.pitchUp(data);
+    });
+
+    eventDispatcher.addEventListener("pitchDown", function (data) {
+        self.pitchDown(data);
+    });
+
+    self.pitchUp = function (data) {
+        var instrument = self.instruments[data.instrumentIndex];
+        instrument.pitchUp(data.count);
+    };
+
+    self.pitchDown = function (data) {
+        var instrument = self.instruments[data.instrumentIndex];
+        instrument.pitchDown(data.count);
+    };
 
     self.remove = function (instrumentIndex, count, elementId) {
         var instrument = self.instruments[instrumentIndex];
@@ -26,7 +44,6 @@ function Instruments(scoreLoader, eventDispatcher) {
             instrument.markers.forEach(function (marker) {
                 dial.removeChild(marker);
             });
-
             instrument.generateMarkers(scoreLoader.score.instruments[instrument.data].times);
         });
     };
@@ -48,8 +65,25 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
             this.makeClickable(this, el);
         },
 
+        pitchUp: function (count) {
+            var pitch = scoreLoader.score.pitchUp(count, this.data);
+            var marker = this.markersMap[count + ""];
+            markers.pitchElement(marker, pitch);
+        },
+
+        pitchDown: function (count) {
+            var pitch = scoreLoader.score.pitchDown(count, this.data);
+            var marker = this.markersMap[count + ""];
+            markers.pitchElement(marker, pitch);
+        },
+
         addTrigger: function (data) {
-            this.markers.push(markers.marker(data.count, this));
+            var marker = markers.marker(data.count, this);
+
+            markers.createBillboard(marker, this.instrumentIndex, data.count);
+
+            this.markers.push(marker);
+            this.markersMap[data.count + ""] = marker;
             scoreLoader.score.addInstrumentTrigger(data.count, this.data);
         },
 
@@ -74,8 +108,11 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
         generateMarkers: function (times) {
             var sself = this;
             sself.markers = [];
+            sself.markersMap = {};
             times.forEach(function (time) {
-                sself.markers.push(markers.marker(time.count, sself));
+                var marker = markers.marker(time.count, sself);
+                sself.markers.push(marker);
+                sself.markersMap[time.count + ""] = marker;
             });
         },
 
@@ -105,15 +142,16 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
                 path.add(new THREE.LineCurve3(cubeTop, edge));
                 var floor = new THREE.Vector3(edge.x, 0, edge.z);
                 path.add(new THREE.LineCurve3(edge, floor));
-                var rndX = Math.random();
-                var rndZ = Math.random();
+                var startRndX = Math.random() * floor.x;
+                var startRndZ = Math.random() * floor.z;
+                var endRndX = Math.random() * floor.x;
+                var endRndZ = Math.random() * floor.z;
                 path.add(new THREE.CubicBezierCurve3(floor,
-                    new THREE.Vector3((floor.x / 3) + rndX, floor.y, Math.min((floor.z / 3) + rndZ, floor.z)),
-                    new THREE.Vector3(((floor.x / 3) * 2) + rndX, floor.y, ((floor.z / 3) * 2) + rndZ),
+                    new THREE.Vector3(startRndX, floor.y, startRndZ),
+                    new THREE.Vector3(endRndX, floor.y, endRndZ),
                     new THREE.Vector3(0, 0, 0)
                 ));
 
-                //path.add(new THREE.LineCurve3(floor, new THREE.Vector3(0, 0, 0)));
                 var geometry = new THREE.TubeGeometry(path, 64, 0.02, 8, false);
 
                 var tube = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({}));
@@ -149,15 +187,15 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
         },
 
         addRings: function (rings) {
-            var current = 0.180;
+            var current = markers.startRadius;
             instruments.instruments.forEach(function (instrument) {
                 var ring = document.createElement("a-ring");
-                ring.setAttribute("radius-outer", current);
-                ring.setAttribute("radius-inner", current - 0.002);
+                ring.setAttribute("radius-outer", current + 0.001);
+                ring.setAttribute("radius-inner", current - 0.001);
                 ring.setAttribute("color", instrument.color);
                 instrument.flash(ring);
                 rings.appendChild(ring);
-                current += 0.05;
+                current += markers.radiusStep;
             });
         }
     });

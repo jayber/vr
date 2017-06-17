@@ -123,7 +123,7 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
         }
     });
 
-    AFRAME.registerComponent('timer', {
+    AFRAME.registerComponent('timer-face', {
         init: function () {
             var el = this.el;
             var self = this;
@@ -193,7 +193,7 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
         }
     });
 
-    AFRAME.registerComponent('animate-rotation', {
+    AFRAME.registerComponent('timer-hand', {
         init: function () {
             var self = this;
             var el = this.el;

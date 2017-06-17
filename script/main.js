@@ -12,9 +12,9 @@
     var scoreLoader = new ScoreLoader(soundSettings);
     var eventDispatcher = new EventDispatcher(scoreLoader, sceneLoaded, blUser);
     var scheduler = new AudioAndAnimationScheduler(soundSettings);
-    var instruments = new Instruments(scoreLoader, eventDispatcher);
-    var animations = new AnimationManager(scheduler, soundSettings, eventDispatcher, scoreLoader);
     var markers = new Markers(eventDispatcher, scoreLoader);
+    var instruments = new Instruments(scoreLoader, eventDispatcher, markers);
+    var animations = new AnimationManager(scheduler, soundSettings, eventDispatcher, scoreLoader);
     InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler, animations, sceneLoaded);
     PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations, blUser, instruments);
     CockpitComponents(soundSettings, animations);

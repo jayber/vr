@@ -57,6 +57,12 @@ function EventDispatcher(scoreLoader, sceneLoaded, blUser) {
             event: "removePlayTrigger",
             data: {instrumentNumber: instrumentIndex, count: count, elementId: elementId}
         });
+    };
+    self.pitchUp = function (instrumentNumber, count) {
+        self.target.dispatch({event: "pitchUp", data: {instrumentIndex: instrumentNumber, count: count}});
+    };
+    self.pitchDown = function (instrumentNumber, count) {
+        self.target.dispatch({event: "pitchDown", data: {instrumentIndex: instrumentNumber, count: count}});
     }
 }
 
@@ -85,7 +91,7 @@ function LocalEventTarget() {
                     var call = element.call(self, param);
                     return Promise.resolve(call);
                 } catch (e) {
-                    console.error(e);
+                    console.log(e);
                     reportException(e);
                 }
             });

@@ -65,8 +65,8 @@ function ScoreLoader(settings) {
     }];
 
 
-    var playableScore = new PlayableScore(settings);
-    self.score = playableScore;
+    var scorePlayer = new ScorePlayer(settings);
+    self.score = scorePlayer;
 
     function convertTimeToCount(beat, seg) {
         return Math.round((settings.segmentsPerBeat * beat) + seg);
@@ -90,7 +90,7 @@ function ScoreLoader(settings) {
         var sources = [];
         Object.keys(currentScore.instrumentParts).forEach(function (key) {
             var instrumentPart = currentScore.instrumentParts[key];
-            playableScore.registerInstrument(key, parseTimes(instrumentPart.times), instrumentPart.src);
+            scorePlayer.registerInstrument(key, parseTimes(instrumentPart.times), instrumentPart.src);
             sources.push(instrumentPart.src);
         });
         return sources;
@@ -107,10 +107,11 @@ function ScoreLoader(settings) {
     self.reload(0);
 }
 
-function PlayableScore(settings) {
+function ScorePlayer(settings) {
     var self = this;
     var bpmVar;
 
+    var triggersMap = {};
     var listeners = {};
 
     function initTriggers() {
@@ -125,6 +126,7 @@ function PlayableScore(settings) {
         var index = self.triggersByTime[count].indexOf(trigger);
         if (index < 0) {
             self.triggersByTime[count].push(trigger);
+            triggersMap[instrumentName + count] = trigger;
         }
     }
 
@@ -231,11 +233,25 @@ function PlayableScore(settings) {
         addTriggerTime(count, instrumentName);
         self.instruments[instrumentName].times.push({count: count})
     };
+
+    self.pitchUp = function (count, instrumentName) {
+        return ++triggersMap[instrumentName + count].rate;
+    };
+
+    self.pitchDown = function (count, instrumentName) {
+        return --triggersMap[instrumentName + count].rate;
+    };
 }
 
+/**
+ * Rate is number of semitones up (+) or down (-) from A-4 (440Hz)
+ */
 function InstrumentTrigger(instrumentName, rate) {
     var self = this;
     self.name = instrumentName;
+    if (!rate) {
+        rate = 0;
+    }
     self.rate = rate;
 
     self.copy = function () {
