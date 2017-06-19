@@ -82,6 +82,7 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
             var marker = markers.marker(data.count, this, trigger);
 
             markers.createPitchBoard(marker, this, data.count);
+            markers.createPitchBoard(marker, this, data.count);
 
             this.markers.push(marker);
             this.markersMap[data.count + ""] = marker;

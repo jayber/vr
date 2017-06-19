@@ -4,6 +4,7 @@ function AudioAndAnimationScheduler(soundSettings) {
     const self = this;
     const timeOnLength = 0.05;
     const segmentsPerBatch = 32;
+    const A = Math.pow(2, 1 / 12);
 
     var count = 0;
     var playedCount = 0;
@@ -170,6 +171,7 @@ function AudioAndAnimationScheduler(soundSettings) {
                         }
                         var source = audioCtx.createBufferSource();
                         source.buffer = soundSettings.soundBuffersMap[instrument.src];
+                        source.playbackRate.value = Math.pow(A, trigger.rate);
                         source.connect(soundSettings.output);
                         source.start(when);
                         sourcesToCancel.push(source);

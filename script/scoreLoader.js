@@ -142,7 +142,10 @@ function ScorePlayer(settings) {
         Object.keys(self.instruments).forEach(function (key) {
             var totalTimes = self.instruments[key].times.length;
             for (var i = 0; i < totalTimes; i++) {
-                self.instruments[key].times[i + totalTimes] = {count: self.instruments[key].times[i].count + self.totalSegments};
+                self.instruments[key].times[i + totalTimes] = {
+                    count: self.instruments[key].times[i].count + self.totalSegments,
+                    trigger: self.instruments[key].times[i].trigger.copy()
+                };
             }
         });
         self.beats = self.beats * 2;
@@ -251,6 +254,6 @@ function InstrumentTrigger(instrumentName, rate) {
     self.rate = rate;
 
     self.copy = function () {
-        return new InstrumentTrigger(instrumentName, rate);
+        return new InstrumentTrigger(instrumentName, self.rate);
     };
 }

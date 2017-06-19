@@ -121,7 +121,6 @@ function Markers(eventDispatcher, scoreLoader) {
     }
 
     function updateOctaveBars(markerElement, octaves) {
-        //var elements = markerElement.querySelectorAll(".bar");
         $(".bar", markerElement).each(function (index, element) {
             element.parentNode.removeChild(element);
         });
@@ -141,11 +140,16 @@ function Markers(eventDispatcher, scoreLoader) {
         }
     }
 
-    this.pitchElement = function (markerElement, pitch, baseColor, isUp) {
+    function calcYDisplacement(pitch) {
         var displacement = pitch % 12;
         if (displacement < 0) {
             displacement = 12 + displacement
         }
+        return displacement;
+    }
+
+    this.pitchElement = function (markerElement, pitch, baseColor, isUp) {
+        var displacement = calcYDisplacement(pitch);
         var pos = displacement * pitchStep;
 
         var octaves = Math.floor(pitch / 12);
@@ -170,12 +174,13 @@ function Markers(eventDispatcher, scoreLoader) {
         var subElement = document.createElement("a-sphere");
 
         var subElementId = instrument.data + count;
-        var displacement = (trigger.rate % 12) * pitchStep;
+        var displacement = calcYDisplacement(trigger.rate);
+        var pos = displacement * pitchStep;
 
         subElement.setAttribute("id", subElementId);
         subElement.setAttribute("class", instrument.data);
         subElement.setAttribute("radius", "0.027");
-        subElement.setAttribute("position", newX + " " + displacement + " " + newY);
+        subElement.setAttribute("position", newX + " " + pos + " " + newY);
         subElement.setAttribute("buffer", false);
         subElement.setAttribute("skipCache", true);
         subElement.setAttribute("mergeTo", "." + instrument.data);
@@ -188,10 +193,12 @@ function Markers(eventDispatcher, scoreLoader) {
         clockFace.appendChild(subElement);
         subElement.setAttribute("material", "src", "#noise-texture");
 
-        var octaves = Math.floor(trigger.rate / 12);
         subElement.setAttribute("color", instrument.color);
 
-        this.createStickElement(subElement, new THREE.Vector3(newX, displacement, newY), instrument, subElementId);
+        this.createStickElement(subElement, new THREE.Vector3(newX, pos, newY), instrument, subElementId);
+
+        var octaves = Math.floor(trigger.rate / 12);
+        updateOctaveBars(subElement, octaves);
 
         subElement.addEventListener("click", function (event) {
             if (!event.handled) {
