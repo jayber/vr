@@ -1,8 +1,6 @@
 function ScoreLoader(settings) {
     var self = this;
 
-    var beatExp = /(\d*):(\d*)\/(\d*)/;
-
     self.readableScores = [{
         "bpm": 180,
         "beats": 4,
@@ -65,42 +63,12 @@ function ScoreLoader(settings) {
     }];
 
 
-    var scorePlayer = new ScorePlayer(settings);
-    self.score = scorePlayer;
-
-    function convertTimeToCount(beat, seg) {
-        return Math.round((settings.segmentsPerBeat * beat) + seg);
-    }
-
-    function parseTimes(times) {
-        var parsedTimes = [];
-        times.forEach(function (time) {
-            var capture = beatExp.exec(time);
-            var beat = capture[1];
-            var nom = capture[2];
-            var denom = capture[3];
-            var seg = (settings.segmentsPerBeat / denom) * nom;
-            var element = {beat: beat, seg: seg, count: convertTimeToCount(beat, seg)};
-            parsedTimes.push(element);
-        });
-        return parsedTimes;
-    }
-
-    function registerInstruments(currentScore) {
-        var sources = [];
-        Object.keys(currentScore.instrumentParts).forEach(function (key) {
-            var instrumentPart = currentScore.instrumentParts[key];
-            scorePlayer.registerInstrument(key, parseTimes(instrumentPart.times), instrumentPart.src);
-            sources.push(instrumentPart.src);
-        });
-        return sources;
-    }
+    self.score = new ScorePlayer(settings);
 
     self.reload = function (index) {
         self.scoreIndex = index;
         var currentScore = self.readableScores[index];
-        self.score.init(currentScore.bpm, currentScore.beats);
-        var sources = registerInstruments(currentScore);
+        var sources = self.score.load(currentScore);
         self.loaded = settings.load(sources);
     };
 
@@ -108,37 +76,33 @@ function ScoreLoader(settings) {
 }
 
 function ScorePlayer(settings) {
+
+    const beatExp = /(\d*):(\d*)\/(\d*)/;
+
     var self = this;
     var bpmVar;
 
     var triggersMap = {};
     var listeners = {};
 
-    function initTriggers() {
-        self.triggersByTime = [self.totalSegments];
-        for (var i = 0; i < self.totalSegments; i++) {
-            self.triggersByTime[i] = [];
-        }
-    }
+    self.load = function (currentScore) {
+        self.bpm = currentScore.bpm;
+        self.beats = currentScore.beats;
+        self.instruments = {};
+        initTriggers();
 
-    function addTriggerTime(count, instrumentName, rate) {
-        var trigger = new InstrumentTrigger(instrumentName, rate);
-        var index = self.triggersByTime[count].indexOf(trigger);
-        if (index < 0) {
-            self.triggersByTime[count].push(trigger);
-            triggersMap[instrumentName + count] = trigger;
-        }
-    }
-
-    function dispatch(type, param) {
-        if (!(type in listeners)) {
-            return true;
-        }
-        var stack = listeners[type];
-        for (var i = 0, l = stack.length; i < l; i++) {
-            stack[i].call(self, param);
-        }
-    }
+        var sources = [];
+        Object.keys(currentScore.instrumentParts).forEach(function (key) {
+            var instrumentPart = currentScore.instrumentParts[key];
+            var times = parseTimes(instrumentPart.times, key);
+            self.instruments[key] = {name: key, times: times, src: instrumentPart.src};
+            times.forEach(function (time) {
+                addTriggerTime(time.count, key, time.trigger);
+            });
+            sources.push(instrumentPart.src);
+        });
+        return sources;
+    };
 
     Object.defineProperty(self, 'bpm', {
         set: function (bpmP) {
@@ -149,28 +113,21 @@ function ScorePlayer(settings) {
         }
     });
 
-    self.getDisplayBpm = function () {
-        return bpmVar
-    };
-
     Object.defineProperty(self, 'totalSegments', {
         get: function () {
             return settings.segmentsPerBeat * self.beats;
         }
     });
 
+    self.getDisplayBpm = function () {
+        return bpmVar
+    };
+
     self.clear = function () {
         initTriggers();
         Object.keys(self.instruments).forEach(function (key) {
             self.instruments[key].times = [];
         })
-    };
-
-    self.init = function (bpmP, beats) {
-        self.bpm = bpmP;
-        self.beats = beats;
-        self.instruments = {};
-        initTriggers();
     };
 
     self.doubleUp = function () {
@@ -202,17 +159,6 @@ function ScorePlayer(settings) {
         listeners[type].push(listener);
     };
 
-    self.unregisterAll = function () {
-        self.init(bpmVar, self.beats);
-    };
-
-    self.registerInstrument = function (name, times, src) {
-        self.instruments[name] = {name: name, times: times, src: src};
-        times.forEach(function (time) {
-            addTriggerTime(time.count, name);
-        });
-    };
-
     self.removeInstrumentTrigger = function (count, instrumentName) {
         var index = self.triggersByTime[count].findIndex(function (element) {
             return element.name === instrumentName;
@@ -230,8 +176,14 @@ function ScorePlayer(settings) {
     };
 
     self.addInstrumentTrigger = function (count, instrumentName) {
-        addTriggerTime(count, instrumentName);
-        self.instruments[instrumentName].times.push({count: count})
+        var trigger = new InstrumentTrigger(instrumentName);
+        addTriggerTime(count, instrumentName, trigger);
+        self.instruments[instrumentName].times.push({count: count, trigger: trigger});
+        return trigger;
+    };
+
+    self.getTrigger = function (count, instrumentName) {
+        return triggersMap[instrumentName + count];
     };
 
     self.pitchUp = function (count, instrumentName) {
@@ -241,6 +193,50 @@ function ScorePlayer(settings) {
     self.pitchDown = function (count, instrumentName) {
         return --triggersMap[instrumentName + count].rate;
     };
+
+    function initTriggers() {
+        self.triggersByTime = [self.totalSegments];
+        for (var i = 0; i < self.totalSegments; i++) {
+            self.triggersByTime[i] = [];
+        }
+    }
+
+    function convertTimeToCount(beat, seg) {
+        return Math.round((settings.segmentsPerBeat * beat) + seg);
+    }
+
+    function parseTimes(times, instrumentName) {
+        var parsedTimes = [];
+        times.forEach(function (time) {
+            var capture = beatExp.exec(time);
+            var beat = capture[1];
+            var nom = capture[2];
+            var denom = capture[3];
+            var seg = (settings.segmentsPerBeat / denom) * nom;
+            var trigger = new InstrumentTrigger(instrumentName);
+            var element = {count: convertTimeToCount(beat, seg), trigger: trigger};
+            parsedTimes.push(element);
+        });
+        return parsedTimes;
+    }
+
+    function addTriggerTime(count, instrumentName, trigger) {
+        var index = self.triggersByTime[count].indexOf(trigger);
+        if (index < 0) {
+            self.triggersByTime[count].push(trigger);
+            triggersMap[instrumentName + count] = trigger;
+        }
+    }
+
+    function dispatch(type, param) {
+        if (!(type in listeners)) {
+            return true;
+        }
+        var stack = listeners[type];
+        for (var i = 0, l = stack.length; i < l; i++) {
+            stack[i].call(self, param);
+        }
+    }
 }
 
 /**

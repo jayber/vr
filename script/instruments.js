@@ -68,23 +68,23 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
         pitchUp: function (count) {
             var pitch = scoreLoader.score.pitchUp(count, this.data);
             var marker = this.markersMap[count + ""];
-            markers.pitchElement(marker, pitch);
+            markers.pitchElement(marker, pitch, this.color, true);
         },
 
         pitchDown: function (count) {
             var pitch = scoreLoader.score.pitchDown(count, this.data);
             var marker = this.markersMap[count + ""];
-            markers.pitchElement(marker, pitch);
+            markers.pitchElement(marker, pitch, this.color, false);
         },
 
         addTrigger: function (data) {
-            var marker = markers.marker(data.count, this);
+            var trigger = scoreLoader.score.addInstrumentTrigger(data.count, this.data);
+            var marker = markers.marker(data.count, this, trigger);
 
-            markers.createBillboard(marker, this.instrumentIndex, data.count);
+            markers.createPitchBoard(marker, this, data.count);
 
             this.markers.push(marker);
             this.markersMap[data.count + ""] = marker;
-            scoreLoader.score.addInstrumentTrigger(data.count, this.data);
         },
 
         removeTrigger: function (elementId, count) {
@@ -106,13 +106,13 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
         },
 
         generateMarkers: function (times) {
-            var sself = this;
-            sself.markers = [];
-            sself.markersMap = {};
+            var self = this;
+            self.markers = [];
+            self.markersMap = {};
             times.forEach(function (time) {
-                var marker = markers.marker(time.count, sself);
-                sself.markers.push(marker);
-                sself.markersMap[time.count + ""] = marker;
+                var marker = markers.marker(time.count, self, time.trigger);
+                self.markers.push(marker);
+                self.markersMap[time.count + ""] = marker;
             });
         },
 
