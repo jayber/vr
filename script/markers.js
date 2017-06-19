@@ -108,6 +108,9 @@ function Markers(eventDispatcher, scoreLoader) {
 
         board.appendChild(animation);
         markerElement.appendChild(board);
+        setTimeout(function () {
+            markerElement.removeChild(board);
+        }, 5000);
     }
 
     function setYFromWorld(markerElement, y) {
