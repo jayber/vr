@@ -1,13 +1,13 @@
-function reportException(e) {
+function reportException(e, line) {
     var data;
     altspace.getUser().then(function (user) {
         try {
             if (e.error) {
                 data = {userId: user.userId + ":" + user.displayName, message: e.error.message, stack: e.error.stack};
             } else if (e.message) {
-                data = {userId: user.userId + ":" + user.displayName, message: e.message, stack: ""};
+                data = {userId: user.userId + ":" + user.displayName, message: e.message, stack: line};
             } else {
-                data = {userId: user.userId + ":" + user.displayName, message: e, stack: ""};
+                data = {userId: user.userId + ":" + user.displayName, message: e, stack: line};
             }
             $.get("error", data);
         } catch (e) {
@@ -21,6 +21,11 @@ function serverLog(message) {
         $.get("log", {userId: user.userId + ":" + user.displayName, message: message});
     });
 }
+
+window.addEventListener('error', function (e, url, line) {
+    var stack = (url ? url : "") + ":" + (line ? line : "");
+    reportException(e, stack);
+});
 
 function makeSceneLoadedPromise() {
     return new Promise(function (resolve, reject) {
@@ -36,10 +41,6 @@ function makeSceneLoadedPromise() {
         });
     });
 }
-
-window.addEventListener('error', function (e) {
-    reportException(e);
-});
 
 function isGearVR() {
     return /.+Mobile.+/i.test(navigator.userAgent);
