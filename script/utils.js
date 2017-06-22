@@ -94,8 +94,10 @@ function sendComment() {
 function BLUser(user) {
     var self = this;
     var listeners = [];
+    var modOnlyListeners = [];
     var ffa = false;
     var moderatorPresent = false;
+    var modOnly = false;
 
     self.user = user;
 
@@ -107,13 +109,16 @@ function BLUser(user) {
         listeners.push(listener);
     };
 
+    self.modOnlyChanged = function (listener) {
+        modOnlyListeners.push(listener);
+    };
+
     self.setFreeForAll = function (value) {
         if (ffa != value) {
             ffa = value;
             dispatchPermissionChanged();
         }
     };
-
 
     Object.defineProperty(self, 'moderatorPresent', {
         set: function (value) {
@@ -124,6 +129,21 @@ function BLUser(user) {
         }
     });
 
+    Object.defineProperty(self, 'modOnly', {
+        set: function (value) {
+            modOnly = value;
+            dispatchModOnlyChanged();
+        }, get: function () {
+            return modOnly;
+        }
+    });
+
+    Object.defineProperty(self, 'moderator', {
+        get: function () {
+            return user.isModerator;
+        }
+    });
+
     self.isFreeForAll = function () {
         return ffa;
     };
@@ -131,6 +151,12 @@ function BLUser(user) {
     function dispatchPermissionChanged() {
         listeners.forEach(function (listener) {
             listener.call(self, self.hasPermission());
+        })
+    }
+
+    function dispatchModOnlyChanged() {
+        modOnlyListeners.forEach(function (listener) {
+            listener.call(self, self.modOnly);
         })
     }
 }

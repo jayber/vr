@@ -1,11 +1,11 @@
-function EventDispatcher(scoreLoader, sceneLoaded, blUser) {
+function EventDispatcher(scoreLoader, sceneLoaded, blUserPromise) {
     var self = this;
 
     var localEventTarget = new LocalEventTarget();
     self.target = localEventTarget;
 
     try {
-        new WebSocketHandler(self, self.target, scoreLoader.loaded, sceneLoaded, blUser);
+        new WebSocketHandler(self, self.target, scoreLoader.loaded, sceneLoaded, blUserPromise);
     } catch (e) {
         reportException(e);
         console.log("continuing in single player mode");
@@ -21,6 +21,12 @@ function EventDispatcher(scoreLoader, sceneLoaded, blUser) {
         } else {
             self.target.dispatch({event: "freeForAllOff"});
         }
+    };
+    self.modOnlyOff = function () {
+        self.target.dispatch({event: "modOnlyOff"});
+    };
+    self.modOnlyOn = function () {
+        self.target.dispatch({event: "modOnlyOn"});
     };
     self.clear = function () {
         self.target.dispatch({event: "clear"});
@@ -99,7 +105,7 @@ function LocalEventTarget() {
     };
 }
 
-function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded, blUser) {
+function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded, blUserPromise) {
     var self = this;
     var host = window.location.host;
     var spaceId = altspace.getSpace().then(function (space) {
@@ -168,9 +174,11 @@ function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded, blU
     }
 
     function emit(message) {
-        if (!demoId || demoId == blUser.user.userId) {
-            emitUnguarded(message);
-        }
+        blUserPromise.then(function (blUser) {
+            if (demoId == blUser.user.userId || (!demoId && (!blUser.user.modOnly || blUser.user.moderator))) {
+                emitUnguarded(message);
+            }
+        });
     }
 
     self.dispatch = function (msg) {
@@ -179,7 +187,7 @@ function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded, blU
         emit({event: type, data: param});
     };
 
-    Promise.all([spaceId, blUser, displayName, scoreLoaded, sceneLoaded]).then(function (values) {
+    Promise.all([spaceId, blUserPromise, displayName, scoreLoaded, sceneLoaded]).then(function (values) {
         connect(values[0], values[1], values[2]);
     });
 }

@@ -3,20 +3,20 @@
 
     altspace.open(getFullUrl("comment.html"), "_experience", {icon: getFullUrl("img/bugform.png"), hidden: true});
 
-    var blUser = altspace.getUser().then(function (user) {
+    var blUserPromise = altspace.getUser().then(function (user) {
         return new BLUser(user);
     });
 
     var sceneLoaded = makeSceneLoadedPromise();
     var soundSettings = new SoundSettings();
     var scoreLoader = new ScoreLoader(soundSettings);
-    var eventDispatcher = new EventDispatcher(scoreLoader, sceneLoaded, blUser);
+    var eventDispatcher = new EventDispatcher(scoreLoader, sceneLoaded, blUserPromise);
     var scheduler = new AudioAndAnimationScheduler(soundSettings);
     var markers = new Markers(eventDispatcher, scoreLoader);
     var instruments = new Instruments(scoreLoader, eventDispatcher, markers);
     var animations = new AnimationManager(scheduler, soundSettings, eventDispatcher, scoreLoader);
     InstrumentComponents(instruments, scoreLoader, markers, soundSettings, scheduler, animations, sceneLoaded);
-    PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations, blUser, instruments);
+    PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, scoreLoader, animations, blUserPromise, instruments);
     CockpitComponents(soundSettings, animations);
 
     eventDispatcher.addEventListener("reload", function (data) {
@@ -28,26 +28,38 @@
     });
 
     eventDispatcher.addEventListener("freeForAllOn", function () {
-        blUser.then(function (user) {
+        blUserPromise.then(function (user) {
             user.setFreeForAll(true);
         });
     });
 
     eventDispatcher.addEventListener("freeForAllOff", function () {
-        blUser.then(function (user) {
+        blUserPromise.then(function (user) {
             user.setFreeForAll(false);
         });
     });
 
     eventDispatcher.addEventListener("moderatorAbsent", function () {
-        blUser.then(function (user) {
+        blUserPromise.then(function (user) {
             user.moderatorPresent = false;
         });
     });
 
     eventDispatcher.addEventListener("moderatorPresent", function () {
-        blUser.then(function (user) {
+        blUserPromise.then(function (user) {
             user.moderatorPresent = true;
+        });
+    });
+
+    eventDispatcher.addEventListener("modOnlyOff", function () {
+        blUserPromise.then(function (user) {
+            user.modOnly = false;
+        });
+    });
+
+    eventDispatcher.addEventListener("modOnlyOn", function () {
+        blUserPromise.then(function (user) {
+            user.modOnly = true;
         });
     });
 

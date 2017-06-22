@@ -17,6 +17,40 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
         });
     }
 
+    AFRAME.registerComponent('mods-only', {
+        init: function () {
+            var el = this.el;
+            el.addEventListener("click", function (event) {
+                blUser.then(function (user) {
+                    if (user.moderator) {
+                        if (user.modOnly) {
+                            eventDispatcher.modOnlyOff();
+                        } else {
+                            eventDispatcher.modOnlyOn();
+                        }
+                    }
+                });
+                event.handled = true;
+            });
+            blUser.then(function (user) {
+                function setModOnlyColor() {
+                    if (user.modOnly) {
+                        el.setAttribute("material", "color", "#0a0")
+                    } else if (user.moderator) {
+                        el.setAttribute("material", "color", "#000")
+                    } else {
+                        el.setAttribute("material", "color", "#999")
+                    }
+                }
+
+                setModOnlyColor();
+                user.modOnlyChanged(function () {
+                    setModOnlyColor();
+                })
+            });
+        }
+    });
+
     AFRAME.registerComponent('reset', {
         init: function () {
             this.el.addEventListener("click", function (event) {
