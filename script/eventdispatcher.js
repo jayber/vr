@@ -97,7 +97,7 @@ function LocalEventTarget() {
                     var call = element.call(self, param);
                     return Promise.resolve(call);
                 } catch (e) {
-                    console.log(e);
+                    console.error(e, e.stack);
                     reportException(e);
                 }
             });

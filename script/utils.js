@@ -2,12 +2,20 @@ function reportException(e, line) {
     var data;
     altspace.getUser().then(function (user) {
         try {
+            var stack = line;
             if (e.error) {
-                data = {userId: user.userId + ":" + user.displayName, message: e.error.message, stack: e.error.stack};
+                stack = e.error.stack;
+                data = {userId: user.userId + ":" + user.displayName, message: e.error.message, stack: stack};
             } else if (e.message) {
-                data = {userId: user.userId + ":" + user.displayName, message: e.message, stack: line};
+                if (e.stack) {
+                    stack = e.stack;
+                }
+                data = {userId: user.userId + ":" + user.displayName, message: e.message, stack: stack};
             } else {
-                data = {userId: user.userId + ":" + user.displayName, message: e, stack: line};
+                if (!stack) {
+                    stack = "[no stack available]"
+                }
+                data = {userId: user.userId + ":" + user.displayName, message: e, stack: stack};
             }
             $.get("error", data);
         } catch (e) {

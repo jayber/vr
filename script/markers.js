@@ -31,12 +31,12 @@ function Markers(eventDispatcher, scoreLoader) {
         var finish = new THREE.Vector3(0, 0 - markerPos, 0);
         var geometry = new THREE.TubeGeometry(new THREE.LineCurve3(start, finish), 1, 0.001, 4, false);
 
-        var tube = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({}));
-        return tube;
+        return geometry;
     }
 
     this.createStickElement = function (markerElement, markerPos, instrument, markerId) {
-        var tube = createStick(markerPos.y);
+        var geometry = createStick(markerPos.y);
+        var tube = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({}));
         var stick = document.createElement("a-entity");
         stick.setAttribute("class", "stick");
         stick.setAttribute("id", "stick" + markerId);
@@ -160,8 +160,7 @@ function Markers(eventDispatcher, scoreLoader) {
         markerElement.object3D.position.y = pos;
         $(markerElement).children(".stick").each(function (index, stick) {
             var tube = createStick(pos);
-            tube.material.color = new THREE.Color(baseColor);
-            stick.setObject3D("mesh", tube);
+            stick.object3DMap["mesh"].geometry = tube;
         })
     };
 
