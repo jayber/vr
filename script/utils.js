@@ -106,11 +106,12 @@ function BLUser(user) {
     var ffa = false;
     var moderatorPresent = false;
     var modOnly = false;
+    var demoId = getUrlParameter("demo");
 
     self.user = user;
 
     self.hasPermission = function () {
-        return !moderatorPresent || (moderatorPresent && ffa) || user.isModerator;
+        return !moderatorPresent || (moderatorPresent && ffa) || user.isModerator || self.demoer;
     };
 
     self.permissionChanged = function (listener) {
@@ -149,6 +150,12 @@ function BLUser(user) {
     Object.defineProperty(self, 'moderator', {
         get: function () {
             return user.isModerator;
+        }
+    });
+
+    Object.defineProperty(self, 'demoer', {
+        get: function () {
+            return demoId && (demoId == user.userId);
         }
     });
 

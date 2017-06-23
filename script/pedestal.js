@@ -22,7 +22,7 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
             var el = this.el;
             el.addEventListener("click", function (event) {
                 blUser.then(function (user) {
-                    if (user.moderator) {
+                    if (user.moderator || blUser.demoer) {
                         if (user.modOnly) {
                             eventDispatcher.modOnlyOff();
                         } else {
@@ -101,14 +101,14 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
             var self = this;
 
             blUser.then(function (blUser) {
-                if (blUser.user.isModerator) {
+                if (blUser.user.isModerator || blUser.demoer) {
                     self.el.setAttribute("material", "color", "#fff");
                 }
             });
 
             this.el.addEventListener("click", function () {
                 blUser.then(function (blUser) {
-                    if (blUser.user.isModerator) {
+                    if (blUser.user.isModerator || blUser.demoer) {
                         eventDispatcher.setFreeForAll(!blUser.isFreeForAll());
                     }
                 });

@@ -175,7 +175,7 @@ function WebSocketHandler(eventDispatcher, target, scoreLoaded, sceneLoaded, blU
 
     function emit(message) {
         blUserPromise.then(function (blUser) {
-            if (demoId == blUser.user.userId || (!demoId && (!blUser.modOnly || blUser.moderator))) {
+            if (blUser.demoer || (!demoId && (!blUser.modOnly || blUser.moderator))) {
                 emitUnguarded(message);
             }
         });
