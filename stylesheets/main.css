@@ -20,6 +20,11 @@ div {
     width: 100%;
 }
 
+p {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 textarea {
     height: 170px;
     font-family: inherit;
