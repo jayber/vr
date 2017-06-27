@@ -178,7 +178,7 @@ function Markers(eventDispatcher, scoreLoader) {
 
         subElement.setAttribute("id", subElementId);
         subElement.setAttribute("class", instrument.data);
-        subElement.setAttribute("radius", "0.027");
+        subElement.setAttribute("radius", "0.025");
         subElement.setAttribute("position", newX + " " + pos + " " + newY);
         subElement.setAttribute("buffer", false);
         subElement.setAttribute("skipCache", true);
