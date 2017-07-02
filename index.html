@@ -61,6 +61,7 @@
         <img id="pitch" src="img/pitch.png">
         <img id="octave" src="img/octave.png">
         <img id="octaves" src="img/octaves.png">
+        <img id="clickplay" src="img/clickplay.png">
         <a-asset-item id="cube" src="models/cube.dae"></a-asset-item>
         <a-asset-item id="pedestal" src="models/pedestal.dae"></a-asset-item>
     </a-assets>
@@ -112,9 +113,14 @@
     <a-entity id="root">
 
         <a-entity collada-model="#pedestal" position="0 0 0" altspace-cursor-collider="enabled:false">
-            <a-sphere playable segments-height="6" segments-width="12" position="0 0.75 0.28" radius="0.1"
+            <a-sphere playable segments-height="6" segments-width="12" position="0 0.74 0.3" radius="0.1"
                       material="src:#play-texture" rotation="0 -90 30" color="#e4dcd4"
                       n-mesh-collider="convex:false" altspace-cursor-collider="enabled:true"></a-sphere>
+            <a-plane id="instruction" n-billboard transparent="true" material="src:#clickplay" position="0 1.1 0.35"
+                     altspace-cursor-collider="enabled:false" height="0.5" width="0.5">
+                <a-animation attribute="position" to="0 1.302 0.33" repeat="indefinite" direction="alternate"
+                             easing="ease-sine"></a-animation>
+            </a-plane>
             <a-sphere disco-mode segments-height="6" segments-width="12" position="0.17 0.84 0.32" radius="0.03"
                       material="src:#disco-texture" rotation="0 -90 30" color="#e4dcd4"
                       n-mesh-collider="convex:false"></a-sphere>
