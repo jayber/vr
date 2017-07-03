@@ -70,6 +70,7 @@ function getFullUrl(path) {
 }
 
 function sendComment() {
+    $("button").attr('disabled', 'true');
     var spaceId = altspace.getSpace().then(function (space) {
         return space.sid;
     });
