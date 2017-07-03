@@ -90,7 +90,9 @@
     eventDispatcher.addEventListener("start", function () {
         return scoreLoader.loaded.then(function () {
             var element = document.querySelector("#instruction");
-            element.parentNode.removeChild(element);
+            if (element) {
+                element.parentNode.removeChild(element);
+            }
             scheduler.start(scoreLoader.score);
         });
     });
