@@ -103,6 +103,7 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
                 setTimeout(function () {
                     animations.unflash(self.data, true);
                 }, 150);
+                event.handled = true;
             });
         },
 

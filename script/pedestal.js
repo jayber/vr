@@ -134,6 +134,7 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
                 } else {
                     eventDispatcher.discoModeOn();
                 }
+                event.handled = true;
             });
         }
     });
@@ -151,6 +152,21 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
                     } else {
                         eventDispatcher.decrementBpm();
                     }
+                    event.handled = true;
+                }
+            });
+        }
+    });
+
+    AFRAME.registerComponent('science', {
+        schema: {type: 'string'},
+        init: function () {
+            var el = this.el;
+            el.setAttribute("n-mesh-collider", "convex:false");
+
+            el.addEventListener("click", function (event) {
+                if (!event.handled) {
+                    soundSettings.play(soundSettings.eventSources[2]);
                     event.handled = true;
                 }
             });
@@ -203,6 +219,7 @@ function PedestalComponents(eventDispatcher, scheduler, soundSettings, markers, 
                 } else {
                     eventDispatcher.start();
                 }
+                event.handled = true;
             });
 
             scheduler.addEventListener("start", function () {

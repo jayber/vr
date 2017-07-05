@@ -10,7 +10,7 @@ function SoundSettings() {
     self.soundBuffersMap = {};
     self.mute = false;
 
-    self.eventSources = ["audio/satan2.wav", "audio/groot.wav"];
+    self.eventSources = ["audio/satan2.wav", "audio/groot.wav", "audio/itsalive.wav"];
 
     self.load = function (sources) {
         return new Promise(function (resolve, reject) {
