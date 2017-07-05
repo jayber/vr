@@ -85,6 +85,7 @@ function sendComment() {
         var messageElement = document.querySelector("#message");
         var message = messageElement.value;
         if (message.length > 0) {
+            $(messageElement).removeClass("error");
             $.post("/savecomment/" + values[0] + "/" + values[1] + ":" + values[2],
                 {email: email, message: message}
             ).done(function () {
@@ -96,6 +97,7 @@ function sendComment() {
                 });
         } else {
             $(messageElement).addClass("error");
+            $("button").removeAttr('disabled');
         }
     });
 }
