@@ -13,6 +13,12 @@ function AnimationManager(scheduler, settings, eventDispatcher, scoreLoader) {
     scoreLoader.score.addEventListener("bpm-change", function (bpm) {
         if (bpm === 666) {
             settings.play(settings.eventSources[0]);
+            setTimeout(function () {
+                $("[collada-model='#cube']").append("<a-entity n-object='res: effects/fire' position='0 2.5 0'></a-entity>");
+            }, 2000);
+            setTimeout(function () {
+                $("[n-object='res: effects/fire']").remove();
+            }, 8000);
         } else if (bpm === 1) {
             settings.play(settings.eventSources[1]);
         }
