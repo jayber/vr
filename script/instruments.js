@@ -136,7 +136,9 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
             var self = this;
             var height = 0.72;
             sceneLoaded.then(function () {
-                var start = el.object3D.getWorldPosition();
+                var startWorld = el.object3D.getWorldPosition();
+                var root = document.querySelector("#root");
+                var start = root.object3D.worldToLocal(startWorld);
                 var cubeTop = new THREE.Vector3(start.x, height, start.z);
                 var path = new THREE.CurvePath();
                 path.add(new THREE.LineCurve3(start, cubeTop));
@@ -159,7 +161,7 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
                 var tube = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({}));
                 var cableElement = document.createElement("a-entity");
                 cableElement.setObject3D("mesh", tube);
-                document.querySelector("#root").appendChild(cableElement);
+                root.appendChild(cableElement);
 
                 cableElement.setAttribute('material', {color: self.color, src: "#cable-texture", repeat: '100 1'});
                 cableElement.setAttribute("altspace-cursor-collider", "enabled", "false");
