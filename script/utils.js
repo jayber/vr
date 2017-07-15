@@ -25,6 +25,7 @@ function reportException(e, line) {
 }
 
 function serverLog(message) {
+    console.log(message);
     altspace.getUser().then(function (user) {
         $.get("log", {userId: user.userId + ":" + user.displayName, message: message});
     });

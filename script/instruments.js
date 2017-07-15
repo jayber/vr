@@ -66,22 +66,24 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
         },
 
         pitchUp: function (count) {
+            serverLog("pitchUp: count=" + count);
             var pitch = scoreLoader.score.pitchUp(count, this.data);
             var marker = this.markersMap[count + ""];
             markers.pitchElement(marker, pitch, this.color, true);
         },
 
         pitchDown: function (count) {
+            serverLog("pitchDown: count=" + count);
             var pitch = scoreLoader.score.pitchDown(count, this.data);
             var marker = this.markersMap[count + ""];
             markers.pitchElement(marker, pitch, this.color, false);
         },
 
         addTrigger: function (data) {
+            serverLog("addTrigger: count=" + data.count);
             var trigger = scoreLoader.score.addInstrumentTrigger(data.count, this.data);
             var marker = markers.marker(data.count, this, trigger);
 
-            markers.createPitchBoard(marker, this, data.count);
             markers.createPitchBoard(marker, this, data.count);
 
             this.markers.push(marker);
@@ -89,6 +91,7 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
         },
 
         removeTrigger: function (elementId, count) {
+            serverLog("removeTrigger: elementId=" + elementId, "; count=" + count);
             var subElement = document.querySelector("#" + elementId);
             document.querySelector("#clock-face").removeChild(subElement);
             scoreLoader.score.removeInstrumentTrigger(count, this.data);

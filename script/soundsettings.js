@@ -32,6 +32,7 @@ function SoundSettings() {
     };
 
     self.play = function (src) {
+        serverLog("play: " + src);
         var source = self.audioCtx.createBufferSource();
         source.buffer = self.soundBuffersMap[src];
         source.connect(self.output);
