@@ -84,15 +84,20 @@
     });
 
     eventDispatcher.addEventListener("stop", function () {
+        removeInstruction();
         scheduler.stop();
     });
 
+    function removeInstruction() {
+        var element = document.querySelector("#instruction");
+        if (element) {
+            element.parentNode.removeChild(element);
+        }
+    }
+
     eventDispatcher.addEventListener("start", function () {
         return scoreLoader.loaded.then(function () {
-            var element = document.querySelector("#instruction");
-            if (element) {
-                element.parentNode.removeChild(element);
-            }
+            removeInstruction();
             scheduler.start(scoreLoader.score);
         });
     });

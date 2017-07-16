@@ -89,10 +89,12 @@ function InstrumentComponents(instruments, scoreLoader, markers, soundSettings, 
 
         removeTrigger: function (elementId, count) {
             var subElement = document.querySelector("#" + elementId);
-            document.querySelector("#clock-face").removeChild(subElement);
-            scoreLoader.score.removeInstrumentTrigger(count, this.data);
-            var index = this.markers.indexOf(subElement);
-            this.markers.splice(index, 1);
+            if (subElement) {
+                document.querySelector("#clock-face").removeChild(subElement);
+                scoreLoader.score.removeInstrumentTrigger(count, this.data);
+                var index = this.markers.indexOf(subElement);
+                this.markers.splice(index, 1);
+            }
         },
 
         makeClickable: function (self, el) {
