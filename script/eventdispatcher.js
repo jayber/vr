@@ -56,18 +56,22 @@ function EventDispatcher(scoreLoader, sceneLoaded, blUserPromise) {
         self.target.dispatch({event: "decrementBpm"});
     };
     self.addPlayTrigger = function (data) {
+        serverLog("addTrigger: count=" + data.count);
         self.target.dispatch({event: "addPlayTrigger", data: data});
     };
     self.removePlayTrigger = function (instrumentIndex, count, elementId) {
+        serverLog("removeTrigger: elementId=" + elementId, "; count=" + count);
         self.target.dispatch({
             event: "removePlayTrigger",
             data: {instrumentNumber: instrumentIndex, count: count, elementId: elementId}
         });
     };
     self.pitchUp = function (instrumentNumber, count) {
+        serverLog("pitchUp: count=" + count);
         self.target.dispatch({event: "pitchUp", data: {instrumentIndex: instrumentNumber, count: count}});
     };
     self.pitchDown = function (instrumentNumber, count) {
+        serverLog("pitchDown: count=" + count);
         self.target.dispatch({event: "pitchDown", data: {instrumentIndex: instrumentNumber, count: count}});
     }
 }

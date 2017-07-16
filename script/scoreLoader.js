@@ -223,8 +223,17 @@ function ScorePlayer(settings) {
         return parsedTimes;
     }
 
+    function findTriggerIndex(array, name) {
+        for (var i = 0; i < array.length; i++) {
+            if (array[i].name === name) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     function addTriggerTime(count, instrumentName, trigger) {
-        var index = self.triggersByTime[count].indexOf(trigger);
+        var index = findTriggerIndex(self.triggersByTime[count], instrumentName);
         if (index < 0) {
             self.triggersByTime[count].push(trigger);
             triggersMap[instrumentName + count] = trigger;
