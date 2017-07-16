@@ -233,6 +233,9 @@ function ScorePlayer(settings) {
     }
 
     function addTriggerTime(count, instrumentName, trigger) {
+        if (!self.triggersByTime[count]) {
+            self.triggersByTime[count] = [];
+        }
         var index = findTriggerIndex(self.triggersByTime[count], instrumentName);
         if (index < 0) {
             self.triggersByTime[count].push(trigger);
