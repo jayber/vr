@@ -41,6 +41,7 @@ function EventDispatcher(scoreLoader, sceneLoaded, blUserPromise) {
         self.target.dispatch({event: "discoModeOn"});
     };
     self.reload = function (index) {
+        self.stop();
         self.target.dispatch({event: "reload", data: {index: index}});
     };
     self.start = function () {
@@ -50,9 +51,11 @@ function EventDispatcher(scoreLoader, sceneLoaded, blUserPromise) {
         self.target.dispatch({event: "stop"});
     };
     self.incrementBpm = function () {
+        self.stop();
         self.target.dispatch({event: "incrementBpm"});
     };
     self.decrementBpm = function () {
+        self.stop();
         self.target.dispatch({event: "decrementBpm"});
     };
     self.addPlayTrigger = function (data) {
